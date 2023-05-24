@@ -45,7 +45,7 @@ View Inventory
         </div>
     </div>
 
-    <!-- <style>
+    <style>
         body::after {
             content: "";
             background-image: url('static/images/pantry.jpg');
@@ -59,6 +59,13 @@ View Inventory
             position: fixed;
             z-index: -1;
         }
-    </style> -->
+
+        @media (max-width: 576px) {
+            .card-img {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    </style>
 
 {% endblock %}
