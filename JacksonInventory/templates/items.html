@@ -5,88 +5,42 @@ View Inventory
 
 {% block content %}
 
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                {% for item in items %}
-                <div class="card mb-3" style="background-color: transparent;">
-                    <div class="row no-gutters">
-                        <div class="col-md-4">
-                            <img src="{{ item.productimage }}" class="card-img" alt="{{ item.productname }}">
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-8">
+            {% for item in items %}
+            <div class="card mb-3" style="background-color: transparent;">
+                <div class="row no-gutters">
+                    <div class="col-4">
+                        <img src="{{ item.productimage }}" class="card-img" alt="{{ item.productname }}">
+                    </div>
+                    <div class="col-4">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ item.productname }}</h5>
+                            <p class="card-text">ID: {{ item.id }}</p>
+                            <p class="card-text">Barcode: {{ item.barcode }}</p>
+                            <p class="card-text">Category: {{ item.productcategory }}</p>
                         </div>
-                        <div class="col-md-8">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="card-body">
-                                        <h5 class="card-title">{{ item.productname }}</h5>
-                                        <p class="card-text">ID: {{ item.id }}</p>
-                                        <p class="card-text">Barcode: {{ item.barcode }}</p>
-                                        <p class="card-text">Category: {{ item.productcategory }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between">
-                                            <p class="card-text{% if item.qty < item.minqty %} text-danger{% endif %}">Quantity:</p>
-                                            <p class="card-text text-right">{{ item.qty }}</p>
-                                        </div>
-                                        <div class="d-flex justify-content-between">
-                                            <p class="card-text">Min Quantity:</p>
-                                            <p class="card-text text-right">{{ item.minqty }}</p>
-                                        </div>
-                                    </div>
-                                </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <p class="card-text{% if item.qty < item.minqty %} text-danger{% endif %}">Quantity:</p>
+                                <p class="card-text text-right">{{ item.qty }}</p>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <p class="card-text">Min Quantity:</p>
+                                <p class="card-text text-right">{{ item.minqty }}</p>
                             </div>
                         </div>
                     </div>
                 </div>
-                {% endfor %}
             </div>
+            {% endfor %}
         </div>
     </div>
+</div>
 
-    <style>
-        .card-img {
-            width: 100%;
-            height: auto;
-        }
-
-        .card-title,
-        .card-text {
-            font-size: 14px;
-        }
-
-        @media (max-width: 576px) {
-            .card-img {
-                width: 25%;
-            }
-
-            .card-title,
-            .card-text {
-                font-size: 12px;
-            }
-        }
-
-        @media (min-width: 768px) {
-            .card-img {
-                width: 50%;
-            }
-            .card-title,
-            .card-text {
-                font-size: 16px;
-            }
-        }
-
-        @media (min-width: 992px) {
-            .card-img {
-                width: 100%;
-            }
-
-            .card-title,
-            .card-text {
-                font-size: 18px;
-            }
-        }
-    </style>
 
 {% endblock %}
+
