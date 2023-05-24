@@ -48,7 +48,6 @@ View Inventory
     <style>
         .card-img {
             width: 100%;
-            max-width: 200px; /* Adjust the value as needed */
             height: auto;
         }
 
@@ -57,24 +56,35 @@ View Inventory
             font-size: 14px;
         }
 
-        @media (min-width: 576px) {
-            .card-title,
-            .card-text {
-                font-size: 10px;
+        @media (max-width: 576px) {
+            .card-img {
+                width: 25%;
             }
-        }
 
-        @media (min-width: 768px) {
             .card-title,
             .card-text {
                 font-size: 12px;
             }
         }
 
-        @media (min-width: 992px) {
+        @media (min-width: 768px) {
+            .card-img {
+                width: 50%;
+            }
             .card-title,
             .card-text {
-                font-size: 14px;
+                font-size: 16px;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .card-img {
+                width: 100%;
+            }
+
+            .card-title,
+            .card-text {
+                font-size: 18px;
             }
         }
     </style>
