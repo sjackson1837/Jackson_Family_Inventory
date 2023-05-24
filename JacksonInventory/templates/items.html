@@ -11,22 +11,30 @@ View Inventory
                 {% for item in items %}
                 <div class="card mb-3" style="background-color: transparent;">
                     <div class="row no-gutters">
-                        <div class="col-md-4 order-2 order-md-1">
+                        <div class="col-md-4">
                             <img src="{{ item.productimage }}" class="card-img" alt="{{ item.productname }}">
                         </div>
-                        <div class="col-md-8 order-1 order-md-2">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ item.productname }}</h5>
-                                <p class="card-text">ID: {{ item.id }}</p>
-                                <p class="card-text">Barcode: {{ item.barcode }}</p>
-                                <p class="card-text">Category: {{ item.productcategory }}</p>
-                                <div class="d-flex justify-content-between">
-                                    <p class="card-text{% if item.qty < item.minqty %} text-danger{% endif %}">Quantity:</p>
-                                    <p class="card-text text-right">{{ item.qty }}</p>
+                        <div class="col-md-8">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ item.productname }}</h5>
+                                        <p class="card-text">ID: {{ item.id }}</p>
+                                        <p class="card-text">Barcode: {{ item.barcode }}</p>
+                                        <p class="card-text">Category: {{ item.productcategory }}</p>
+                                    </div>
                                 </div>
-                                <div class="d-flex justify-content-between">
-                                    <p class="card-text">Min Quantity:</p>
-                                    <p class="card-text text-right">{{ item.minqty }}</p>
+                                <div class="col-md-6">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between">
+                                            <p class="card-text{% if item.qty < item.minqty %} text-danger{% endif %}">Quantity:</p>
+                                            <p class="card-text text-right">{{ item.qty }}</p>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <p class="card-text">Min Quantity:</p>
+                                            <p class="card-text text-right">{{ item.minqty }}</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -38,26 +46,35 @@ View Inventory
     </div>
 
     <style>
-        body::after {
-            content: "";
-            /* background-image: url('static/images/pantry.jpg');
-            background-repeat: no-repeat;
-            background-size: cover;
-            opacity: 0.25;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            right: 0;
-            position: fixed;
-            z-index: -1; */
+        .card-img {
+            width: 100%;
+            max-width: 200px; /* Adjust the value as needed */
+            height: auto;
         }
 
-        @media (max-width: 576px) {
-            .order-md-1 {
-                order: 1;
+        .card-title,
+        .card-text {
+            font-size: 14px;
+        }
+
+        @media (min-width: 576px) {
+            .card-title,
+            .card-text {
+                font-size: 10px;
             }
-            .order-md-2 {
-                order: 2;
+        }
+
+        @media (min-width: 768px) {
+            .card-title,
+            .card-text {
+                font-size: 12px;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .card-title,
+            .card-text {
+                font-size: 14px;
             }
         }
     </style>
