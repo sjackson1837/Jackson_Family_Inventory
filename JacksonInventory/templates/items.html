@@ -7,29 +7,27 @@ View Inventory
 
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-8">
+        <div class="col-12">
             {% for item in items %}
             <div class="card mb-3" style="background-color: transparent;">
                 <div class="row no-gutters">
                     <div class="col-4">
-                        <img src="{{ item.productimage }}" class="card-img" alt="{{ item.productname }}">
+                        <img src="{{ item.productimage }}" class="card-img" alt="{{ item.productname }}" style="max-width: 125px; max-height: 125px;">
                     </div>
-                    <div class="col-4">
+                    <div class="col-5">
                         <div class="card-body">
                             <h5 class="card-title">{{ item.productname }}</h5>
-                            <p class="card-text">ID: {{ item.id }}</p>
-                            <p class="card-text">Barcode: {{ item.barcode }}</p>
-                            <p class="card-text">Category: {{ item.productcategory }}</p>
+                            <p class="card-text">{{ item.productcategory }}</p>
                         </div>
                     </div>
-                    <div class="col-4">
+                    <div class="col-3">
                         <div class="card-body">
                             <div class="d-flex justify-content-between">
-                                <p class="card-text{% if item.qty < item.minqty %} text-danger{% endif %}">Quantity:</p>
+                                <p class="card-text{% if item.qty < item.minqty %} text-danger{% endif %}">Qty:</p>
                                 <p class="card-text text-right">{{ item.qty }}</p>
                             </div>
                             <div class="d-flex justify-content-between">
-                                <p class="card-text">Min Quantity:</p>
+                                <p class="card-text">Min:</p>
                                 <p class="card-text text-right">{{ item.minqty }}</p>
                             </div>
                         </div>
@@ -41,6 +39,4 @@ View Inventory
     </div>
 </div>
 
-
 {% endblock %}
-
