@@ -30,5 +30,6 @@ class Item(db.Model):
     productcategory = db.Column(db.String(length=75), nullable=False)
     qty = db.Column(db.Integer())
     minqty = db.Column(db.Integer())
+    productimage = db.Column(db.String(200))
     def __repr__(self):
         return f'Item {self.name}'

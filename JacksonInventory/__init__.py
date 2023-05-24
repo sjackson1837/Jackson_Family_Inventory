@@ -5,7 +5,18 @@ from flask_login import LoginManager
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///jacksoninv.db'
+
+ENV = 'prod'
+#ENV = 'dev'
+if ENV == 'dev':
+    app.debug = True
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///jacksoninv.db'
+else:
+    #postgres://jackson_inventory_y1ni_user:hJdH5ksfB02loDrw4Kgccqtebvvmhm3l@dpg-chmnfkm4dad21k5r45cg-a.oregon-postgres.render.com/jackson_inventory_y1ni
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://jackson_inventory_y1ni_user:hJdH5ksfB02loDrw4Kgccqtebvvmhm3l@dpg-chmnfkm4dad21k5r45cg-a.oregon-postgres.render.com/jackson_inventory_y1ni'
+
+
+
 app.config['SECRET_KEY'] = 'SUPER SECRET KEY'
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)

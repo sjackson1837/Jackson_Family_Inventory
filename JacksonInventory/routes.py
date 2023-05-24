@@ -10,9 +10,9 @@ from flask_login import login_user, logout_user, login_required, current_user
 def home_page():
     return render_template('home.html')
 
-@app.route('/market', methods=['GET', 'POST'])
+@app.route('/mainmenu', methods=['GET', 'POST'])
 @login_required
-def market_page():
+def mainmenu_page():
     purchase_form = PurchaseItemForm()
     selling_form = SellItemForm()
     if request.method == "POST":
@@ -36,12 +36,12 @@ def market_page():
                 flash(f"Something went wrong with selling {s_item_object.name}", category='danger')
 
 
-        return redirect(url_for('market_page'))
+        return redirect(url_for('mainmenu_page'))
 
     if request.method == "GET":
         # items = Item.query.filter_by(owner=None)
         # owned_items = Item.query.filter_by(owner=current_user.id)
-        return render_template('market.html')
+        return render_template('mainmenu.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_page():
@@ -82,3 +82,11 @@ def logout_page():
     flash("You have been logged out!", category='info')
     return redirect(url_for("home_page"))
 
+
+
+@app.route('/items')
+@login_required
+def items_page():
+    #Grab all items from the database
+    items = Item.query.order_by(Item.id)
+    return render_template('items.html', items=items)
