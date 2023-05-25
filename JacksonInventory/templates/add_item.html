@@ -7,23 +7,22 @@
 <div class="container">
   <form method="POST" action="/add_item">
     <br/><br/>
-    <label for="barcode" class="left-align">Barcode:</label>
-    <input type="text" id="barcode" name="barcode" required oninput="addProduct()" class="right-align"><br/>
-    <input type="textarea" id="productname" name="productname" required readonly class="right-align"><br/>
+    <label for="barcode">Barcode:</label>
+    <input type="text" id="barcode" name="barcode" required oninput="addProduct()"><br/>
+    <input type="textarea" id="productname" name="productname" required readonly><br/>
     <img src="" id="productimage_show" alt="" style="max-width: 125px; max-height: 125px; background: transparent;"><br/><br/>
 
-    <label for="qty" class="left-align">Qty:</label>
-    <input class="quantity-input right-align" type="text" id="qty" name="qty" required><br/><br/>
+    <label for="qty">Qty:</label>
+    <input class="quantity-input" type="text" id="qty" name="qty" required><br/><br/>
 
-    <label for="minqty" class="left-align">Min Qty:</label>
-    <input type="text" id="minqty" name="minqty" required class="quantity-input right-align"><br/><br/>
+    <label for="minqty">Min Qty:</label>
+    <input type="text" id="minqty" name="minqty" required><br/><br/>
 
     <label hidden=True for="productimage">Product Image</label>
     <input hidden=True type="text" id="productimage" name="productimage" required>
 
-
-    <label for="category" class="left-align">Category</label><br/>
-    <select id="category" name="category_id" required class="right-align">
+    <label for="category">Category:</label>
+    <select id="category" name="category_id" required>
       <option value="">-- Select Category --</option> <!-- Empty option -->
       {% for category in categories %}
       <option value="{{ category.id }}">{{ category.category }}</option>
@@ -51,17 +50,10 @@
     padding: 0;
   }
 
-  .left-align {
-    text-align: left;
-    display: inline-block;
+  label {
+    display: block;
     width: 120px;
     margin-right: 10px;
-  }
-
-  .right-align {
-    text-align: right;
-    display: inline-block;
-    width: 200px;
   }
 
   .quantity-input {
