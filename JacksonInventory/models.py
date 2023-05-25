@@ -27,9 +27,14 @@ class Item(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     barcode = db.Column(db.String(length=40), nullable=False, unique=True)
     productname = db.Column(db.String(length=150), nullable=False, unique=True)
-    productcategory = db.Column(db.String(length=75), nullable=False)
     qty = db.Column(db.Integer())
     minqty = db.Column(db.Integer())
     productimage = db.Column(db.String(200))
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
     def __repr__(self):
         return f'Item {self.name}'
+    
+class Category(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    category = db.Column(db.String(75), unique=True)
+    items = db.relationship('Item', backref='category', lazy=True)

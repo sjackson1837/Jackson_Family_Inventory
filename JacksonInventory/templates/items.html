@@ -12,7 +12,9 @@ View Inventory
             <div class="card mb-3" style="background-color: transparent;">
                 <div class="row no-gutters">
                     <div class="col-4">
-                        <img src="{{ item.productimage }}" class="card-img" alt="{{ item.productname }}" style="max-width: 125px; max-height: 125px;">
+                        <a href="{{ url_for('item', id=item.id) }}">
+                            <img src="{{ item.productimage }}" class="card-img" alt="{{ item.productname }}" style="max-width: 125px; max-height: 125px;">
+                        </a>
                     </div>
                     <div class="col-5">
                         <div class="card-body">

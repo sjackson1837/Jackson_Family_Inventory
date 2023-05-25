@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Register Page 
+{% endblock %}
+
+{% block content %}
+<form method="POST" action="/add_item">
+  <label for="barcode">Barcodesss</label>
+  <input type="text" id="barcode" name="barcode" required><br/><br/>
+
+  <label for="productname">Product Name</label>
+  <input type="text" id="productname" name="productname" required><br/><br/>
+
+  <label for="qty">Qty</label>
+  <input type="text" id="qty" name="qty" required><br/><br/>
+
+  <label for="minqty">Min Qty</label>
+  <input type="text" id="minqty" name="minqty" required><br/><br/>
+
+  <label for="productimage">Product Image</label>
+  <input type="text" id="productimage" name="productimage" required><br/><br/>
+
+  <label for="category">Category</label><br/>
+  <select id="category" name="category_id" required>
+    <option value="">-- Select Category --</option> <!-- Empty option -->
+    {% for category in categories %}
+    <option value="{{ category.id }}">{{ category.category }}</option>
+    {% endfor %}
+  </select>
+
+  <br/><br/>
+
+  <input type="submit" value="Add Item">
+</form>
+
+<script type="text/javascript" src="static/scripts/scripts.js"></script>
+
+{% endblock %}

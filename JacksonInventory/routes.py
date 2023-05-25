@@ -1,6 +1,6 @@
 from JacksonInventory import app
 from flask import render_template, redirect, url_for, flash, request
-from JacksonInventory.models import Item, User
+from JacksonInventory.models import Item, User, Category
 from JacksonInventory.forms import RegisterForm, LoginForm, PurchaseItemForm, SellItemForm
 from JacksonInventory import db
 from flask_login import login_user, logout_user, login_required, current_user
@@ -90,3 +90,34 @@ def items_page():
     #Grab all items from the database
     items = Item.query.order_by(Item.id)
     return render_template('items.html', items=items)
+
+@app.route('/items/<int:id>')
+@login_required
+def item(id):
+    item = Item.query.get_or_404(id)
+    return render_template('item.html', item=item)
+
+@app.route('/add_item', methods=['GET'])
+@login_required
+def add_item_form():
+    categories = Category.query.all()
+    return render_template('add_item.html', categories=categories)
+
+@app.route('/add_item', methods=['POST'])
+@login_required
+def add_item():
+    barcode = request.form['barcode']
+    productname = request.form['productname']
+    qty = request.form['qty']
+    minqty = request.form['minqty']
+    productimage = request.form['productimage']
+    category_id = request.form['category_id']
+
+    # Create a new Item object and set its attributes
+    item = Item(barcode=barcode, productname=productname, qty=qty, minqty=minqty, productimage=productimage, category_id=category_id)
+
+    # Save the item to the database
+    db.session.add(item)
+    db.session.commit()
+
+    return redirect(url_for("items_page"))
