@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
+
 {% block title %}
-    Register Page 
+    Register Page
 {% endblock %}
 
 {% block content %}
@@ -18,11 +19,9 @@
     <label for="minqty" class="left-align">Min Qty:</label>
     <input type="text" id="minqty" name="minqty" required class="quantity-input right-align"><br/><br/>
 
-    <label hidden=True for="productimage">Product Image</label>
-    <input hidden=True type="text" id="productimage" name="productimage" required>
+    <label hidden="true" for="productimage">Product Image</label>
+    <input hidden="true" type="text" id="productimage" name="productimage" required>
 
-
-  
     <label for="category" class="left-align">Category</label><br/>
     <select id="category" name="category_id" required class="selectpicker right-align" data-live-search="true">
       <option value="">-- Select Category --</option>
@@ -36,7 +35,7 @@
   </form>
 </div>
 
-<script type="text/javascript" src="static/scripts/scripts.js"></script>
+<script src="static/scripts/scripts.js"></script>
 <script>
   $(document).ready(function() {
     $('.selectpicker').selectpicker();
