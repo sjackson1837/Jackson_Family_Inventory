@@ -1,90 +1,77 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0/css/bootstrap-select.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0/js/bootstrap-select.min.js"></script>
+{% extends 'base.html' %}
 
-  <title>Document</title>
-</head>
-<body>
-  <div class="container">
-    <form method="POST" action="/add_item">
-      <br/><br/>
-      <label for="barcode" class="left-align">Barcode:</label>
-      <input type="text" id="barcode" name="barcode" required oninput="addProduct()" class="right-align"><br/>
-      <input type="textarea" id="productname" name="productname" required readonly class="right-align"><br/>
-      <img src="" id="productimage_show" alt="" style="max-width: 125px; max-height: 125px; background: transparent;"><br/><br/>
-  
-      <label for="qty" class="left-align">Qty:</label>
-      <input class="quantity-input right-align" type="text" id="qty" name="qty" required><br/><br/>
-  
-      <label for="minqty" class="left-align">Min Qty:</label>
-      <input type="text" id="minqty" name="minqty" required class="quantity-input right-align"><br/><br/>
-  
-      <label hidden=True for="productimage">Product Image</label>
-      <input hidden=True type="text" id="productimage" name="productimage" required>
-  
-  
-      <label for="category" class="left-align">Category</label><br/>
-      <select id="category" name="category_id" required class="selectpicker right-align" data-live-search="true">
-        <option value="">-- Select Category --</option>
-        {% for category in categories %}
-          <option value="{{ category.id }}">{{ category.category }}</option>
-        {% endfor %}
-      </select>
-      
-      <br/><br/>
-  
-      <input type="submit" value="Add Item">
-    </form>
-  </div>
-  
-  <script type="text/javascript" src="static/scripts/scripts.js"></script>
+{% block title %}
+    Register Page
+{% endblock %}
 
-      <script>
-        $(document).ready(function() {
-          $('.selectpicker').selectpicker();
-        });
-      </script>
+{% block content %}
+<div class="container">
+  <form method="POST" action="/add_item">
+    <br/><br/>
+    <label for="barcode" class="left-align">Barcode:</label>
+    <input type="text" id="barcode" name="barcode" required oninput="addProduct()" class="right-align"><br/>
+    <input type="textarea" id="productname" name="productname" required readonly class="right-align"><br/>
+    <img src="" id="productimage_show" alt="" style="max-width: 125px; max-height: 125px; background: transparent;"><br/><br/>
 
-  <style>
-    .container {
-      display: flex;
-      justify-content: center;
-      height: 100vh;
-    }
-  
-    input[readonly] {
-      border: none;
-      background-color: transparent;
-      color: white;
-      padding: 0;
-    }
-  
-    .left-align {
-      text-align: left;
-      display: inline-block;
-      width: 120px;
-      margin-right: 10px;
-    }
-  
-    .right-align {
-      text-align: right;
-      display: inline-block;
-      width: 200px;
-    }
-  
-    .quantity-input {
-      width: 3ch;
-    }
-  </style>
-  
-  
-</body>
-</html>
+    <label for="qty" class="left-align">Qty:</label>
+    <input class="quantity-input right-align" type="text" id="qty" name="qty" required><br/><br/>
 
+    <label for="minqty" class="left-align">Min Qty:</label>
+    <input type="text" id="minqty" name="minqty" required class="quantity-input right-align"><br/><br/>
 
+    <label hidden="true" for="productimage">Product Image</label>
+    <input hidden="true" type="text" id="productimage" name="productimage" required>
+
+    <label for="category" class="left-align">Category</label><br/>
+    <select id="category" name="category_id" required class="selectpicker right-align" data-live-search="true">
+      <option value="">-- Select Category --</option>
+      {% for category in categories %}
+        <option value="{{ category.id }}">{{ category.category }}</option>
+      {% endfor %}
+    </select>
+    <br/><br/>
+
+    <input type="submit" value="Add Item">
+  </form>
+</div>
+
+<script src="static/scripts/scripts.js"></script>
+<script>
+  $(document).ready(function() {
+    $('.selectpicker').selectpicker();
+  });
+</script>
+
+<style>
+  .container {
+    display: flex;
+    justify-content: center;
+    height: 100vh;
+  }
+
+  input[readonly] {
+    border: none;
+    background-color: transparent;
+    color: white;
+    padding: 0;
+  }
+
+  .left-align {
+    text-align: left;
+    display: inline-block;
+    width: 120px;
+    margin-right: 10px;
+  }
+
+  .right-align {
+    text-align: right;
+    display: inline-block;
+    width: 200px;
+  }
+
+  .quantity-input {
+    width: 3ch;
+  }
+</style>
+
+{% endblock %}
