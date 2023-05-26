@@ -10,7 +10,7 @@
     <br/><br/>
     <label for="barcode" class="left-align">Barcode:</label>
     <input type="text" id="barcode" name="barcode" required oninput="addProduct()" class="right-align"><br/>
-    <input type="textarea" id="productname" name="productname" required readonly class="right-align"><br/>
+    <input type="textarea" id="productname" name="productname" readonly class="right-align"><br/>
     <img src="" id="productimage_show" alt="" style="max-width: 125px; max-height: 125px; background: transparent;"><br/><br/>
 
     <label for="qty" class="left-align">Qty:</label>
@@ -20,7 +20,7 @@
     <input type="text" id="minqty" name="minqty" required class="quantity-input right-align"><br/><br/>
 
     <label hidden="true" for="productimage">Product Image</label>
-    <input hidden="true" type="text" id="productimage" name="productimage" required>
+    <input hidden="true" type="text" id="productimage" name="productimage" readonly>
 
     <label for="category" class="left-align">Category</label><br/>
     <select id="category" name="category_id" required class="selectpicker right-align" data-live-search="true">
@@ -34,6 +34,7 @@
     <input type="submit" value="Add Item">
   </form>
 </div>
+
 
 <script src="static/scripts/scripts.js"></script>
 <script>

@@ -100,7 +100,7 @@ def item(id):
 @app.route('/add_item', methods=['GET'])
 @login_required
 def add_item_form():
-    categories = Category.query.all()
+    categories = Category.query.order_by(Category.category)
     return render_template('add_item.html', categories=categories)
 
 @app.route('/add_item', methods=['POST'])
