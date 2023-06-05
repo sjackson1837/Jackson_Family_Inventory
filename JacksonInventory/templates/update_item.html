@@ -1,41 +1,43 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    Register Page
+    Update Item
 {% endblock %}
 
 {% block content %}
 <div class="container">
-  <form method="POST" action="/add_item">
+  <form method="POST" action="/update_item/{{ item.id }}">
     <br/><br/>
     <label for="barcode" class="left-align">Barcode:</label>
-    <input type="text" id="barcode" name="barcode" required oninput="checkBarcode(event)" class="right-align"><br/>
-    <input type="textarea" id="productname" name="productname" readonly class="right-align"><br/>
-    <img src="" id="productimage_show" alt="" style="max-width: 125px; max-height: 125px; background: transparent;"><br/><br/>
+    <input type="text" id="barcode" name="barcode" value="{{ item.barcode }}" readonly class="right-align"><br/>
+    <input type="textarea" id="productname" name="productname" value="{{ item.productname }}" required class="right-align"><br/>
+    <img src="{{ item.productimage }}" id="productimage_show" alt="" style="max-width: 125px; max-height: 125px; background: transparent;"><br/><br/>
 
     <label for="qty" class="left-align">Qty:</label>
-    <input class="quantity-input right-align" type="text" id="qty" name="qty" required><br/><br/>
+    <input class="quantity-input right-align" type="text" id="qty" name="qty" value="{{ item.qty }}" required><br/><br/>
 
     <label for="minqty" class="left-align">Min Qty:</label>
-    <input type="text" id="minqty" name="minqty" required class="quantity-input right-align"><br/><br/>
-
-    <label hidden="true" for="productimage">Product Image</label>
-    <input hidden="true" type="text" id="productimage" name="productimage" readonly>
+    <input type="text" id="minqty" name="minqty" value="{{ item.minqty }}" required class="quantity-input right-align"><br/><br/>
 
     <label for="category" class="left-align">Category</label><br/>
     <select id="category" name="category_id" required class="selectpicker right-align" data-live-search="true">
-      <option value="">-- Select Category --</option>
       {% for category in categories %}
-        <option value="{{ category.id }}">{{ category.category }}</option>
+        <option value="{{ category.id }}" {% if category.id == item.category_id %}selected{% endif %}>{{ category.category }}</option>
       {% endfor %}
     </select>
     <br/><br/>
 
-    <input type="submit" value="Add Item">
+    <input type="submit" value="Update Item">
   </form>
 </div>
 
+
 <script src="static/scripts/scripts.js"></script>
+<script>
+  $(document).ready(function() {
+    $('.selectpicker').selectpicker();
+  });
+</script>
 
 <style>
   .container {

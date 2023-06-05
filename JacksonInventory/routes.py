@@ -1,5 +1,5 @@
 from JacksonInventory import app
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, jsonify
 from JacksonInventory.models import Item, User, Category
 from JacksonInventory.forms import RegisterForm, LoginForm, PurchaseItemForm, SellItemForm
 from JacksonInventory import db
@@ -100,8 +100,9 @@ def item(id):
 @app.route('/add_item', methods=['GET'])
 @login_required
 def add_item_form():
+    barcode = request.args.get('barcode')
     categories = Category.query.order_by(Category.category)
-    return render_template('add_item.html', categories=categories)
+    return render_template('add_item.html', barcode=barcode, categories=categories)
 
 @app.route('/add_item', methods=['POST'])
 @login_required
@@ -119,5 +120,26 @@ def add_item():
     # Save the item to the database
     db.session.add(item)
     db.session.commit()
-
     return redirect(url_for("items_page"))
+
+@app.route('/check_item', methods=['POST'])
+@login_required
+def check_item():
+    barcode = request.form['barcode']
+    existing_item = Item.query.filter_by(barcode=barcode).first()
+
+    if existing_item:
+        existing_item.qty += 1  # Increment the quantity by 1
+        db.session.commit()
+        product_name = existing_item.productname
+        updated_qty = existing_item.qty
+        flash(f'Product: {product_name} now has {updated_qty}', category='success')
+        return jsonify({
+            'redirect_url': url_for('add_item'),
+            'product_name': product_name,
+            'updated_qty': updated_qty
+        })
+    else:
+        return jsonify({'barcode_not_found': True})
+
+
