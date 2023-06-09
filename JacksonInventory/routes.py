@@ -4,6 +4,7 @@ from JacksonInventory.models import Item, User, Category
 from JacksonInventory.forms import RegisterForm, LoginForm, PurchaseItemForm, SellItemForm
 from JacksonInventory import db
 from flask_login import login_user, logout_user, login_required, current_user
+from sqlalchemy.sql import text
 
 @app.route('/')
 @app.route('/home')
@@ -120,7 +121,8 @@ def add_item():
     # Save the item to the database
     db.session.add(item)
     db.session.commit()
-    return redirect(url_for("items_page"))
+    #return redirect(url_for("items_page"))
+    return redirect(url_for("add_item"))
 
 @app.route('/check_item', methods=['POST'])
 @login_required
@@ -141,5 +143,39 @@ def check_item():
         })
     else:
         return jsonify({'barcode_not_found': True})
+    
+@app.route('/grocery_list', methods=['GET'])
+@login_required
+def grocery_list():
+    query = text('''
+    SELECT c.category, i.productname, i.qty, i.minqty
+    FROM item i
+    JOIN category c ON i.category_id = c.id
+    ORDER BY c.category, i.productname
+    ''')
+    result = db.session.execute(query)
+    groceries = result.fetchall()
 
+    grouped_groceries = {}
+    for grocery in groceries:
+        category = grocery.category
+        productname = grocery.productname
+        qty = grocery.qty
+        minqty = grocery.minqty
+        needed_qty = max(0, minqty - qty)  # Calculate needed qty
+        if category in grouped_groceries:
+            grouped_groceries[category].append({
+                'productname': productname,
+                'qty': qty,
+                'minqty': minqty,
+                'needed_qty': needed_qty
+            })
+        else:
+            grouped_groceries[category] = [{
+                'productname': productname,
+                'qty': qty,
+                'minqty': minqty,
+                'needed_qty': needed_qty
+            }]
 
+    return render_template('grocery_list.html', grouped_groceries=grouped_groceries)
