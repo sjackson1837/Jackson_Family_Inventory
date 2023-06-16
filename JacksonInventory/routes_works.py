@@ -4,7 +4,7 @@ from JacksonInventory.models import Item, User, Category
 from JacksonInventory.forms import RegisterForm, LoginForm, PurchaseItemForm, SellItemForm
 from JacksonInventory import db
 from flask_login import login_user, logout_user, login_required, current_user
-from sqlalchemy.sql import text, func
+from sqlalchemy.sql import text
 
 @app.route('/')
 @app.route('/home')
@@ -85,58 +85,12 @@ def logout_page():
 
 
 
-from sqlalchemy import func
-
 @app.route('/items')
 @login_required
 def items_page():
-    query = text('''
-    SELECT c.id, c.category, COUNT(i.category_id) AS product_count
-    FROM category c
-    LEFT JOIN item i ON i.category_id = c.id
-    GROUP BY c.id, c.category
-    ORDER BY c.id
-    ''')
-    result = db.session.execute(query)
-    categories = result.fetchall()
-
-    # Retrieve the total product count
-    total_product_count = db.session.query(func.count()).select_from(Item).scalar()
-
-    return render_template('items.html', categories=categories, total_product_count=total_product_count)
-
-
-
-@app.route('/category/<int:id>')
-@login_required
-def category_page(id):
-    # Retrieve products for the specified category
-    category = Category.query.get(id)
-    print(id)
-    query = text('''
-    SELECT c.id, i.id as productid, c.category, i.productname, i.qty, i.minqty, i.productimage
-    FROM item i
-    JOIN category c ON i.category_id = c.id
-    WHERE c.id = :id  -- Filter by the category ID
-    ORDER BY c.category, i.productname
-    ''')
-    result = db.session.execute(query, {'id': id}) 
-    groceries = result.fetchall()
-    return render_template('category.html', category=category, groceries=groceries)
-
-@app.route('/all_categories')
-@login_required
-def all_categories_page():
-    query = text('''
-    SELECT c.id, i.id as productid, c.category, i.productname, i.qty, i.minqty, i.productimage
-    FROM item i
-    JOIN category c ON i.category_id = c.id
-    ORDER BY c.category, i.productname
-    ''')
-    result = db.session.execute(query)
-    groceries = result.fetchall()
-    
-    return render_template('category.html', groceries=groceries)
+    #Grab all items from the database
+    items = Item.query.order_by(Item.id)
+    return render_template('items.html', items=items)
 
 @app.route('/items/<int:id>')
 @login_required

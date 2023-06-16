@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+
 {% block title %}
 View Inventory
 {% endblock %}
@@ -6,39 +7,36 @@ View Inventory
 {% block content %}
 
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-12">
-            {% for item in items %}
-            <div class="card mb-3" style="background-color: transparent;">
-                <div class="row no-gutters">
-                    <div class="col-4">
-                        <a href="{{ url_for('item', id=item.id) }}">
-                            <img src="{{ item.productimage }}" class="card-img" alt="{{ item.productname }}" style="max-width: 125px; max-height: 125px;">
-                        </a>
-                    </div>
-                    <div class="col-5">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ item.productname }}</h5>
-                            <p class="card-text">{{ item.productcategory }}</p>
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between">
-                                <p class="card-text{% if item.qty < item.minqty %} text-danger{% endif %}">Qty:</p>
-                                <p class="card-text text-right">{{ item.qty }}</p>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <p class="card-text">Min:</p>
-                                <p class="card-text text-right">{{ item.minqty }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  <div class="row justify-content-center">
+    <div class="col-12">
+      {% if categories %}
+      <div class="card mb-3" style="background-color: transparent;">
+        <div class="row no-gutters">
+          <div class="col-6">
+            <div class="card-body">
+              <h5 class="card-title">All Categories</h5>
+              <p class="card-text">Product Count: {{ total_product_count }}</p>
+              <a href="{{ url_for('all_categories_page') }}" class="btn btn-primary">View All Products</a>
             </div>
-            {% endfor %}
+          </div>
         </div>
+      </div>
+      {% endif %}
+      {% for category in categories %}
+      <div class="card mb-3" style="background-color: transparent;">
+        <div class="row no-gutters">
+          <div class="col-6">
+            <div class="card-body">
+              <h5 class="card-title">{{ category[1] }}</h5>
+              <p class="card-text">Product Count: {{ category[2] }}</p>
+              <a href="{{ url_for('category_page', id=category[0]) }}" class="btn btn-primary">View Products</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
     </div>
+  </div>
 </div>
 
 {% endblock %}

@@ -34,12 +34,16 @@ function checkItem() {
     .then(data => {
       if (data.status === 0) {
         // Barcode not found, allow typing product information
+        console.log("Did I make it here??????");
+        document.getElementById("barcode").readOnly = true;
+        document.getElementById("barcode").value = barcode;
         document.getElementById("productname").readOnly = false;
         document.getElementById("qty").readOnly = false;
         document.getElementById("productimage").readOnly = false;
         document.getElementById("productimage").value = "https://cdn.dribbble.com/users/1247449/screenshots/3984840/no_img.png";
 
         document.getElementById("productimage_show").src = "https://cdn.dribbble.com/users/1247449/screenshots/3984840/no_img.png";
+        showProductData();
         var audio = new Audio('scripts/sounds/negative.mp3');
         audio.play();
       } else {
@@ -113,4 +117,8 @@ function decrementMinQty() {
   let qtyValue = parseInt(qtyInput.value);
   qtyValue = isNaN(qtyValue) ? 0 : qtyValue;
   qtyInput.value = qtyValue > 0 ? qtyValue - 1 : 0;
+}
+
+function enableProductNameEditing() {
+  document.getElementById("productname").removeAttribute("readonly");
 }
