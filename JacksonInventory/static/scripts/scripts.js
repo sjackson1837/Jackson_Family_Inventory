@@ -14,11 +14,6 @@ function checkBarcode(event) {
           // Barcode not found, run the checkItem() function
           checkItem(barcode);
         } else {
-          // Barcode found, display the message
-          // const product_name = response.product_name;
-          // const updated_qty = response.updated_qty;
-          // const message = `Product: ${product_name}, Updated Quantity: ${updated_qty}`;
-          // flash(message, 'info');
           flash("testing flash message");
         }
       }
@@ -33,7 +28,6 @@ function checkBarcode(event) {
 function checkItem() {
   const barcode = document.getElementById("barcode").value;
   const url = `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`;
-  console.log("AMMMMM IIII HEEERRE???")
 
   fetch(url)
     .then(response => response.json())
@@ -54,6 +48,7 @@ function checkItem() {
         const ProductDescription = data.product.generic_name;
         // const ProductQty = "new";
         var ProductQty = 1;
+        var MinQty = 1;
         
         let imageUrl = data.product.image_url;
         
@@ -69,12 +64,53 @@ function checkItem() {
         document.getElementById("barcode").value = barcode;
         document.getElementById("productname").value = ProductName;
         document.getElementById("qty").value = ProductQty;
+        document.getElementById("minqty").value = MinQty;
         document.getElementById("productimage").value = imageUrl;
         document.getElementById("productimage_show").src = imageUrl;
+
+        showProductData();
         // document.getElementById("barcode").value = "";
         var audio = new Audio('static/sounds/positive.mp3');
         audio.play();
       }
     })
     .catch(error => console.error(error));
+}
+
+function showProductData() {
+  const barcodeContainer = document.getElementById('barcodeContainer');
+  const productDataContainer = document.getElementById('productDataContainer');
+  const productImage = document.getElementById('productimage_show');
+  
+  barcodeContainer.style.display = 'none';
+  productDataContainer.style.display = 'block';
+  productImage.style.display = 'block';
+}
+
+function incrementQty() {
+  const qtyInput = document.getElementById('qty');
+  let qtyValue = parseInt(qtyInput.value);
+  qtyValue = isNaN(qtyValue) ? 0 : qtyValue;
+  qtyInput.value = qtyValue + 1;
+}
+
+function decrementQty() {
+  const qtyInput = document.getElementById('qty');
+  let qtyValue = parseInt(qtyInput.value);
+  qtyValue = isNaN(qtyValue) ? 0 : qtyValue;
+  qtyInput.value = qtyValue > 0 ? qtyValue - 1 : 0;
+}
+
+function incrementMinQty() {
+  const qtyInput = document.getElementById('minqty');
+  let qtyValue = parseInt(qtyInput.value);
+  qtyValue = isNaN(qtyValue) ? 0 : qtyValue;
+  qtyInput.value = qtyValue + 1;
+}
+
+function decrementMinQty() {
+  const qtyInput = document.getElementById('minqty');
+  let qtyValue = parseInt(qtyInput.value);
+  qtyValue = isNaN(qtyValue) ? 0 : qtyValue;
+  qtyInput.value = qtyValue > 0 ? qtyValue - 1 : 0;
 }

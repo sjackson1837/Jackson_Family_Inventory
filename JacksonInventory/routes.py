@@ -163,19 +163,20 @@ def grocery_list():
         qty = grocery.qty
         minqty = grocery.minqty
         needed_qty = max(0, minqty - qty)  # Calculate needed qty
-        if category in grouped_groceries:
-            grouped_groceries[category].append({
-                'productname': productname,
-                'qty': qty,
-                'minqty': minqty,
-                'needed_qty': needed_qty
-            })
-        else:
-            grouped_groceries[category] = [{
-                'productname': productname,
-                'qty': qty,
-                'minqty': minqty,
-                'needed_qty': needed_qty
-            }]
+        if needed_qty > 0: 
+            if category in grouped_groceries:
+                grouped_groceries[category].append({
+                    'productname': productname,
+                    'qty': qty,
+                    'minqty': minqty,
+                    'needed_qty': needed_qty
+                })
+            else:
+                grouped_groceries[category] = [{
+                    'productname': productname,
+                    'qty': qty,
+                    'minqty': minqty,
+                    'needed_qty': needed_qty
+                }]
 
     return render_template('grocery_list.html', grouped_groceries=grouped_groceries)

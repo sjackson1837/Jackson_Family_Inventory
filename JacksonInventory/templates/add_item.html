@@ -8,36 +8,59 @@
 <div class="container">
   <form method="POST" action="/add_item">
     <br/><br/>
-    <label for="barcode" class="left-align">Barcode:</label>
-    <input type="text" id="barcode" name="barcode" required oninput="checkBarcode(event)" class="right-align"><br/>
-    <input type="textarea" id="productname" name="productname" readonly class="right-align"><br/>
-    <img src="" id="productimage_show" alt="" style="max-width: 125px; max-height: 125px; background: transparent;"><br/><br/>
+    <div id="barcodeContainer">
+      <label for="barcode" class="left-align">Barcode:</label>
+      <input type="text" id="barcode" name="barcode" required oninput="checkBarcode(event)" class="right-align"><br/>
+    </div>
+   
 
-    <label for="qty" class="left-align">Qty:</label>
-    <input class="quantity-input right-align" type="text" id="qty" name="qty" required><br/><br/>
+    <div id="productDataContainer" style="display: none;">
+      <textarea id="productname" name="productname" class="left-align"></textarea><br/>
+      <img src="" id="productimage_show" alt="" style="max-width: 125px; max-height: 125px; background: transparent; display: none;"><br/><br/>
+      <div class="quantity-input-container">
+        <div class="quantity-label">Qty:</div>
+        <button class="quantity-button" type="button" onclick="decrementQty()">-</button>
+        <input class="quantity-input center-align" type="text" id="qty" name="qty" required>
+        <button class="quantity-button" type="button" onclick="incrementQty()">+</button>
+      </div>
+      <br/><br/>
+    
+      <div class="quantity-input-container">
+        <div class="quantity-label">Min Qty:</div>
+        <button class="quantity-button" type="button" onclick="decrementMinQty()">-</button>
+        <input class="quantity-input center-align" type="text" id="minqty" name="minqty" required>
+        <button class="quantity-button" type="button" onclick="incrementMinQty()">+</button>
+      </div>
+      <br/><br/>
 
-    <label for="minqty" class="left-align">Min Qty:</label>
-    <input type="text" id="minqty" name="minqty" required class="quantity-input right-align"><br/><br/>
+      <label hidden="true" for="productimage">Product Image</label>
+      <input hidden="true" type="text" id="productimage" name="productimage" readonly>
 
-    <label hidden="true" for="productimage">Product Image</label>
-    <input hidden="true" type="text" id="productimage" name="productimage" readonly>
+      <label for="category" class="left-align">Category</label><br/>
+      <select id="category" name="category_id" required class="selectpicker right-align" data-live-search="true">
+        <option value="">-- Select Category --</option>
+        {% for category in categories %}
+          <option value="{{ category.id }}">{{ category.category }}</option>
+        {% endfor %}
+      </select>
+      <br/><br/>
 
-    <label for="category" class="left-align">Category</label><br/>
-    <select id="category" name="category_id" required class="selectpicker right-align" data-live-search="true">
-      <option value="">-- Select Category --</option>
-      {% for category in categories %}
-        <option value="{{ category.id }}">{{ category.category }}</option>
-      {% endfor %}
-    </select>
-    <br/><br/>
-
-    <input type="submit" value="Add Item">
+      <input type="submit" value="Add Item">
+    </div>
   </form>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="static/scripts/scripts.js"></script>
 
 <style>
+  textarea {
+  width: 300px;
+  height: 75px;
+  resize: none;
+  }
+ 
+
   .container {
     display: flex;
     justify-content: center;
@@ -54,7 +77,7 @@
   .left-align {
     text-align: left;
     display: inline-block;
-    width: 120px;
+    width: 200px;
     margin-right: 10px;
   }
 
@@ -64,9 +87,30 @@
     width: 200px;
   }
 
-  .quantity-input {
-    width: 3ch;
+  .quantity-input-container {
+  display: flex;
+  align-items: center;
   }
+
+.quantity-input {
+  width: 30px;
+  text-align: center;
+  margin-right: 10px;
+  margin-left: 10px;
+  font-size: 16px;
+}
+
+.quantity-button {
+  font-size: 16px;
+}
+
+.quantity-label {
+  text-align: right;
+  margin-right: 20px;
+  font-size: 20px;
+}
+
 </style>
+
 
 {% endblock %}
