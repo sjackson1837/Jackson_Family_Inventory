@@ -22,7 +22,31 @@ function checkBarcode(event) {
   xhr.send("barcode=" + barcode);
 }
 
-
+function useItem(event) {
+  const barcode = event.target.value;
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", "/use_item", true);
+  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        const response = JSON.parse(xhr.responseText);
+        if (response.redirect_url) {
+          // Barcode found in the database, update quantity and save the record
+          window.location.href = response.redirect_url;
+        } else if (response.barcode_not_found) {
+          // Barcode not found, run the checkItem() function
+          //checkItem(barcode);
+          alert("Item not found in inventory");
+          event.target.value = "";
+        } else {
+          //flash("testing flash message");
+        }
+      }
+    }
+  };
+  xhr.send("barcode=" + barcode);
+}
 
 
 function checkItem() {
@@ -34,15 +58,18 @@ function checkItem() {
     .then(data => {
       if (data.status === 0) {
         // Barcode not found, allow typing product information
-        console.log("Did I make it here??????");
         document.getElementById("barcode").readOnly = true;
         document.getElementById("barcode").value = barcode;
         document.getElementById("productname").readOnly = false;
         document.getElementById("qty").readOnly = false;
+        var ProductQty = 1;
+        var MinQty = 1;
+        document.getElementById("qty").value = ProductQty;
+        document.getElementById("minqty").value = MinQty;
         document.getElementById("productimage").readOnly = false;
-        document.getElementById("productimage").value = "https://cdn.dribbble.com/users/1247449/screenshots/3984840/no_img.png";
+        document.getElementById("productimage").value = "https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg";
 
-        document.getElementById("productimage_show").src = "https://cdn.dribbble.com/users/1247449/screenshots/3984840/no_img.png";
+        document.getElementById("productimage_show").src = "https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg";
         showProductData();
         var audio = new Audio('scripts/sounds/negative.mp3');
         audio.play();

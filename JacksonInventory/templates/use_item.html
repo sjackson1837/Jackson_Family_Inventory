@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Register Page
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <form method="POST" action="/use_item">
+    <br/><br/>
+    <div id="barcodeContainer">
+      <label for="barcode" class="left-align">Barcode:</label>
+      <input type="text" id="barcode" name="barcode" required oninput="useItem(event)" class="right-align"><br/>
+    </div>
+    </div>
+  </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="static/scripts/scripts.js"></script>
+
+<style>
+  .container {
+    display: flex;
+    justify-content: center;
+    height: 100vh;
+  }
+
+  .quantity-input-container {
+  display: flex;
+  align-items: center;
+}
+
+.quantity-input {
+  width: 20px;
+  margin-right: 10px;
+}
+
+.quantity-button {
+  font-size: 20px;
+}
+
+.quantity-label {
+  text-align: right;
+  margin-right: 10px;
+  font-size: 20px;
+}
+
+
+  input[readonly] {
+    border: none;
+    background-color: transparent;
+    color: white;
+    padding: 0;
+  }
+
+  .left-align {
+    text-align: left;
+    display: inline-block;
+    width: 120px;
+    margin-right: 10px;
+  }
+
+  .right-align {
+    text-align: right;
+    display: inline-block;
+    width: 200px;
+  }
+
+  .quantity-input {
+    width: 3ch;
+  }
+
+  textarea {
+  width: 200px;
+  height: 100px;
+  resize: none;
+}
+
+</style>
+
+
+
+{% endblock %}

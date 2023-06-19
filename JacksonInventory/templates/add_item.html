@@ -13,32 +13,40 @@
       <input type="text" id="barcode" name="barcode" required oninput="checkBarcode(event)" class="right-align"><br/>
     </div>
     
-    
     <div id="productDataContainer" style="display: none;">
-      <input type="text" id="productname" name="productname" readonly class="left-align" onclick="enableProductNameEditing()"><br/>
-      <img src="" id="productimage_show" alt="" style="max-width: 125px; max-height: 125px; background: transparent; display: none;"><br/><br/>
+      <textarea id="productname" style="width: 300px; height: 3em; resize: none;" name="productname" readonly class="left-align" onclick="enableProductNameEditing()"></textarea><br/>
+      <div class="vertical-center">
+        <img src="" id="productimage_show" alt="" style="max-width: 150px; max-height: 150px; object-fit: contain; background: transparent; display: none;"><br/><br/>
+      
       <div class="quantity-input-container">
-        <div class="quantity-label">Qty:</div>
-        <button class="quantity-button" type="button" onclick="decrementQty()">-</button>
-        <input class="quantity-input center-align" type="text" id="qty" name="qty" required>
-        <button class="quantity-button" type="button" onclick="incrementQty()">+</button>
+        
+          <div class="quantity-label"><span>Qty&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</span></div>
+          <div class="quantity-value">
+            <button class="quantity-button" type="button" onclick="decrementQty()">-</button>
+            <input class="quantity-input center-align" type="text" id="qty" name="qty" required>
+            <button class="quantity-button" type="button" onclick="incrementQty()">+</button>
+        
+        </div>
       </div>
-      <br/><br/>
-    
-      <label for="minqty" class="left-align">Min Qty:</label>
+      <br/>
+      
       <div class="quantity-input-container">
-        <div class="quantity-label">Min Qty:</div>
-        <button class="quantity-button" type="button" onclick="decrementMinQty()">-</button>
-        <input class="quantity-input center-align" type="text" id="minqty" name="minqty" required>
-        <button class="quantity-button" type="button" onclick="incrementMinQty()">+</button>
+        
+          <div class="quantity-label">Min Qty:</div>
+          <div class="quantity-value">
+            <button class="quantity-button" type="button" onclick="decrementMinQty()">-</button>
+            <input class="quantity-input center-align" type="text" id="minqty" name="minqty" required>
+            <button class="quantity-button" type="button" onclick="incrementMinQty()">+</button>
+        
+        </div>
+      
       </div>
-      <br/><br/>
-    
+      <br/>
     
       <label hidden="true" for="productimage">Product Image</label>
       <input hidden="true" type="text" id="productimage" name="productimage" readonly>
 
-      <label for="category" class="left-align">Category</label><br/>
+      <label for="category" class="left-align">Category</label>
       <select id="category" name="category_id" required class="selectpicker right-align" data-live-search="true">
         <option value="">-- Select Category --</option>
         {% for category in categories %}
@@ -46,7 +54,7 @@
         {% endfor %}
       </select>
       <br/><br/>
-
+    </div>
       <input type="submit" value="Add Item">
     </div>
     </div>
@@ -57,32 +65,45 @@
 <script src="static/scripts/scripts.js"></script>
 
 <style>
-  .container {
+.container {
     display: flex;
     justify-content: center;
     height: 100vh;
   }
 
-  .quantity-input-container {
+.vertical-center {
   display: flex;
+  flex-direction: column;
   align-items: center;
 }
 
-.quantity-input {
-  width: 20px;
-  margin-right: 10px;
-}
-
-.quantity-button {
-  font-size: 20px;
+.quantity-input-container {
+  display: flex;
+  align-items: center;
 }
 
 .quantity-label {
   text-align: right;
   margin-right: 10px;
   font-size: 20px;
+  white-space: nowrap; /* Ensure label doesn't wrap to a new line */
 }
 
+.quantity-value {
+  display: flex;
+  align-items: center;
+}
+
+.quantity-button {
+  font-size: 20px;
+} 
+
+.quantity-input {
+  margin-right: 10px;
+  margin-left: 10px;
+  width: 3ch;
+  text-align: center;
+}
 
   input[readonly] {
     border: none;
@@ -102,10 +123,6 @@
     text-align: right;
     display: inline-block;
     width: 200px;
-  }
-
-  .quantity-input {
-    width: 3ch;
   }
 
   textarea {
