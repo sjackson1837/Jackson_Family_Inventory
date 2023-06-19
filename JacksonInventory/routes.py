@@ -95,7 +95,7 @@ def items_page():
     FROM category c
     LEFT JOIN item i ON i.category_id = c.id
     GROUP BY c.id, c.category
-    ORDER BY c.id
+    ORDER BY c.category
     ''')
     result = db.session.execute(query)
     categories = result.fetchall()
@@ -104,8 +104,6 @@ def items_page():
     total_product_count = db.session.query(func.count()).select_from(Item).scalar()
 
     return render_template('items.html', categories=categories, total_product_count=total_product_count)
-
-
 
 @app.route('/category/<int:id>')
 @login_required
