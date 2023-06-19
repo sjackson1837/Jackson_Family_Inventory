@@ -1,127 +1,121 @@
 {% extends 'base.html' %}
 
 {% block title %}
-View Inventory
+    Register Page
 {% endblock %}
 
 {% block content %}
-
 <div class="container">
-  <div class="row justify-content-center">
-    <div class="col-12">
-      <div class="category-buttons mb-3">
-        <button class="category-button active" onclick="filterItems('all')">All</button>
-        {% for category in categories %}
-        <button class="category-button" onclick="filterItems('{{ category.name }}')">{{ category.name }}</button>
-        {% endfor %}
-      </div>
-      {% for item in items %}
-      <div class="card mb-3{% if item.qty < item.minqty %} text-danger{% endif %} {% if item.category != selectedCategory and selectedCategory != 'all' %}d-none{% endif %}" style="background-color: transparent;">
-        <div class="row no-gutters">
-          <div class="col-4">
-            <a href="{{ url_for('item', id=item.id) }}">
-              <img src="{{ item.productimage }}" class="card-img" alt="{{ item.productname }}" style="max-width: 125px; max-height: 125px;">
-            </a>
-          </div>
-          <div class="col-5">
-            <div class="card-body">
-              <h5 class="card-title">{{ item.productname }}</h5>
-              <p class="card-text">{{ item.productcategory }}</p>
-            </div>
-          </div>
-          <div class="col-3">
-            <div class="card-body">
-              <div class="d-flex justify-content-between">
-                <p class="card-text{% if item.qty < item.minqty %} text-danger{% endif %}">Qty:</p>
-                <p class="card-text text-right">{{ item.qty }}</p>
-              </div>
-              <div class="d-flex justify-content-between">
-                <p class="card-text">Min:</p>
-                <p class="card-text text-right">{{ item.minqty }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      {% endfor %}
+  <form method="POST" action="/add_item">
+    <br/><br/>
+    <div id="barcodeContainer">
+      <label for="barcode" class="left-align">Barcode:</label>
+      <input type="text" id="barcode" name="barcode" required oninput="checkBarcode(event)" class="right-align"><br/>
     </div>
-  </div>
+    
+    
+    <div id="productDataContainer" style="display: none;">
+      <input type="text" id="productname" name="productname" readonly class="left-align" onclick="enableProductNameEditing()"><br/>
+      <img src="" id="productimage_show" alt="" style="max-width: 125px; max-height: 125px; background: transparent; display: none;"><br/><br/>
+      <div class="quantity-input-container">
+        <div class="quantity-label">Qty:</div>
+        <button class="quantity-button" type="button" onclick="decrementQty()">-</button>
+        <input class="quantity-input center-align" type="text" id="qty" name="qty" required>
+        <button class="quantity-button" type="button" onclick="incrementQty()">+</button>
+      </div>
+      <br/><br/>
+    
+      <label for="minqty" class="left-align">Min Qty:</label>
+      <div class="quantity-input-container">
+        <div class="quantity-label">Min Qty:</div>
+        <button class="quantity-button" type="button" onclick="decrementMinQty()">-</button>
+        <input class="quantity-input center-align" type="text" id="minqty" name="minqty" required>
+        <button class="quantity-button" type="button" onclick="incrementMinQty()">+</button>
+      </div>
+      <br/><br/>
+    
+    
+      <label hidden="true" for="productimage">Product Image</label>
+      <input hidden="true" type="text" id="productimage" name="productimage" readonly>
+
+      <label for="category" class="left-align">Category</label><br/>
+      <select id="category" name="category_id" required class="selectpicker right-align" data-live-search="true">
+        <option value="">-- Select Category --</option>
+        {% for category in categories %}
+          <option value="{{ category.id }}">{{ category.category }}</option>
+        {% endfor %}
+      </select>
+      <br/><br/>
+
+      <input type="submit" value="Add Item">
+    </div>
+    </div>
+  </form>
 </div>
 
-
-<script>
-  var selectedCategory = 'all';
-
-  function filterItems(category) {
-    selectedCategory = category;
-    var items = document.getElementsByClassName('card');
-    for (var i = 0; i < items.length; i++) {
-      var item = items[i];
-      if (category === 'all' || item.classList.contains(category)) {
-        item.classList.remove('d-none');
-      } else {
-        item.classList.add('d-none');
-      }
-    }
-    updateActiveButton(category);
-  }
-
-  function updateActiveButton(category) {
-    var buttons = document.getElementsByClassName('category-button');
-    for (var i = 0; i < buttons.length; i++) {
-      var button = buttons[i];
-      if (button.innerText === category) {
-        button.classList.add('active');
-      } else {
-        button.classList.remove('active');
-      }
-    }
-  }
-</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="static/scripts/scripts.js"></script>
 
 <style>
-  .category-buttons {
-    margin-bottom: 10px;
+  .container {
+    display: flex;
+    justify-content: center;
+    height: 100vh;
   }
 
-  .category-button {
-    margin-right: 5px;
-    padding: 5px 10px;
+  .quantity-input-container {
+  display: flex;
+  align-items: center;
+}
+
+.quantity-input {
+  width: 20px;
+  margin-right: 10px;
+}
+
+.quantity-button {
+  font-size: 20px;
+}
+
+.quantity-label {
+  text-align: right;
+  margin-right: 10px;
+  font-size: 20px;
+}
+
+
+  input[readonly] {
     border: none;
-    background-color: #eee;
-    cursor: pointer;
+    background-color: transparent;
+    color: white;
+    padding: 0;
   }
 
-  .category-button.active {
-    background-color: #ccc;
+  .left-align {
+    text-align: left;
+    display: inline-block;
+    width: 120px;
+    margin-right: 10px;
   }
 
-  .d-none {
-    display: none;
+  .right-align {
+    text-align: right;
+    display: inline-block;
+    width: 200px;
   }
+
+  .quantity-input {
+    width: 3ch;
+  }
+
+  textarea {
+  width: 200px;
+  height: 100px;
+  resize: none;
+}
+
 </style>
 
-<script>
-  // Fetch categories from API endpoint
-  fetch('/categories')
-    .then(response => response.json())
-    .then(data => {
-      // Call a function to populate the categories
-      populateCategories(data);
-    })
-    .catch(error => {
-      console.error('Error:', error);
-    });
 
-  function populateCategories(categories) {
-    var categoryButtonsContainer = document.querySelector('.category-buttons');
-    categoryButtonsContainer.innerHTML = `
-      <button class="category-button active" onclick="filterItems('all')">All</button>
-      ${categories.map(category => `
-        <button class="category-button" onclick="filterItems('${category.name}')">${category.name}</button>
-      `).join('')}
-    `;
-  }
-</script>
 
 {% endblock %}
