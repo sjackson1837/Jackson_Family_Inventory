@@ -75,6 +75,16 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="static/scripts/scripts.js"></script>
 
+<script>
+  function setFocusToBarcodeInput() {
+    document.getElementById("barcode").focus();
+  }
+
+  // Call the function to set the focus when the page is loaded or refreshed
+  window.onload = setFocusToBarcodeInput;
+</script>
+
+
 <style>
 .container {
     display: flex;
