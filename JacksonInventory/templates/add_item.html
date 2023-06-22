@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    Register Page
+    Add Item
 {% endblock %}
 
 {% block content %}
@@ -46,11 +46,22 @@
       <label hidden="true" for="productimage">Product Image</label>
       <input hidden="true" type="text" id="productimage" name="productimage" readonly>
 
+      
+
       <label for="category" class="left-align">Category</label>
-      <select id="category" name="category_id" required class="selectpicker right-align" data-live-search="true">
+      <select id="category" name="category_id" required class="selectpicker right-align" data-live-search="true" onchange="loadSubcategories()">
         <option value="">-- Select Category --</option>
         {% for category in categories %}
           <option value="{{ category.id }}">{{ category.category }}</option>
+        {% endfor %}
+      </select>
+      <br/><br/>
+      
+      <label for="subcategory" class="left-align">Subcategory</label>
+      <select id="subcategory" name="subcategory_id" required class="selectpicker right-align" data-live-search="true" disabled>
+        <option value="">-- Select Subcategory --</option>
+        {% for subcategory in subcategories %}
+          <option value="{{ subcategory.id }}" data-category="{{ subcategory.category_id }}">{{ subcategory.subcategory }}</option>
         {% endfor %}
       </select>
       <br/><br/>
@@ -105,27 +116,27 @@
   text-align: center;
 }
 
-  input[readonly] {
-    border: none;
-    background-color: transparent;
-    color: white;
-    padding: 0;
-  }
+input[readonly] {
+  border: none;
+  background-color: transparent;
+  color: white;
+  padding: 0;
+}
 
-  .left-align {
-    text-align: left;
-    display: inline-block;
-    width: 120px;
-    margin-right: 10px;
-  }
+.left-align {
+  text-align: left;
+  display: inline-block;
+  width: 120px;
+  margin-right: 10px;
+}
 
-  .right-align {
-    text-align: right;
-    display: inline-block;
-    width: 200px;
-  }
+.right-align {
+  text-align: right;
+  display: inline-block;
+  width: 200px;
+}
 
-  textarea {
+textarea {
   width: 200px;
   height: 100px;
   resize: none;
@@ -133,6 +144,31 @@
 
 </style>
 
-
+<script>
+  function loadSubcategories() {
+    console.log("I'M HEREL!!!!!!!");
+    var categorySelect = document.getElementById("category");
+    var subcategorySelect = document.getElementById("subcategory");
+    var selectedCategoryId = categorySelect.value;
+    
+    // Reset subcategory options
+    subcategorySelect.innerHTML = '<option value="">-- Select Subcategory --</option>';
+    
+    if (selectedCategoryId) {
+      console.log("i'm herelllll.....  " + selectedCategoryId );
+      var subcategories = Array.from(subcategorySelect.options);
+      console.log("asdfsadf  " + subcategories);
+      subcategories.forEach(function(option) {
+        if (option.dataset.category === selectedCategoryId) {
+          subcategorySelect.appendChild(option.cloneNode(true));
+        }
+      });
+      
+      subcategorySelect.disabled = false;
+    } else {
+      subcategorySelect.disabled = true;
+    }
+  }
+</script>
 
 {% endblock %}

@@ -1,7 +1,7 @@
 from JacksonInventory import app
 from flask import render_template, redirect, url_for, flash, request, jsonify
 from JacksonInventory.models import Item, User, Category
-from JacksonInventory.forms import RegisterForm, LoginForm, PurchaseItemForm, SellItemForm
+from JacksonInventory.forms import RegisterForm, LoginForm, PurchaseItemForm, SellItemForm, SearchForm
 from JacksonInventory import db
 from flask_login import login_user, logout_user, login_required, current_user
 from sqlalchemy.sql import text, func
@@ -251,3 +251,25 @@ def use_item():
         })
     else:
         return jsonify({'barcode_not_found': True})
+    
+
+#Pass Stuff to Navbar
+@app.context_processor
+def base():
+    form = SearchForm()
+    return dict(form=form)
+
+#Create Search Function
+@app.route('/search', methods=["POST"])
+@login_required
+def search():
+    form = SearchForm()
+    items = Item.query
+    if form.validate_on_submit():
+        #Get data from submitted form
+        item.searched = form.searched.data
+        print(item.searched)
+        # Query the Database
+        items = items.filter(Item.productname.like('%' + item.searched + '%'))
+        items = items.order_by(Item.barcode).all()
+        return render_template("search.html", form=form, searched=item.searched, items = items)
