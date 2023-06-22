@@ -56,15 +56,6 @@
         {% endfor %}
       </select>
       <br/><br/>
-      
-      <label for="subcategory" class="left-align">Subcategory</label>
-      <select id="subcategory" name="subcategory_id" required class="selectpicker right-align" data-live-search="true" disabled>
-        <option value="">-- Select Subcategory --</option>
-        {% for subcategory in subcategories %}
-          <option value="{{ subcategory.id }}" data-category="{{ subcategory.category_id }}">{{ subcategory.subcategory }}</option>
-        {% endfor %}
-      </select>
-      <br/><br/>
     </div>
       <input type="submit" value="Add Item">
     </div>
