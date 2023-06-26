@@ -32,3 +32,8 @@ class PurchaseItemForm(FlaskForm):
 class SellItemForm(FlaskForm):
     submit = SubmitField(label='Sell Item!')
 
+#Create A Search Form
+class SearchForm(FlaskForm):
+    searched = StringField("Searched", validators=[DataRequired()])
+    submit = SubmitField("Submit")
+

@@ -1,139 +1,226 @@
-{% extends 'base.html' %}
-
-{% block title %}
-    Register Page
-{% endblock %}
-
-{% block content %}
-<div class="container">
-  <form method="POST" action="/add_item">
-    <br/>
-    <br/>
-    <div id="barcodeContainer">
-      <label for="barcode" class="left-align">Barcode:</label>
-      <input type="text" id="barcode" name="barcode" required oninput="checkBarcode(event)" class="right-align"><br/>
-    </div>
-    
-    <div id="productDataContainer" style="display: none;">
-      <textarea id="productname" style="width: 300px; height: 3em; resize: none;" name="productname" readonly class="left-align" onclick="enableProductNameEditing()"></textarea><br/>
-      <div class="vertical-center">
-        <img src="" id="productimage_show" alt="" style="max-width: 150px; max-height: 150px; object-fit: contain; background: transparent; display: none;"><br/><br/>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <a class="btn btn-primary" href="{{ url_for('mainmenu_page') }}">Home</a>  
+  <div class="container">
+    <form method="POST" action="/add_item">
+      <br/>
+      <br/>
+      <div id="barcodeContainer">
+        <label for="barcode" class="left-align">Barcode:</label>
+        <input type="text" id="barcode" name="barcode" required oninput="checkBarcode(event)" class="right-align"><br/>
+      </div>
       
-      <div class="quantity-input-container">
+      <div id="productDataContainer" style="display: none;">
+        <textarea id="productname" style="width: 300px; height: 3em; resize: none;" name="productname" readonly class="left-align" onclick="enableProductNameEditing()"></textarea><br/>
+        <div class="vertical-center">
+          <img src="" id="productimage_show" alt="" style="max-width: 150px; max-height: 150px; object-fit: contain; background: transparent; display: none;"><br/><br/>
         
-          <div class="quantity-label"><span>Qty&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</span></div>
-          <div class="quantity-value">
-            <button class="quantity-button" type="button" onclick="decrementQty()">-</button>
-            <input class="quantity-input center-align" type="text" id="qty" name="qty" required>
-            <button class="quantity-button" type="button" onclick="incrementQty()">+</button>
+        <div class="quantity-input-container">
+          
+            <div class="quantity-label"><span>Qty&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</span></div>
+            <div class="quantity-value">
+              <button class="quantity-button" type="button" onclick="decrementQty()">-</button>
+              <input class="quantity-input center-align" type="text" id="qty" name="qty" required>
+              <button class="quantity-button" type="button" onclick="incrementQty()">+</button>
+          
+          </div>
+        </div>
+        <br/>
+        
+        <div class="quantity-input-container">
+          
+            <div class="quantity-label">Min Qty:</div>
+            <div class="quantity-value">
+              <button class="quantity-button" type="button" onclick="decrementMinQty()">-</button>
+              <input class="quantity-input center-align" type="text" id="minqty" name="minqty" required>
+              <button class="quantity-button" type="button" onclick="incrementMinQty()">+</button>
+          
+          </div>
         
         </div>
-      </div>
-      <br/>
+        <br/>
       
-      <div class="quantity-input-container">
+        <label hidden="true" for="productimage">Product Image</label>
+        <input hidden="true" type="text" id="productimage" name="productimage" readonly>
+  
         
-          <div class="quantity-label">Min Qty:</div>
-          <div class="quantity-value">
-            <button class="quantity-button" type="button" onclick="decrementMinQty()">-</button>
-            <input class="quantity-input center-align" type="text" id="minqty" name="minqty" required>
-            <button class="quantity-button" type="button" onclick="incrementMinQty()">+</button>
+  
+        <label for="category" class="left-align">Category</label>
+        <select id="category" name="category_id" required class="selectpicker right-align" data-live-search="true" onchange="updateSubcategories()">
+          <option value="">-- Select Category --</option>
+          {% for category in categories %}
+            <option value="{{ category.id }}">{{ category.category }}</option>
+          {% endfor %}
+        </select>
+        <br/><br/>
+  
+        <label for="subcategory" class="left-align">Sub Category</label>
+        <select id="subcategory" name="subcategory_id" required class="selectpicker right-align" data-live-search="true">
+          <option value="">-- Select Subcategory --</option>
+        </select>
         
-        </div>
-      
       </div>
-      <br/>
-    
-      <label hidden="true" for="productimage">Product Image</label>
-      <input hidden="true" type="text" id="productimage" name="productimage" readonly>
-
-      <label for="category" class="left-align">Category</label>
-      <select id="category" name="category_id" required class="selectpicker right-align" data-live-search="true">
-        <option value="">-- Select Category --</option>
-        {% for category in categories %}
-          <option value="{{ category.id }}">{{ category.category }}</option>
-        {% endfor %}
-      </select>
-      <br/><br/>
-    </div>
-      <input type="submit" value="Add Item">
-    </div>
-    </div>
-  </form>
-</div>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="static/scripts/scripts.js"></script>
-
-<style>
-.container {
+        <input type="submit" value="Add Item">
+      </div>
+      </div>
+    </form>
+  </div>
+  
+  <script src="static/scripts/scripts.js"></script>
+  
+  <script>
+    function setFocusToBarcodeInput() {
+      document.getElementById("barcode").focus();
+    }
+  
+    // Call the function to set the focus when the page is loaded or refreshed
+    window.onload = setFocusToBarcodeInput;
+  </script>
+  
+  <script>
+    function updateSubcategories() {
+        console.log("I'm hereeeee!!!!!!!")
+        var category_id = document.getElementById('category').value;
+        var subcategoryDropdown = document.getElementById('subcategory');
+  
+        // Clear previous options
+        subcategoryDropdown.innerHTML = '';
+  
+        // Create an empty default option
+        var defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = '-- Select Subcategory --';
+        subcategoryDropdown.appendChild(defaultOption);
+  
+        // Perform an AJAX request to retrieve subcategories based on the selected category
+        if (category_id !== '') {
+            $.ajax({
+                url: '/subcategories',
+                method: 'POST',
+                data: {
+                    category_id: category_id
+                },
+                success: function(response) {
+                    // Add new subcategory options based on the server response
+                    response.subcategories.forEach(function(subcategory) {
+                        var option = document.createElement('option');
+                        option.value = subcategory.id;
+                        option.textContent = subcategory.name;
+                        subcategoryDropdown.appendChild(option);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        }
+    }
+  </script>
+  
+  
+  <style>
+  .container {
+      display: flex;
+      justify-content: center;
+      height: 100vh;
+    }
+  
+  .vertical-center {
     display: flex;
-    justify-content: center;
-    height: 100vh;
+    flex-direction: column;
+    align-items: center;
   }
-
-.vertical-center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.quantity-input-container {
-  display: flex;
-  align-items: center;
-}
-
-.quantity-label {
-  text-align: right;
-  margin-right: 10px;
-  font-size: 20px;
-  white-space: nowrap; /* Ensure label doesn't wrap to a new line */
-}
-
-.quantity-value {
-  display: flex;
-  align-items: center;
-}
-
-.quantity-button {
-  font-size: 20px;
-} 
-
-.quantity-input {
-  margin-right: 10px;
-  margin-left: 10px;
-  width: 3ch;
-  text-align: center;
-}
-
+  
+  .quantity-input-container {
+    display: flex;
+    align-items: center;
+  }
+  
+  .quantity-label {
+    text-align: right;
+    margin-right: 10px;
+    font-size: 20px;
+    white-space: nowrap; /* Ensure label doesn't wrap to a new line */
+  }
+  
+  .quantity-value {
+    display: flex;
+    align-items: center;
+  }
+  
+  .quantity-button {
+    font-size: 20px;
+  } 
+  
+  .quantity-input {
+    margin-right: 10px;
+    margin-left: 10px;
+    width: 3ch;
+    text-align: center;
+  }
+  
   input[readonly] {
     border: none;
     background-color: transparent;
     color: white;
     padding: 0;
   }
-
+  
   .left-align {
     text-align: left;
     display: inline-block;
     width: 120px;
     margin-right: 10px;
   }
-
+  
   .right-align {
     text-align: right;
     display: inline-block;
     width: 200px;
   }
-
+  
   textarea {
-  width: 200px;
-  height: 100px;
-  resize: none;
-}
-
-</style>
-
-
-
-{% endblock %}
+    width: 200px;
+    height: 100px;
+    resize: none;
+  }
+  
+  </style>
+  
+  <script>
+    function loadSubcategories() {
+      console.log("I'M HEREL!!!!!!!");
+      var categorySelect = document.getElementById("category");
+      var subcategorySelect = document.getElementById("subcategory");
+      var selectedCategoryId = categorySelect.value;
+      
+      // Reset subcategory options
+      subcategorySelect.innerHTML = '<option value="">-- Select Subcategory --</option>';
+      
+      if (selectedCategoryId) {
+        console.log("i'm herelllll.....  " + selectedCategoryId );
+        var subcategories = Array.from(subcategorySelect.options);
+        console.log("asdfsadf  " + subcategories);
+        subcategories.forEach(function(option) {
+          if (option.dataset.category === selectedCategoryId) {
+            subcategorySelect.appendChild(option.cloneNode(true));
+          }
+        });
+        
+        subcategorySelect.disabled = false;
+      } else {
+        subcategorySelect.disabled = true;
+      }
+    }
+  </script>
+  
+    
+</body>
+</html>

@@ -1,7 +1,7 @@
 from JacksonInventory import app
 from flask import render_template, redirect, url_for, flash, request, jsonify
-from JacksonInventory.models import Item, User, Category
-from JacksonInventory.forms import RegisterForm, LoginForm, PurchaseItemForm, SellItemForm
+from JacksonInventory.models import Item, User, Category, Subcategory
+from JacksonInventory.forms import RegisterForm, LoginForm, PurchaseItemForm, SellItemForm, SearchForm
 from JacksonInventory import db
 from flask_login import login_user, logout_user, login_required, current_user
 from sqlalchemy.sql import text, func
@@ -143,30 +143,48 @@ def item(id):
     return render_template('item.html', item=item)
 
 @app.route('/add_item', methods=['GET'])
-@login_required
 def add_item_form():
     barcode = request.args.get('barcode')
-    categories = Category.query.order_by(Category.category)
+    category_id = request.args.get('category_id')
+    categories = Category.query.order_by(Category.category).all()
     return render_template('add_item.html', barcode=barcode, categories=categories)
 
-@app.route('/add_item', methods=['POST'])
-@login_required
+@app.route('/add_item', methods=['GET', 'POST'])
 def add_item():
     barcode = request.form['barcode']
     productname = request.form['productname']
     qty = request.form['qty']
     minqty = request.form['minqty']
     productimage = request.form['productimage']
-    category_id = request.form['category_id']
+    category_id = int(request.form['category_id'])
+    subcategory_id = int(request.form['subcategory_id'])
 
     # Create a new Item object and set its attributes
-    item = Item(barcode=barcode, productname=productname, qty=qty, minqty=minqty, productimage=productimage, category_id=category_id)
+    item = Item(barcode=barcode, productname=productname, qty=qty, minqty=minqty, productimage=productimage, category_id=category_id, subcategory_id=subcategory_id)
 
     # Save the item to the database
+    print(item)
     db.session.add(item)
     db.session.commit()
     #return redirect(url_for("items_page"))
     return redirect(url_for("add_item"))
+
+# Add the following route to handle the AJAX request for subcategories
+@app.route('/subcategories', methods=['POST'])
+def subcategories():
+    # Retrieve the selected category ID from the AJAX request
+    category_id = int(request.form['category_id'])
+
+    # Query the subcategories based on the selected category ID
+    subcategories = Subcategory.query.filter_by(category_id=category_id).order_by(Subcategory.subcategory).all()
+
+    # Create a list of dictionaries containing subcategory details
+    subcategory_list = [{'id': subcategory.id, 'name': subcategory.subcategory} for subcategory in subcategories]
+    print(subcategory_list)
+
+    # Return the subcategories as JSON response
+    return jsonify({'subcategories': subcategory_list})
+
 
 @app.route('/check_item', methods=['POST'])
 @login_required
@@ -251,3 +269,25 @@ def use_item():
         })
     else:
         return jsonify({'barcode_not_found': True})
+    
+
+#Pass Stuff to Navbar
+@app.context_processor
+def base():
+    form = SearchForm()
+    return dict(form=form)
+
+#Create Search Function
+@app.route('/search', methods=["POST"])
+@login_required
+def search():
+    form = SearchForm()
+    items = Item.query
+    if form.validate_on_submit():
+        #Get data from submitted form
+        item.searched = form.searched.data
+        print(item.searched)
+        # Query the Database
+        items = items.filter(Item.productname.like('%' + item.searched + '%'))
+        items = items.order_by(Item.barcode).all()
+        return render_template("search.html", form=form, searched=item.searched, items = items)

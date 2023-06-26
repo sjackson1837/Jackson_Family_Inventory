@@ -31,10 +31,15 @@ class Item(db.Model):
     minqty = db.Column(db.Integer())
     productimage = db.Column(db.String(200))
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
-    def __repr__(self):
-        return f'Item {self.name}'
-    
+    subcategory_id = db.Column(db.Integer, db.ForeignKey('subcategory.id'), nullable=False)
+
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     category = db.Column(db.String(75), unique=True)
     items = db.relationship('Item', backref='category', lazy=True)
+
+class Subcategory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    subcategory = db.Column(db.String(75), unique=True)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
+    items = db.relationship('Item', backref='subcategory', lazy=True)
