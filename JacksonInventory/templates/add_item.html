@@ -1,13 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% block title %}
+Main Menu
+{% endblock %}
+
+{% block content %}
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <a class="btn btn-primary" href="{{ url_for('mainmenu_page') }}">Home</a>  
+  <a class="btn btn-primary" href="{{ url_for('mainmenu_page') }}">Main Menu</a>  
   <div class="container">
     <form method="POST" action="/add_item">
       <br/>
@@ -86,7 +84,6 @@
   
   <script>
     function updateSubcategories() {
-        console.log("I'm hereeeee!!!!!!!")
         var category_id = document.getElementById('category').value;
         var subcategoryDropdown = document.getElementById('subcategory');
   
@@ -193,10 +190,10 @@
   }
   
   </style>
-  
+
+ 
   <script>
     function loadSubcategories() {
-      console.log("I'M HEREL!!!!!!!");
       var categorySelect = document.getElementById("category");
       var subcategorySelect = document.getElementById("subcategory");
       var selectedCategoryId = categorySelect.value;
@@ -205,9 +202,7 @@
       subcategorySelect.innerHTML = '<option value="">-- Select Subcategory --</option>';
       
       if (selectedCategoryId) {
-        console.log("i'm herelllll.....  " + selectedCategoryId );
         var subcategories = Array.from(subcategorySelect.options);
-        console.log("asdfsadf  " + subcategories);
         subcategories.forEach(function(option) {
           if (option.dataset.category === selectedCategoryId) {
             subcategorySelect.appendChild(option.cloneNode(true));
@@ -220,7 +215,5 @@
       }
     }
   </script>
-  
-    
-</body>
-</html>
+
+{% endblock %}

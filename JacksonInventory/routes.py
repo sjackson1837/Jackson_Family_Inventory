@@ -110,7 +110,6 @@ def items_page():
 def category_page(id):
     # Retrieve products for the specified category
     category = Category.query.get(id)
-    print(id)
     query = text('''
     SELECT c.id, i.id as productid, c.category, i.productname, i.qty, i.minqty, i.productimage
     FROM item i
@@ -163,7 +162,6 @@ def add_item():
     item = Item(barcode=barcode, productname=productname, qty=qty, minqty=minqty, productimage=productimage, category_id=category_id, subcategory_id=subcategory_id)
 
     # Save the item to the database
-    print(item)
     db.session.add(item)
     db.session.commit()
     #return redirect(url_for("items_page"))
@@ -180,7 +178,6 @@ def subcategories():
 
     # Create a list of dictionaries containing subcategory details
     subcategory_list = [{'id': subcategory.id, 'name': subcategory.subcategory} for subcategory in subcategories]
-    print(subcategory_list)
 
     # Return the subcategories as JSON response
     return jsonify({'subcategories': subcategory_list})
@@ -286,7 +283,6 @@ def search():
     if form.validate_on_submit():
         #Get data from submitted form
         item.searched = form.searched.data
-        print(item.searched)
         # Query the Database
         items = items.filter(Item.productname.like('%' + item.searched + '%'))
         items = items.order_by(Item.barcode).all()
