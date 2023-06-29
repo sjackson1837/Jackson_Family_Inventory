@@ -7,8 +7,6 @@ Main Menu
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <div class="container">
     <form method="POST" action="/add_item">
-      <br/>
-      <br/>
       <div id="barcodeContainer">
         <label for="barcode" class="left-align">Barcode:</label>
         <input type="text" id="barcode" name="barcode" required oninput="checkBarcode(event)" class="right-align"><br/>
@@ -20,7 +18,6 @@ Main Menu
           <img src="" id="productimage_show" alt="" style="max-width: 150px; max-height: 150px; object-fit: contain; "><br/>
               <button class="btn btn-warning" type="button" onclick="changeImageSrc(); return false;">Delete Picture</button>
               <input type="text" id="productimage_input" name="productimage" readonly style="display: none;">
-          <br/>
         
         <div class="quantity-input-container">
             <div class="quantity-label"><span>Qty&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</span></div>
@@ -61,14 +58,11 @@ Main Menu
         <select id="subcategory" name="subcategory_id" required class="selectpicker right-align" data-live-search="true">
           <option value="">-- Select Subcategory --</option>
         </select>
-        <br/><br/>
-        
+        <br/>        
         <div class="button-container">
           <input class="btn btn-primary" type="submit" value="Add Item">
           <input class="btn btn-primary" type="button" value="Cancel" onclick="reloadPage()">
         </div>
-        
-        
       </div>
     </form>
     <div id="barcodeImageContainer" style="display: none;">
