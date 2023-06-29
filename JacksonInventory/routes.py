@@ -111,11 +111,13 @@ def category_page(id):
     # Retrieve products for the specified category
     category = Category.query.get(id)
     query = text('''
-    SELECT c.id, i.id as productid, c.category, i.productname, i.qty, i.minqty, i.productimage
+    SELECT c.id, i.id as productid, c.category, s.subcategory,
+    i.productname, i.qty, i.minqty, i.productimage
     FROM item i
     JOIN category c ON i.category_id = c.id
+    JOIN subcategory s ON i.subcategory_id = s.id
     WHERE c.id = :id  -- Filter by the category ID
-    ORDER BY c.category, i.productname
+    ORDER BY c.category, s.subcategory,     i.productname
     ''')
     result = db.session.execute(query, {'id': id}) 
     groceries = result.fetchall()
@@ -125,10 +127,12 @@ def category_page(id):
 @login_required
 def all_categories_page():
     query = text('''
-    SELECT c.id, i.id as productid, c.category, i.productname, i.qty, i.minqty, i.productimage
+    SELECT c.id, i.id as productid, c.category, s.subcategory,
+    i.productname, i.qty, i.minqty, i.productimage
     FROM item i
     JOIN category c ON i.category_id = c.id
-    ORDER BY c.category, i.productname
+    JOIN subcategory s ON i.subcategory_id = s.id
+    ORDER BY c.category, s.subcategory, i.productname
     ''')
     result = db.session.execute(query)
     groceries = result.fetchall()
@@ -154,12 +158,12 @@ def add_item():
     productname = request.form['productname']
     qty = request.form['qty']
     minqty = request.form['minqty']
-    productimage = request.form['productimage']
+    productimage_input = request.form['productimage']
     category_id = int(request.form['category_id'])
     subcategory_id = int(request.form['subcategory_id'])
 
     # Create a new Item object and set its attributes
-    item = Item(barcode=barcode, productname=productname, qty=qty, minqty=minqty, productimage=productimage, category_id=category_id, subcategory_id=subcategory_id)
+    item = Item(barcode=barcode, productname=productname, qty=qty, minqty=minqty, productimage=productimage_input, category_id=category_id, subcategory_id=subcategory_id)
 
     # Save the item to the database
     db.session.add(item)

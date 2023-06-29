@@ -66,8 +66,8 @@ function checkItem() {
         var MinQty = 1;
         document.getElementById("qty").value = ProductQty;
         document.getElementById("minqty").value = MinQty;
-        document.getElementById("productimage").readOnly = false;
-        document.getElementById("productimage").value = "https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg";
+        document.getElementById("productimage_input").readOnly = false;
+        document.getElementById("productimage_input").value = "https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg";
 
         document.getElementById("productimage_show").src = "https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg";
         showProductData();
@@ -85,22 +85,20 @@ function checkItem() {
         
         // Check if the image URL is undefined
         if (typeof imageUrl === 'undefined') {
-            console.log("The image is not defined.....")
-            imageUrl = 'https://cdn.dribbble.com/users/1247449/screenshots/3984840/no_img.png';
+            imageUrl = 'https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg';
         }
 
         document.getElementById("barcode").readOnly = true;
         document.getElementById("productname").readOnly = true;
-        document.getElementById("productimage").readOnly = true;
+        document.getElementById("productimage_input").readOnly = true;
         document.getElementById("barcode").value = barcode;
         document.getElementById("productname").value = ProductName;
         document.getElementById("qty").value = ProductQty;
         document.getElementById("minqty").value = MinQty;
-        document.getElementById("productimage").value = imageUrl;
+        document.getElementById("productimage_input").value = imageUrl;
         document.getElementById("productimage_show").src = imageUrl;
 
         showProductData();
-        // document.getElementById("barcode").value = "";
         var audio = new Audio('static/sounds/positive.mp3');
         audio.play();
       }
@@ -113,7 +111,7 @@ function showProductData() {
   const productDataContainer = document.getElementById('productDataContainer');
   const productImage = document.getElementById('productimage_show');
   
-  barcodeContainer.style.display = 'none';
+  barcodeContainer.style.display = 'block';
   productDataContainer.style.display = 'block';
   productImage.style.display = 'block';
 }

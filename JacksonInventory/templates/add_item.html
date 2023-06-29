@@ -5,7 +5,6 @@ Main Menu
 
 {% block content %}
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <a class="btn btn-primary" href="{{ url_for('mainmenu_page') }}">Main Menu</a>  
   <div class="container">
     <form method="POST" action="/add_item">
       <br/>
@@ -16,18 +15,19 @@ Main Menu
       </div>
       
       <div id="productDataContainer" style="display: none;">
-        <textarea id="productname" style="width: 300px; height: 3em; resize: none;" name="productname" readonly class="left-align" onclick="enableProductNameEditing()"></textarea><br/>
+        <textarea id="productname" style="width: 335px; height: 3em; resize: none;" name="productname" readonly class="left-align" onclick="enableProductNameEditing()"></textarea><br/>
         <div class="vertical-center">
-          <img src="" id="productimage_show" alt="" style="max-width: 150px; max-height: 150px; object-fit: contain; background: transparent; display: none;"><br/><br/>
+          <img src="" id="productimage_show" alt="" style="max-width: 150px; max-height: 150px; object-fit: contain; "><br/>
+              <button class="btn btn-warning" type="button" onclick="changeImageSrc(); return false;">Delete Picture</button>
+              <input type="text" id="productimage_input" name="productimage" readonly style="display: none;">
+          <br/>
         
         <div class="quantity-input-container">
-          
             <div class="quantity-label"><span>Qty&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</span></div>
             <div class="quantity-value">
               <button class="quantity-button" type="button" onclick="decrementQty()">-</button>
               <input class="quantity-input center-align" type="text" id="qty" name="qty" required>
               <button class="quantity-button" type="button" onclick="incrementQty()">+</button>
-          
           </div>
         </div>
         <br/>
@@ -38,10 +38,8 @@ Main Menu
             <div class="quantity-value">
               <button class="quantity-button" type="button" onclick="decrementMinQty()">-</button>
               <input class="quantity-input center-align" type="text" id="minqty" name="minqty" required>
-              <button class="quantity-button" type="button" onclick="incrementMinQty()">+</button>
-          
+              <button class="quantity-button" type="button" onclick="incrementMinQty()">+</button>          
           </div>
-        
         </div>
         <br/>
       
@@ -57,20 +55,27 @@ Main Menu
             <option value="{{ category.id }}">{{ category.category }}</option>
           {% endfor %}
         </select>
-        <br/><br/>
+        <br/>
   
         <label for="subcategory" class="left-align">Sub Category</label>
         <select id="subcategory" name="subcategory_id" required class="selectpicker right-align" data-live-search="true">
           <option value="">-- Select Subcategory --</option>
         </select>
+        <br/><br/>
+        
+        <div class="button-container">
+          <input class="btn btn-primary" type="submit" value="Add Item">
+          <input class="btn btn-primary" type="button" value="Cancel" onclick="reloadPage()">
+        </div>
+        
         
       </div>
-        <input type="submit" value="Add Item">
-      </div>
-      </div>
     </form>
+    <div id="barcodeImageContainer" style="display: none;">
+      <img src="" id="barcodeImage" alt="Scanned Barcode" style="max-width: 300px; max-height: 300px;">
+    </div>
   </div>
-  
+
   <script src="static/scripts/scripts.js"></script>
   
   <script>
@@ -81,6 +86,13 @@ Main Menu
     // Call the function to set the focus when the page is loaded or refreshed
     window.onload = setFocusToBarcodeInput;
   </script>
+
+<script>
+  function reloadPage() {
+    location.reload();
+  }
+</script>
+
   
   <script>
     function updateSubcategories() {
@@ -120,6 +132,22 @@ Main Menu
         }
     }
   </script>
+
+<script>
+  function changeImageSrc() {
+    var productImage = document.getElementById("productimage_show");
+    var productImageInput = document.getElementById("productimage_input");
+
+    productImage.src = "https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg";
+    productImageInput.value = "https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg";
+
+    // Prevent form submission
+    return false;
+  }
+
+</script>
+
+
   
   
   <style>
@@ -165,8 +193,7 @@ Main Menu
   
   input[readonly] {
     border: none;
-    background-color: transparent;
-    color: white;
+    color: black;
     padding: 0;
   }
   
@@ -184,36 +211,25 @@ Main Menu
   }
   
   textarea {
-    width: 200px;
+    width: 250px;
     height: 100px;
     resize: none;
   }
+
+  .button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.button-container input {
+  margin-right: 30px;
+}
+
   
   </style>
 
  
-  <script>
-    function loadSubcategories() {
-      var categorySelect = document.getElementById("category");
-      var subcategorySelect = document.getElementById("subcategory");
-      var selectedCategoryId = categorySelect.value;
-      
-      // Reset subcategory options
-      subcategorySelect.innerHTML = '<option value="">-- Select Subcategory --</option>';
-      
-      if (selectedCategoryId) {
-        var subcategories = Array.from(subcategorySelect.options);
-        subcategories.forEach(function(option) {
-          if (option.dataset.category === selectedCategoryId) {
-            subcategorySelect.appendChild(option.cloneNode(true));
-          }
-        });
-        
-        subcategorySelect.disabled = false;
-      } else {
-        subcategorySelect.disabled = true;
-      }
-    }
-  </script>
+ 
 
 {% endblock %}

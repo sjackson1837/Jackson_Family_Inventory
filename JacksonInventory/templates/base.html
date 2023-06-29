@@ -11,7 +11,29 @@
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0/js/bootstrap-select.min.js"></script>
-  
+  <style>
+    @media (max-width: 991.98px) {
+        .offcanvas-collapse {
+            position: fixed;
+            top: 56px;
+            /* Height of navbar */
+            bottom: 0;
+            right: 100%;
+            width: 35%;
+            padding-right: 1rem;
+            padding-left: 1rem;
+            overflow-y: auto;
+            visibility: hidden;
+            background-color: #343a40;
+            transition: transform .3s ease-in-out, visibility .3s ease-in-out;
+        }
+
+        .offcanvas-collapse.open {
+            visibility: visible;
+            transform: translateX(100%);
+        }
+    }
+</style>
   <title>
     {% block title %}
 
@@ -19,6 +41,43 @@
   </title>
 </head>
 <body>
+  <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark" aria-label="Main navigation">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('home_page') }}">Jackson Family Inventory</a>
+        <button class="navbar-toggler p-0 border-0" type="button" id="navbarSideCollapse" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse offcanvas-collapse" id="navbarsExampleDefault">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{{ url_for('mainmenu_page') }}">Main Menu</a>
+                </li>
+                {% if current_user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('logout_page') }}">Logout</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('login_page') }}">Log In</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('register_page') }}">Register</a>
+                </li>
+                
+
+                {% endif %}
+            </ul>
+            <form method="POST" action="{{ url_for('search') }}" class="d-flex ml-auto" role="search">
+                {{ form.hidden_tag() }}
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="searched">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+            <br/>
+        </div>
+    </div>
+    <br/>
+</nav><br/><br/>
+
   {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
   {% for category, message in messages %}
@@ -31,6 +90,7 @@
   {% endfor %}
   {% endif %}
   {% endwith %}
+
   
   {% block content %}
 
@@ -39,7 +99,7 @@
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-pzjw8y+ua61z70K5LvFqgEuIxUgBks4fXnbo7w2pKsLJv/dQC7Sarh4zrPw2+rMX" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.3/js/bootstrap.bundle.min.js" integrity="sha384-pzjw8y+ua61z70K5LvFqgEuIxUgBks4fXnbo7w2pKsLJv/dQC7Sarh4zrPw2+rMX" crossorigin="anonymous"></script>
   
   <script>
     function closeFlashMessage(button) {

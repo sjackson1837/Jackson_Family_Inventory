@@ -1,0 +1,43 @@
+Start to Finish - Creating this page:
+	1. Create a new folder to store all of your files.  I created Inventory Tracker (changed this a few times) in my Documents folder
+	2. Open VS Code and go to the folder you just created (I used the powershell terminal).
+	3. Create virtual environment using the following commands.  
+        - python -m venv virt
+        - cd .\venv\
+        - .\Scripts\activate
+        - cd ..\\
+			
+	4. Install Flask - pip install flask
+		a. You can check to make sure everything installed by typing - flask --version
+	5. Create a new python file in the Inventory Tracker folder.  
+    I called my file InvTracker.py (this is also changed based on the file strucure you see)
+		a. Type this in the InvTracker.py file
+		
+		from flask import Flask
+		app = Flask(__name__)
+		@app.route('/')
+		def hello_world():
+		    return 'Hello, World!'
+	
+	6. GO TO YOUR CMD PROMPT TERMINAL:  
+		a. Type:  cd .\virt\
+		b. .\Scripts\activate
+		c. cd ..\\
+		d. set FLASK_APP=InvTracker
+		e. flask run
+		f. This will open the development server so you can view the InvTracker file you just created.
+	
+    7. Type: set FLASK_DEBUG = 1 (this will allow you to make changes to your code and just refresh the browser, instead of having to stop/start the server again.
+	8. Create a templates folder in the 'Inventory Tracker' directory.  This folder will hold all of the html files
+
+DATABASES AND MODELING - This section shows how to  create database files
+	1. Type in cmd prompt:  pip install flask-sqlalchemy
+	2. Now, import this into the InvTracker.py file:  from flask_sqlalchemy import SQLAlchemy
+	3. Put this in the InvTraker.py file:  db = SQLAlchemy(app)
+	4. Put this in the InvTraker.py file:  app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///invtracker.db'
+	5. Go to cmd prompt.  Type in flask shell
+	6. This will give you three arrows >>>
+	7. >>>from InvTracker import db
+        >>>db.create_all()
+        ***To delete all tables, type db.drop_all() before the db.create_all()
+    
