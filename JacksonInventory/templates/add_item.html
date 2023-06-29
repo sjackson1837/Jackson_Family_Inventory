@@ -5,7 +5,7 @@ Main Menu
 
 {% block content %}
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <div class="container">
+  <div class="container no-scroll">
     <form method="POST" action="/add_item">
       <div id="barcodeContainer">
         <label for="barcode" class="left-align">Barcode:</label>
@@ -149,6 +149,10 @@ Main Menu
       display: flex;
       justify-content: center;
       height: 100vh;
+    }
+
+    .container.no-scroll {
+      overflow: hidden;
     }
   
   .vertical-center {
