@@ -278,8 +278,13 @@ def base():
     form = SearchForm()
     return dict(form=form)
 
+@app.route('/search_start')
+@login_required
+def search_start():
+    return render_template('search_start.html')
+
 #Create Search Function
-@app.route('/search', methods=["POST"])
+@app.route('/search', methods=['GET', 'POST'])
 @login_required
 def search():
     form = SearchForm()
