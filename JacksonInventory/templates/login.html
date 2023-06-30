@@ -6,10 +6,10 @@
 {% block content %}
 <body class="text-center">
     <div class="container">
-        <form method="POST" class="form-signin" style="color:white">
+        <form method="POST" class="form-signin" style="color:black">
             {{ form.hidden_tag() }}
             <img class="mb-4" src="static/images/grocery_bag_cartoon.jfif" width="100px" height="100px" alt="">
-            <h1 class="h3 mb-3 font-weight-normal">
+            <h1 class="h3 mb-3 font-weight-large">
                 Please Login
             </h1>
             <br>
@@ -33,18 +33,20 @@
     </div>
 </body>
 <style>
-    body::after {
-        content: "";
-        background-image: url('static/images/pantry.jpg');
-        background-repeat: no-repeat;
-        background-size: cover;
-        opacity: 0.25;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        position: fixed;
-        z-index: -1;
-    }
+            body::after {
+                content: "";
+                background-image: url('static/images/pantry.jpg');
+                background-repeat: no-repeat;
+                background-size: cover;
+                background-position: center;
+                opacity: 0.25;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                right: 0;
+                position: fixed;
+                z-index: -1;
+            }
+
 </style>
 {% endblock %}
