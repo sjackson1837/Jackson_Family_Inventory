@@ -17,19 +17,21 @@ Family Inventory
    
     </div>
     <style>
-        body::after {
-            content: "";
-            background-image: url('static/images/pantry.jpg');
-            background-repeat: no-repeat;
-            background-size: cover;
-            opacity: 0.25;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            right: 0;
-            position: fixed;
-            z-index: -1;
-        }
+            body::after {
+                content: "";
+                background-image: url('static/images/pantry.jpg');
+                background-repeat: no-repeat;
+                background-size: contain;
+                background-position: center;
+                opacity: 0.15;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                right: 0;
+                position: fixed;
+                z-index: -1;
+            }
+
     </style>
 
 {% endblock %}
