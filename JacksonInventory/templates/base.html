@@ -10,12 +10,24 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0/css/bootstrap-select.min.css">
   
   <style>
-    /* Custom CSS for the navbar */
+body {
+  margin-bottom: 56px; /* Adjust the margin value as needed */
+}
+
+/* Custom CSS for the navbar */
     .navbar {
-      position: sticky;
-      top: 0;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
       z-index: 1000;
     }
+
+
+    
+.custom-navbar {
+    background-color: rgba(195, 182, 182, 0.8); /* Adjust the alpha value to control darkness */
+  }
     
     @media (max-width: 460px) {
       /* Media query for smaller screens */
@@ -27,13 +39,14 @@
         font-size: 14px; /* Adjust the font size as per your preference */
       }
 
-
-
       .navbar-nav {
         flex-wrap: nowrap;
       }
 
     }
+
+
+
   </style>
   
   <title>
@@ -43,7 +56,7 @@
   </title>
 </head>
 <body>
-  <nav class="navbar navbar-expand-sm bg-dark">
+  <nav class="navbar navbar-expand-sm custom-navbar">
     <div class="container-fluid">
         <a class="navbar-brand" href="{{ url_for('home_page') }}">Home</a>
         <a class="navbar-brand" href="{{ url_for('mainmenu_page') }}">Main Menu</a>
@@ -51,7 +64,7 @@
           <a class="navbar-brand" href="{{ url_for('logout_page') }}">Logout</a>
         {% else %}
           <a class="navbar-brand" href="{{ url_for('login_page') }}">Log In</a>
-          <a class="nav-brand" href="{{ url_for('register_page') }}">Register</a>
+          <a class="navbar-brand" href="{{ url_for('register_page') }}">Register</a>
         {% endif %}
     </div>
 </nav>

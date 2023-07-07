@@ -85,7 +85,6 @@ def logout_page():
 
 
 
-from sqlalchemy import func
 
 @app.route('/items')
 @login_required
@@ -142,8 +141,52 @@ def all_categories_page():
 @app.route('/items/<int:id>')
 @login_required
 def item(id):
-    item = Item.query.get_or_404(id)
-    return render_template('item.html', item=item)
+    query = text('''
+    SELECT c.id as categoryid, i.id as productid, c.category, s.id as subcategoryid, s.subcategory,
+    i.productname, i.qty, i.minqty, i.productimage
+    FROM item i
+    JOIN category c ON i.category_id = c.id
+    JOIN subcategory s ON i.subcategory_id = s.id
+    WHERE i.id = :id
+    ORDER BY c.category, s.subcategory, i.productname
+    ''')
+    result = db.session.execute(query, {'id': id})  # Pass the 'id' value as a parameter
+    item = result.fetchall()
+
+    # Retrieve categories and subcategories from the database
+    categories_query = Category.query.all()
+    subcategories_query = Subcategory.query.all()
+
+    return render_template('item.html', item=item, categories=categories_query, subcategories=subcategories_query)
+
+@app.route('/items/<int:id>', methods=['POST'])
+@login_required
+def update_item(id):
+    # Retrieve the updated values from the form
+    updated_productname = request.form.get('productname')
+    print(updated_productname)
+    updated_qty = request.form.get('qty')
+    updated_minqty = request.form.get('minqty')
+    updated_category_id = request.form.get('category_id')
+    print(updated_category_id)
+    updated_subcategory_id = request.form.get('subcategory_id')
+    print(updated_subcategory_id)
+
+    # Update the item in the database
+    item = Item.query.get(id)
+    item.productname = updated_productname
+    item.qty = updated_qty
+    item.minqty = updated_minqty
+    item.category_id = updated_category_id
+    print(updated_category_id)
+    item.subcategory_id = updated_subcategory_id
+
+    db.session.commit()
+
+    # Redirect to the item view page or any other appropriate response
+    return redirect(url_for('items_page'))
+
+
 
 @app.route('/add_item', methods=['GET'])
 def add_item_form():

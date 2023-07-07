@@ -117,6 +117,7 @@ function showProductData() {
 }
 
 function incrementQty() {
+  console.log("I'm ereererkjerh");
   const qtyInput = document.getElementById('qty');
   let qtyValue = parseInt(qtyInput.value);
   qtyValue = isNaN(qtyValue) ? 0 : qtyValue;
