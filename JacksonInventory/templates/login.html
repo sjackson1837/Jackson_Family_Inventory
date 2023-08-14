@@ -6,47 +6,148 @@
 {% block content %}
 <body class="text-center">
     <div class="container">
-        <form method="POST" class="form-signin" style="color:black">
+        <form method="POST" class="form-signin" style="color: black">
             {{ form.hidden_tag() }}
             <img class="mb-4" src="static/images/grocery_bag_cartoon.jfif" width="100px" height="100px" alt="">
             <h1 class="h3 mb-3 font-weight-large">
                 Please Login
             </h1>
             <br>
+
             {{ form.username.label() }}
-            {{ form.username(class="form-control", placeholder="User Name") }}
+            <div class="row justify-content-center">
+                <div class="col-md-3">
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label class="btn btn-secondary btn-lg btn-block">
+                                <input type="radio" name="{{ form.username.name }}" value="Steven"> Steven
+                            </label>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="btn btn-secondary btn-lg btn-block">
+                                <input type="radio" name="{{ form.username.name }}" value="Kanika"> Kanika
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-1"></div> <!-- Add an empty column for line break -->
+                <div class="col-md-3">
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label class="btn btn-secondary btn-lg btn-block">
+                                <input type="radio" name="{{ form.username.name }}" value="Averi"> Averi
+                            </label>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="btn btn-secondary btn-lg btn-block">
+                                <input type="radio" name="{{ form.username.name }}" value="Adalyn"> Adalyn
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+                        
 
             {{ form.password.label() }}
-            {{ form.password(class="form-control", placeholder="Password") }}
+            <div class="keypad d-flex justify-content-center">
+                <div class="row">
+                    <div class="col-4">
+                        <button type="button" class="btn btn-secondary btn-lg keypad-btn" data-key="7">7</button>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-secondary btn-lg keypad-btn" data-key="8">8</button>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-secondary btn-lg keypad-btn" data-key="9">9</button>
+                    </div>
+                </div>
+            </div>
+            <div class="keypad d-flex justify-content-center">
+                <div class="row">
+                    <div class="col-4">
+                        <button type="button" class="btn btn-secondary btn-lg keypad-btn" data-key="4">4</button>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-secondary btn-lg keypad-btn" data-key="5">5</button>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-secondary btn-lg keypad-btn" data-key="6">6</button>
+                    </div>
+                </div>
+            </div>
+            <div class="keypad d-flex justify-content-center">
+                <div class="row">
+                    <div class="col-4">
+                        <button type="button" class="btn btn-secondary btn-lg keypad-btn" data-key="1">1</button>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-secondary btn-lg keypad-btn" data-key="2">2</button>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-secondary btn-lg keypad-btn" data-key="3">3</button>
+                    </div>
+                </div>
+            </div>
+            <div class="keypad d-flex justify-content-center">
+                <div class="row">
+                    <div class="col-12 text-center"> <!-- Make the column span the full width -->
+                        <button type="button" class="btn btn-secondary btn-lg keypad-btn" data-key="0">0</button>
+                    </div>
+                </div>
+            </div>
+            
+            <input type="hidden" class="keypad-input" name="{{ form.password.name }}" pattern="[0-9]*" required>
 
             <br>
 
             {{ form.submit(class="btn btn-lg btn-block btn-primary") }}
-            <br/><br/><br/>
+            <br/>
         
             <div class="checkbox mb-3">
                 <h6>Do not have an account?</h6>
                 <a class="btn btn-sm btn-secondary" href="{{ url_for('register_page') }}">Register</a>
-             </div>
+            </div>
 
         </form>
     </div>
 </body>
 <style>
-            body::after {
-                content: "";
-                background-image: url('static/images/pantry.jpg');
-                background-repeat: no-repeat;
-                background-size: cover;
-                background-position: center;
-                opacity: 0.25;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                right: 0;
-                position: fixed;
-                z-index: -1;
-            }
+    body::after {
+        content: "";
+        background-image: url('static/images/pantry.jpg');
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+        opacity: 0.25;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        position: fixed;
+        z-index: -1;
+    }
 
+    .keypad {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .keypad-btn {
+        width: 100%;
+        font-size: 33px;
+    }
 </style>
+<script>
+    const keypadButtons = document.querySelectorAll('.keypad-btn');
+    const keypadInput = document.querySelector('.keypad-input');
+
+    keypadButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            keypadInput.value += button.getAttribute('data-key');
+        });
+    });
+</script>
 {% endblock %}
