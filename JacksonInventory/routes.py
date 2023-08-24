@@ -50,6 +50,7 @@ def register_page():
     if form.validate_on_submit():
         user_to_create = User(username=form.username.data,
                               password=form.password1.data)
+        print(form.password1.data)
         db.session.add(user_to_create)
         db.session.commit()
         login_user(user_to_create)
