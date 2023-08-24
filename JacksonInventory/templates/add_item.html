@@ -73,12 +73,20 @@ Main Menu
   <script src="static/scripts/scripts.js"></script>
   
   <script>
-    function setFocusToBarcodeInput() {
-      document.getElementById("barcode").focus();
-    }
+    // function setFocusToBarcodeInput() {
+    //   document.getElementById("barcode").focus();
+    // }
   
-    // Call the function to set the focus when the page is loaded or refreshed
-    window.onload = setFocusToBarcodeInput;
+    // // Call the function to set the focus when the page is loaded or refreshed
+    // window.onload = setFocusToBarcodeInput;
+    function setFocusToBarcodeInput() {
+        setTimeout(function() {
+          document.getElementById("barcode").focus();
+        }, 100); // Adjust the delay as needed
+      }
+
+window.onload = setFocusToBarcodeInput;
+
   </script>
 
 <script>

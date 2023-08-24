@@ -16,35 +16,23 @@
 
             {{ form.username.label() }}
             <div class="row justify-content-center">
-                <div class="col-md-3">
-                    <div class="row">
                         <div class="col-md-12 mb-3">
                             <label class="btn btn-secondary btn-lg btn-block">
                                 <input type="radio" name="{{ form.username.name }}" value="Steven"> Steven
                             </label>
                         </div>
-                        <div class="col-md-12">
+                        
                             <label class="btn btn-secondary btn-lg btn-block">
                                 <input type="radio" name="{{ form.username.name }}" value="Kanika"> Kanika
                             </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-1"></div> <!-- Add an empty column for line break -->
-                <div class="col-md-3">
-                    <div class="row">
-                        <div class="col-md-12 mb-3">
+                        
                             <label class="btn btn-secondary btn-lg btn-block">
                                 <input type="radio" name="{{ form.username.name }}" value="Averi"> Averi
                             </label>
-                        </div>
-                        <div class="col-md-12">
                             <label class="btn btn-secondary btn-lg btn-block">
                                 <input type="radio" name="{{ form.username.name }}" value="Adalyn"> Adalyn
                             </label>
-                        </div>
-                    </div>
-                </div>
+                        
             </div>
             
                         
@@ -96,7 +84,13 @@
                     </div>
                 </div>
             </div>
-            
+            <div class="keypad d-flex justify-content-center">
+                <div class="row">
+                    <div class="col-12 text-center"> <!-- Make the column span the full width -->
+                        <button type="button" class="btn btn-secondary btn-lg keypad-btn" id="clear-button">Clear</button>
+                    </div>
+                </div>
+            </div>
             <input type="hidden" class="keypad-input" name="{{ form.password.name }}" pattern="[0-9]*" required>
 
             <br>
@@ -140,14 +134,26 @@
         font-size: 33px;
     }
 </style>
+
 <script>
     const keypadButtons = document.querySelectorAll('.keypad-btn');
     const keypadInput = document.querySelector('.keypad-input');
+    const clearButton = document.querySelector('#clear-button');
 
     keypadButtons.forEach(button => {
         button.addEventListener('click', () => {
-            keypadInput.value += button.getAttribute('data-key');
+            if (button.getAttribute('data-key') === '0') {
+                keypadInput.value += button.getAttribute('data-key');
+            } else {
+                keypadInput.value += button.getAttribute('data-key');
+            }
         });
     });
+
+    clearButton.addEventListener('click', () => {
+        keypadInput.value = '';
+    });
 </script>
+
+
 {% endblock %}
