@@ -79,14 +79,16 @@ Main Menu
   
     // // Call the function to set the focus when the page is loaded or refreshed
     // window.onload = setFocusToBarcodeInput;
-    function setFocusToBarcodeInput() {
-        setTimeout(function() {
-          document.getElementById("barcode").focus();
-        }, 100); // Adjust the delay as needed
-      }
+        function setFocusToBarcodeInput() {
+            var barcodeInput = document.getElementById("barcode");
+            barcodeInput.focus();
 
-window.onload = setFocusToBarcodeInput;
+            // Trigger the keyboard manually
+            barcodeInput.click();
+            barcodeInput.focus();
+          }
 
+          window.onload = setFocusToBarcodeInput;
   </script>
 
 <script>
