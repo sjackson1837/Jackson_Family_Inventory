@@ -88,13 +88,19 @@ Main Menu
         //     barcodeInput.focus();
         //   }
 
-        //   window.onload = setFocusToBarcodeInput;
-        window.addEventListener('DOMContentLoaded', (event) => {
-    // Get a reference to the barcode input field by its ID
-    const barcodeInput = document.getElementById('barcode');
+    //     //   window.onload = setFocusToBarcodeInput;
+    //     window.addEventListener('DOMContentLoaded', (event) => {
+    // // Get a reference to the barcode input field by its ID
+    // const barcodeInput = document.getElementById('barcode');
     
-    // Set focus to the input field
-    barcodeInput.focus();
+    // // Set focus to the input field
+    // barcodeInput.focus();
+//});
+window.addEventListener('DOMContentLoaded', (event) => {
+    setTimeout(() => {
+        const barcodeInput = document.getElementById('barcode');
+        barcodeInput.focus();
+    }, 100); // Adjust the delay time as needed
 });
   </script>
 
