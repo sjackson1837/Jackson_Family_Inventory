@@ -79,16 +79,23 @@ Main Menu
   
     // // Call the function to set the focus when the page is loaded or refreshed
     // window.onload = setFocusToBarcodeInput;
-        function setFocusToBarcodeInput() {
-            var barcodeInput = document.getElementById("barcode");
-            barcodeInput.focus();
+        // function setFocusToBarcodeInput() {
+        //     var barcodeInput = document.getElementById("barcode");
+        //     barcodeInput.focus();
 
-            // Trigger the keyboard manually
-            barcodeInput.click();
-            barcodeInput.focus();
-          }
+        //     // Trigger the keyboard manually
+        //     barcodeInput.click();
+        //     barcodeInput.focus();
+        //   }
 
-          window.onload = setFocusToBarcodeInput;
+        //   window.onload = setFocusToBarcodeInput;
+        window.addEventListener('DOMContentLoaded', (event) => {
+    // Get a reference to the barcode input field by its ID
+    const barcodeInput = document.getElementById('barcode');
+    
+    // Set focus to the input field
+    barcodeInput.focus();
+});
   </script>
 
 <script>
