@@ -13,7 +13,7 @@
                 Please Login
             </h1>
 
-            {{ form.username.label() }}
+            <!-- {{ form.username.label() }} -->
             <div class="col-md-12 mb-12">
                 <div class="btn-group" role="group" aria-label="User Buttons">
                     <label class="btn btn-secondary btn-md">
@@ -31,7 +31,7 @@
                 </div>
             </div>
 
-            {{ form.password.label() }}
+            <!-- {{ form.password.label() }} -->
             <div class="keypad d-flex justify-content-center">
                 <div class="row">
                     <div class="col-4">
@@ -103,51 +103,6 @@
         </form>
     </div>
 </body>
-<style>
-    body::after {
-        content: "";
-        background-image: url('static/images/pantry.jpg');
-        background-repeat: no-repeat;
-        background-size: cover;
-        background-position: center;
-        opacity: 0.25;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        position: fixed;
-        z-index: -1;
-    }
-
-    .btn-group {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-}
-
-.btn-group .btn {
-    width: 23%; /* Adjust the width to your preference */
-    margin-right: 15px; /* Add margin to the right side of each button */
-}
-
-
-    .keypad {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
-        margin-top: 10px;
-    }
-
-    .keypad-btn {
-        width: 100%;
-        font-size: 20px;
-    }
-
-    .keypad-input-display {
-    font-size: 18px;
-    margin: 10px auto;
-    }
-</style>
 
 <script>
     const keypadButtons = document.querySelectorAll('.keypad-btn');

@@ -4,7 +4,6 @@ Main Menu
 {% endblock %}
 
 {% block content %}
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <div class="container no-scroll">
     <form method="POST" action="/add_item">
       <div id="barcodeContainer">
@@ -22,10 +21,10 @@ Main Menu
         <div class="quantity-input-container">
             <div class="quantity-label"><span>Qty&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</span></div>
             <div class="quantity-value">
-              <button class="quantity-button" type="button" onclick="decrementQty()">-</button>
+              <button class="quantity-button circular-button" type="button" onclick="decrementQty()">-</button>
               <input class="quantity-input center-align" type="text" id="qty" name="qty" required>
-              <button class="quantity-button" type="button" onclick="incrementQty()">+</button>
-          </div>
+              <button class="quantity-button circular-button" type="button" onclick="incrementQty()">+</button>
+            </div>            
         </div>
         <br/>
         
@@ -33,9 +32,9 @@ Main Menu
           
             <div class="quantity-label">Min Qty:</div>
             <div class="quantity-value">
-              <button class="quantity-button" type="button" onclick="decrementMinQty()">-</button>
+              <button class="quantity-button circular-button" type="button" onclick="decrementMinQty()">-</button>
               <input class="quantity-input center-align" type="text" id="minqty" name="minqty" required>
-              <button class="quantity-button" type="button" onclick="incrementMinQty()">+</button>          
+              <button class="quantity-button circular-button" type="button" onclick="incrementMinQty()">+</button>          
           </div>
         </div>
         <br/>
@@ -71,102 +70,7 @@ Main Menu
   </div>
 
   <script src="static/scripts/scripts.js"></script>
-  
-  <script>
-    // function setFocusToBarcodeInput() {
-    //   document.getElementById("barcode").focus();
-    // }
-  
-    // // Call the function to set the focus when the page is loaded or refreshed
-    // window.onload = setFocusToBarcodeInput;
-        // function setFocusToBarcodeInput() {
-        //     var barcodeInput = document.getElementById("barcode");
-        //     barcodeInput.focus();
-
-        //     // Trigger the keyboard manually
-        //     barcodeInput.click();
-        //     barcodeInput.focus();
-        //   }
-
-    //     //   window.onload = setFocusToBarcodeInput;
-    //     window.addEventListener('DOMContentLoaded', (event) => {
-    // // Get a reference to the barcode input field by its ID
-    // const barcodeInput = document.getElementById('barcode');
     
-    // // Set focus to the input field
-    // barcodeInput.focus();
-//});
-window.addEventListener('DOMContentLoaded', (event) => {
-    setTimeout(() => {
-        const barcodeInput = document.getElementById('barcode');
-        barcodeInput.focus();
-    }, 100); // Adjust the delay time as needed
-});
-  </script>
-
-<script>
-  function reloadPage() {
-    location.reload();
-  }
-</script>
-
-  
-  <script>
-    function updateSubcategories() {
-        var category_id = document.getElementById('category').value;
-        var subcategoryDropdown = document.getElementById('subcategory');
-  
-        // Clear previous options
-        subcategoryDropdown.innerHTML = '';
-  
-        // Create an empty default option
-        var defaultOption = document.createElement('option');
-        defaultOption.value = '';
-        defaultOption.textContent = '-- Select Subcategory --';
-        subcategoryDropdown.appendChild(defaultOption);
-  
-        // Perform an AJAX request to retrieve subcategories based on the selected category
-        if (category_id !== '') {
-            $.ajax({
-                url: '/subcategories',
-                method: 'POST',
-                data: {
-                    category_id: category_id
-                },
-                success: function(response) {
-                    // Add new subcategory options based on the server response
-                    response.subcategories.forEach(function(subcategory) {
-                        var option = document.createElement('option');
-                        option.value = subcategory.id;
-                        option.textContent = subcategory.name;
-                        subcategoryDropdown.appendChild(option);
-                    });
-                },
-                error: function(xhr, status, error) {
-                    console.error(error);
-                }
-            });
-        }
-    }
-  </script>
-
-<script>
-  function changeImageSrc() {
-    var productImage = document.getElementById("productimage_show");
-    var productImageInput = document.getElementById("productimage_input");
-
-    productImage.src = "https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg";
-    productImageInput.value = "https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg";
-
-    // Prevent form submission
-    return false;
-  }
-
-</script>
-
-
-  
-  
   <style>
   .container {
       display: flex;
@@ -202,8 +106,27 @@ window.addEventListener('DOMContentLoaded', (event) => {
   }
   
   .quantity-button {
-    font-size: 20px;
+    font-size: 40px;
   } 
+
+  .circular-button {
+  width: 30px; /* Adjust the width as needed */
+  height: 30px; /* Adjust the height as needed */
+  border-radius: 50%; /* Makes the button circular */
+  border: none; /* Remove the default button border */
+  background-color: #2c05dd; /* Set the button's background color */
+  color: #fff; /* Set the button's text color */
+  font-size: 25px; /* Adjust the font size as needed */
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  }
+
+  .circular-button .button-text {
+  transform: translateY(15px); /* Adjust the value to move the text up or down */
+}
   
   .quantity-input {
     margin-right: 10px;
