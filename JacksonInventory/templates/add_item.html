@@ -8,7 +8,9 @@ Main Menu
     <form method="POST" action="/add_item">
       <div id="barcodeContainer">
         <label for="barcode" class="left-align">Barcode:</label>
-        <input type="text" id="barcode" name="barcode" required oninput="checkBarcode(event)" class="right-align"><br/>
+        <!-- <input type="text" id="barcode" name="barcode" required oninput="checkBarcode(event)" class="right-align"><br/> -->
+        <input type="text" id="barcode" name="barcode" required oninput="checkBarcodeDelayed(event)" class="right-align"><br/>
+
       </div>
       
       <div id="productDataContainer" style="display: none;">

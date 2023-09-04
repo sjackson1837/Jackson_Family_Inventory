@@ -307,13 +307,12 @@ def use_item():
         product_name = existing_item.productname
         updated_qty = existing_item.qty
         flash(f'Product: {product_name} now has {updated_qty}', category='success')
-        return jsonify({
-            'redirect_url': url_for('use_item'),
-            'product_name': product_name,
-            'updated_qty': updated_qty
-        })
+        # Redirect to the /use_item webpage
+        return redirect(url_for('use_item'))
     else:
-        return jsonify({'barcode_not_found': True})
+        # flash(f'Barcode Not Found')
+        # flash(f'Barcode Not Found', category='success')
+        return redirect(url_for('use_item'))
     
 
 #Pass Stuff to Navbar

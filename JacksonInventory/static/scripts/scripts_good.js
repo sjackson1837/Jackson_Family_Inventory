@@ -1,24 +1,7 @@
-let debounceTimer;
-
-function debounce(func, delay) {
-  clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(func, delay);
-}
-
-function checkBarcodeDelayed(event) {
-  debounce(() => {
-    checkBarcode(event);
-  }, 500); // Adjust the delay as needed (e.g., 500 milliseconds)
-}
-
-function checkBarcodeDelayedUseItem(event) {
-  debounce(() => {
-    useItem(event);
-  }, 500); // Adjust the delay as needed (e.g., 500 milliseconds)
-}
-
 function checkBarcode(event) {
+  console.log("I'm here!!!!!!");
   for (let i = 0; i < 5; i++) {
+    console.log("Iteration: " + i);
   }
   const barcode = event.target.value;
 
@@ -33,11 +16,7 @@ function checkBarcode(event) {
           const response = JSON.parse(xhr.responseText);
           if (response.redirect_url) {
             // Barcode found in the database, update quantity and save the record
-            var audio = new Audio('static/sounds/positive.mp3');
-          audio.onended = function () {
             window.location.href = response.redirect_url;
-          };
-          audio.play();
           } else if (response.barcode_not_found) {
             // Barcode not found, run the checkItem() function
             checkItem(barcode);
@@ -63,20 +42,10 @@ function useItem(event) {
         const response = JSON.parse(xhr.responseText);
         if (response.redirect_url) {
           // Barcode found in the database, update quantity and save the record
-          console.log("here before sound");
-          var audio = new Audio('static/sounds/positive.mp3');
-          audio.onended = function () {
-            window.location.href = response.redirect_url;
-          };
-          audio.play();
+          window.location.href = response.redirect_url;
         } else if (response.barcode_not_found) {
           // Barcode not found, run the checkItem() function
           //checkItem(barcode);
-          var audio = new Audio('static/sounds/negative.mp3');
-          audio.onended = function () {
-            window.location.href = response.redirect_url;
-          };
-          audio.play();
           alert("Item not found in inventory");
           event.target.value = "";
         } else {
@@ -111,7 +80,7 @@ function checkItem() {
 
         document.getElementById("productimage_show").src = "https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg";
         showProductData();
-        var audio = new Audio('static/sounds/negative.mp3');
+        var audio = new Audio('scripts/sounds/negative.mp3');
         audio.play();
       } else {
         // Barcode found, populate product information
@@ -157,6 +126,7 @@ function showProductData() {
 }
 
 function incrementQty() {
+  console.log("I'm ereererkjerh");
   const qtyInput = document.getElementById('qty');
   let qtyValue = parseInt(qtyInput.value);
   qtyValue = isNaN(qtyValue) ? 0 : qtyValue;
