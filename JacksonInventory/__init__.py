@@ -7,7 +7,7 @@ from flask_login import LoginManager
 app = Flask(__name__)
 
 ENV = 'prod'
-#ENV = 'dev'
+# ENV = 'dev'
 if ENV == 'dev':
     app.debug = True
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///jacksoninv.db'
