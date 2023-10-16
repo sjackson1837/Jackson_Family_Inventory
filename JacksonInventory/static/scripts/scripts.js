@@ -11,11 +11,7 @@ function checkBarcodeDelayed(event) {
   }, 500); // Adjust the delay as needed (e.g., 500 milliseconds)
 }
 
-function checkBarcodeDelayedUseItem(event) {
-  debounce(() => {
-    useItem(event);
-  }, 500); // Adjust the delay as needed (e.g., 500 milliseconds)
-}
+
 
 function checkBarcode(event) {
   for (let i = 0; i < 5; i++) {
@@ -52,41 +48,7 @@ function checkBarcode(event) {
 }
 
 
-function useItem(event) {
-  const barcode = event.target.value;
-  const xhr = new XMLHttpRequest();
-  xhr.open("POST", "/use_item", true);
-  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState === 4) {
-      if (xhr.status === 200) {
-        const response = JSON.parse(xhr.responseText);
-        if (response.redirect_url) {
-          // Barcode found in the database, update quantity and save the record
-          console.log("here before sound");
-          var audio = new Audio('static/sounds/positive.mp3');
-          audio.onended = function () {
-            window.location.href = response.redirect_url;
-          };
-          audio.play();
-        } else if (response.barcode_not_found) {
-          // Barcode not found, run the checkItem() function
-          //checkItem(barcode);
-          var audio = new Audio('static/sounds/negative.mp3');
-          audio.onended = function () {
-            window.location.href = response.redirect_url;
-          };
-          audio.play();
-          alert("Item not found in inventory");
-          event.target.value = "";
-        } else {
-          //flash("testing flash message");
-        }
-      }
-    }
-  };
-  xhr.send("barcode=" + barcode);
-}
+
 
 
 function checkItem() {
