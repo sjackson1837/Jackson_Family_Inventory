@@ -138,13 +138,10 @@ def item(id):
 def update_item(id):
     # Retrieve the updated values from the form
     updated_productname = request.form.get('productname')
-    print(updated_productname)
     updated_qty = request.form.get('qty')
     updated_minqty = request.form.get('minqty')
     updated_category_id = request.form.get('category_id')
-    print(updated_category_id)
     updated_subcategory_id = request.form.get('subcategory_id')
-    print(updated_subcategory_id)
 
     # Update the item in the database
     item = Item.query.get(id)
@@ -152,7 +149,6 @@ def update_item(id):
     item.qty = updated_qty
     item.minqty = updated_minqty
     item.category_id = updated_category_id
-    print(updated_category_id)
     item.subcategory_id = updated_subcategory_id
 
     db.session.commit()
