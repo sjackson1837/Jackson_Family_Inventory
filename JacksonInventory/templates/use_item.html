@@ -16,6 +16,13 @@ Add Inventory
   </div>
 
   <script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Wait for the page to load and then focus on the barcode input field
+      document.getElementById('barcode').focus();
+    });
+
+
     // Define the debounce function
     function debounce(func, delay) {
       let timer;
@@ -81,4 +88,19 @@ Add Inventory
     }
   }
 </script>
+
+
+<style>
+    .container {
+      display: flex;
+      justify-content: center;
+      height: 100vh;
+    }
+    
+    .right-align {
+    text-align: right;
+    display: inline-block;
+    width: 200px;
+  }
+</style>
 {% endblock %}
