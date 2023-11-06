@@ -302,17 +302,15 @@ def use_item():
     existing_item = Item.query.filter_by(barcode=barcode).first()
 
     if existing_item:
-        existing_item.qty -= 1  # Increment the quantity by 1
+        existing_item.qty -= 1  # Decrement the quantity by 1
         db.session.commit()
         product_name = existing_item.productname
         updated_qty = existing_item.qty
         flash(f'Product: {product_name} now has {updated_qty}', category='success')
-        # Redirect to the /use_item webpage
-        return redirect(url_for('use_item'))
+        return jsonify({'redirect_url': url_for('use_item')})  # Redirect to a different route
     else:
-        # flash(f'Barcode Not Found')
-        # flash(f'Barcode Not Found', category='success')
-        return redirect(url_for('use_item'))
+        flash('Barcode Not Found', category='danger')
+        return jsonify({'barcode_not_found': True})
     
 
 #Pass Stuff to Navbar

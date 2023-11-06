@@ -63,24 +63,19 @@ function useItem(event) {
         const response = JSON.parse(xhr.responseText);
         if (response.redirect_url) {
           // Barcode found in the database, update quantity and save the record
-          console.log("here before sound");
+          console.log("Barcode found, redirecting after sound");
           var audio = new Audio('static/sounds/positive.mp3');
           audio.onended = function () {
             window.location.href = response.redirect_url;
           };
           audio.play();
         } else if (response.barcode_not_found) {
-          // Barcode not found, run the checkItem() function
-          //checkItem(barcode);
+          // Barcode not found, play negative sound and show alert
+          console.log("Barcode not found, playing negative sound");
           var audio = new Audio('static/sounds/negative.mp3');
-          audio.onended = function () {
-            window.location.href = response.redirect_url;
-          };
           audio.play();
           alert("Item not found in inventory");
           event.target.value = "";
-        } else {
-          //flash("testing flash message");
         }
       }
     }
