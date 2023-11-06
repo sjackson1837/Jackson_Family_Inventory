@@ -11,11 +11,7 @@ function checkBarcodeDelayed(event) {
   }, 500); // Adjust the delay as needed (e.g., 500 milliseconds)
 }
 
-function checkBarcodeDelayedUseItem(event) {
-  debounce(() => {
-    useItem(event);
-  }, 500); // Adjust the delay as needed (e.g., 500 milliseconds)
-}
+
 
 function checkBarcode(event) {
   for (let i = 0; i < 5; i++) {
@@ -52,6 +48,7 @@ function checkBarcode(event) {
 }
 
 
+<<<<<<< HEAD
 function useItem(event) {
   const barcode = event.target.value;
   const xhr = new XMLHttpRequest();
@@ -82,6 +79,9 @@ function useItem(event) {
   };
   xhr.send("barcode=" + barcode);
 }
+=======
+
+>>>>>>> 6d1ce5f108c428eb3ed9624577224624e59f3e3f
 
 
 function checkItem() {

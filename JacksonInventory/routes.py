@@ -1,7 +1,7 @@
 from JacksonInventory import app
 from flask import render_template, redirect, url_for, flash, request, jsonify
 from JacksonInventory.models import Item, User, Category, Subcategory
-from JacksonInventory.forms import RegisterForm, LoginForm, PurchaseItemForm, SellItemForm, SearchForm
+from JacksonInventory.forms import RegisterForm, LoginForm, SearchForm
 from JacksonInventory import db
 from flask_login import login_user, logout_user, login_required, current_user
 from sqlalchemy.sql import text, func
@@ -12,36 +12,12 @@ def home_page():
     return render_template('home.html')
 
 @app.route('/mainmenu', methods=['GET', 'POST'])
-@login_required
+# @login_required
 def mainmenu_page():
-    purchase_form = PurchaseItemForm()
-    selling_form = SellItemForm()
     if request.method == "POST":
-        #Purchase Item Logic
-        purchased_item = request.form.get('purchased_item')
-        p_item_object = Item.query.filter_by(name=purchased_item).first()
-        if p_item_object:
-            if current_user.can_purchase(p_item_object):
-                p_item_object.buy(current_user)
-                flash(f"Congratulations! You purchased {p_item_object.name} for {p_item_object.price}$", category='success')
-            else:
-                flash(f"Unfortunately, you don't have enough money to purchase {p_item_object.name}!", category='danger')
-        #Sell Item Logic
-        sold_item = request.form.get('sold_item')
-        s_item_object = Item.query.filter_by(name=sold_item).first()
-        if s_item_object:
-            if current_user.can_sell(s_item_object):
-                s_item_object.sell(current_user)
-                flash(f"Congratulations! You sold {s_item_object.name} back to market!", category='success')
-            else:
-                flash(f"Something went wrong with selling {s_item_object.name}", category='danger')
-
-
         return redirect(url_for('mainmenu_page'))
 
     if request.method == "GET":
-        # items = Item.query.filter_by(owner=None)
-        # owned_items = Item.query.filter_by(owner=current_user.id)
         return render_template('mainmenu.html')
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -84,11 +60,8 @@ def logout_page():
     flash("You have been logged out!", category='info')
     return redirect(url_for("home_page"))
 
-
-
-
 @app.route('/items')
-@login_required
+# @login_required
 def items_page():
     query = text('''
     SELECT c.id, c.category, COUNT(i.category_id) AS product_count
@@ -106,7 +79,7 @@ def items_page():
     return render_template('items.html', categories=categories, total_product_count=total_product_count)
 
 @app.route('/category/<int:id>')
-@login_required
+# @login_required
 def category_page(id):
     # Retrieve products for the specified category
     category = Category.query.get(id)
@@ -124,7 +97,7 @@ def category_page(id):
     return render_template('category.html', category=category, groceries=groceries)
 
 @app.route('/all_categories')
-@login_required
+# @login_required
 def all_categories_page():
     query = text('''
     SELECT c.id, i.id as productid, c.category, s.subcategory,
@@ -140,7 +113,7 @@ def all_categories_page():
     return render_template('category.html', groceries=groceries)
 
 @app.route('/items/<int:id>')
-@login_required
+# @login_required
 def item(id):
     query = text('''
     SELECT c.id as categoryid, i.id as productid, c.category, s.id as subcategoryid, s.subcategory,
@@ -161,17 +134,14 @@ def item(id):
     return render_template('item.html', item=item, categories=categories_query, subcategories=subcategories_query)
 
 @app.route('/items/<int:id>', methods=['POST'])
-@login_required
+# @login_required
 def update_item(id):
     # Retrieve the updated values from the form
     updated_productname = request.form.get('productname')
-    print(updated_productname)
     updated_qty = request.form.get('qty')
     updated_minqty = request.form.get('minqty')
     updated_category_id = request.form.get('category_id')
-    print(updated_category_id)
     updated_subcategory_id = request.form.get('subcategory_id')
-    print(updated_subcategory_id)
 
     # Update the item in the database
     item = Item.query.get(id)
@@ -179,15 +149,12 @@ def update_item(id):
     item.qty = updated_qty
     item.minqty = updated_minqty
     item.category_id = updated_category_id
-    print(updated_category_id)
     item.subcategory_id = updated_subcategory_id
 
     db.session.commit()
 
     # Redirect to the item view page or any other appropriate response
     return redirect(url_for('items_page'))
-
-
 
 @app.route('/add_item', methods=['GET'])
 def add_item_form():
@@ -230,9 +197,8 @@ def subcategories():
     # Return the subcategories as JSON response
     return jsonify({'subcategories': subcategory_list})
 
-
 @app.route('/check_item', methods=['POST'])
-@login_required
+# @login_required
 def check_item():
     barcode = request.form['barcode']
     existing_item = Item.query.filter_by(barcode=barcode).first()
@@ -252,7 +218,7 @@ def check_item():
         return jsonify({'barcode_not_found': True})
     
 @app.route('/grocery_list', methods=['GET'])
-@login_required
+# @login_required
 def grocery_list():
     query = text('''
     SELECT c.category, i.productname, i.qty, i.minqty
@@ -289,14 +255,14 @@ def grocery_list():
     return render_template('grocery_list.html', grouped_groceries=grouped_groceries)
 
 @app.route('/use_item', methods=['GET'])
-@login_required
+# @login_required
 def use_item_form():
     barcode = request.args.get('barcode')
     categories = Category.query.order_by(Category.category)
     return render_template('use_item.html', barcode=barcode, categories=categories)
 
 @app.route('/use_item', methods=['POST'])
-@login_required
+# @login_required
 def use_item():
     barcode = request.form['barcode']
     existing_item = Item.query.filter_by(barcode=barcode).first()
@@ -307,10 +273,12 @@ def use_item():
         product_name = existing_item.productname
         updated_qty = existing_item.qty
         flash(f'Product: {product_name} now has {updated_qty}', category='success')
-        return jsonify({'redirect_url': url_for('use_item')})  # Redirect to a different route
+        # Redirect to the /use_item webpage
+        return redirect(url_for('use_item'))
     else:
-        flash('Barcode Not Found', category='danger')
-        return jsonify({'barcode_not_found': True})
+        # flash(f'Barcode Not Found')
+        # flash(f'Barcode Not Found', category='success')
+        return redirect(url_for('use_item'))
     
 
 #Pass Stuff to Navbar
@@ -320,13 +288,13 @@ def base():
     return dict(form=form)
 
 @app.route('/search_start')
-@login_required
+# @login_required
 def search_start():
     return render_template('search_start.html')
 
 #Create Search Function
 @app.route('/search', methods=['GET', 'POST'])
-@login_required
+# @login_required
 def search():
     form = SearchForm()
     items = Item.query
