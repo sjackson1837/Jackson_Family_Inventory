@@ -3,7 +3,7 @@ Start to Finish - Creating this page:
 	2. Open VS Code and go to the folder you just created (I used the powershell terminal).
 	3. Create virtual environment using the following commands.  
         - python -m venv virt
-        - cd .\venv\
+        - cd .\virt\
         - .\Scripts\activate
         - cd ..\\
 			
@@ -36,7 +36,7 @@ Start to Finish - Creating this page:
     7. Type: set FLASK_DEBUG = 1 (this will allow you to make changes to your code and just refresh the browser, instead of having to stop/start the server again.
 	8. Create a templates folder in the 'Inventory Tracker' directory.  This folder will hold all of the html files
 
-DATABASES AND MODELING - This section shows how to  create database files
+DATABASES AND MODELING - This section shows how to  create database files...
 	1. Type in cmd prompt:  pip install flask-sqlalchemy
 	2. Now, import this into the InvTracker.py file:  from flask_sqlalchemy import SQLAlchemy
 	3. Put this in the InvTraker.py file:  db = SQLAlchemy(app)
