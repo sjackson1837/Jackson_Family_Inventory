@@ -8,6 +8,7 @@ All Categories - Products
 <style>
   .card-group {
     display: flex;
+    flex-wrap: wrap; /* Allow cards to wrap to next line */
     justify-content: space-between;
     margin-bottom: 10px;
   }
@@ -16,6 +17,7 @@ All Categories - Products
     background-color: transparent;
     display: flex;
     flex-direction: column;
+    margin-bottom: 10px; /* Add some space between cards */
   }
   .card-body {
     padding: 10px;
@@ -23,6 +25,9 @@ All Categories - Products
   }
   .card-title {
     margin-bottom: 5px;
+    white-space: nowrap; /* Prevent long titles from wrapping */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Show ellipsis (...) for overflowing text */
   }
   .card-text {
     margin-bottom: 3px;
@@ -31,6 +36,13 @@ All Categories - Products
     max-width: 125px;
     max-height: 125px;
     object-fit: contain;
+  }
+
+  /* Media query for smaller devices */
+  @media (max-width: 767px) {
+    .card {
+      width: 100%; /* Make cards occupy full width */
+    }
   }
 </style>
 
@@ -44,7 +56,7 @@ All Categories - Products
           <div class="row no-gutters">
             <div class="col-4">
               <a href="{{ url_for('item', id=grocery.productid) }}">
-                <img src="{{ grocery.productimage }}" class="card-img" alt="{{ grocery.productname }}">
+                <img src="{{ grocery.productimage }}" class="card-img" alt="{{ grocery.productname }}" width="auto">
               </a>
             </div>
             <div class="col-8">

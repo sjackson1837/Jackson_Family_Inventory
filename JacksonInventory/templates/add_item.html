@@ -1,11 +1,13 @@
 {% extends 'base.html' %}
 {% block title %}
-Main Menu
+Add Inventory
 {% endblock %}
 
 {% block content %}
   <div class="container no-scroll">
     <form method="POST" action="/add_item">
+      <h1 class="display-6 font-weight-normal">Add Item Page</h1>
+      <br/>
       <div id="barcodeContainer">
         <label for="barcode" class="left-align">Barcode:</label>
         <!-- <input type="text" id="barcode" name="barcode" required oninput="checkBarcode(event)" class="right-align"><br/> -->
@@ -56,8 +58,8 @@ Main Menu
         <br/>
   
         <label for="subcategory" class="left-align">Sub Category</label>
-        <select id="subcategory" name="subcategory_id" required class="selectpicker right-align" data-live-search="true">
-          <option value="">-- Select Subcategory --</option>
+        <select id="subcategory" name="subcategory_id"  class="selectpicker right-align" data-live-search="true">
+          <option value=" ">-- Select Subcategory --</option>
         </select>
         <br/>        
         <div class="button-container">
