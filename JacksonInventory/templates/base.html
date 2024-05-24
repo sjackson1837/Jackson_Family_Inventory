@@ -58,7 +58,7 @@
         }
         @media (max-width: 480px) {
             .header {
-                font-size: 18px;
+                font-size: 12px;
             }
             .sidebar {
                 padding: 10px;
@@ -79,11 +79,12 @@
             {% if current_user.is_authenticated %}
             <!-- <a href="{{ url_for('home_page') }}"><i class="fas fa-home"></i> Home</a> -->
             <a href="{{ url_for('mainmenu_page') }}"><i class="fas fa-boxes"></i> Main Menu</a>
-            <a href="{{ url_for('add_item') }}"><i class="fas fa-boxes"></i> Add Inventory</a>
-            <a href="{{ url_for('use_item') }}"><i class="fas fa-boxes"></i> Use Inventory</a>
-            <a href="{{ url_for('items_page') }}"><i class="fas fa-boxes"></i> View Inventory</a>
+            <a href="{{ url_for('add_item') }}"><i class="fas fa-boxes"></i> Add Item</a>
+            <a href="{{ url_for('use_item') }}"><i class="fas fa-boxes"></i> Use Item</a>
+            <a href="{{ url_for('items_page') }}"><i class="fas fa-boxes"></i> View Inv</a>
             <a href="{{ url_for('grocery_list') }}"><i class="fas fa-boxes"></i> Grocery List</a>
-            <a href="{{ url_for('search_start') }}"><i class="fas fa-boxes"></i> Search Item</a>
+            <a href="{{ url_for('search_start') }}"><i class="fas fa-boxes"></i> Search</a>
+            <a href="{{ url_for('logout_page') }}"><i class="fas fa-boxes"></i> Logout</a>
             {% else %}
             <a href="{{ url_for('login_page') }}"><i class="fas fa-sign-in-alt"></i> Log In</a>
             <a href="{{ url_for('register_page') }}"><i class="fas fa-user-plus"></i> Register</a>

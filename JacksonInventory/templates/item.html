@@ -7,11 +7,11 @@ View Inventory
 {% block content %}
 
 <form action="{{ url_for('update_item', id=item[0]['productid']) }}" method="POST">
-  <div>
-    <div>
-      <img src="{{ item[0]['productimage'] }}" />
+  <div class="item-container">
+    <div class="item-image">
+      <img src="{{ item[0]['productimage'] }}" alt="Product Image"/>
     </div>
-    <div>
+    <div class="item-details">
       <textarea id="productname" name="productname">{{ item[0]['productname'] }}</textarea><br />
       <br />
       <div>
@@ -22,9 +22,7 @@ View Inventory
           <button type="button" onclick="incrementQty()">+</button>
         </div>
       </div>
-
       <br />
-
       <div>
         <div>Min Qty:</div>
         <div>
@@ -35,7 +33,6 @@ View Inventory
       </div>
       <br /><br />
     </div>
-
     <div>
       <label for="category">Category</label>
       <select id="category_id" name="category_id" required onchange="updateSubcategories()">
@@ -44,7 +41,6 @@ View Inventory
         {% endfor %}
       </select>
       <br />
-
       <label for="subcategory">Sub Category</label>
       <select id="subcategory" name="subcategory_id" required>
         {% for subcategory in subcategories %}
@@ -128,3 +124,28 @@ View Inventory
 </script>
 
 {% endblock %}
+
+<style>
+  .item-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+  }
+  .item-image img {
+    width: 50px;
+    height: 50px;
+  }
+  .item-details {
+    grid-column: span 2;
+  }
+  @media (max-width: 768px) {
+    .item-container {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 480px) {
+    .item-container {
+      grid-template-columns: repeat(1, 1fr);
+    }
+  }
+</style>
