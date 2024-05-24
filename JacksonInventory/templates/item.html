@@ -7,62 +7,54 @@ View Inventory
 {% block content %}
 
 <form action="{{ url_for('update_item', id=item[0]['productid']) }}" method="POST">
-
-  <div class="d-flex justify-content-center align-items-center" style="min-height: 100vh; flex-direction: column;">
-    <div class="col-12 text-center">
-      <img src="{{ item[0]['productimage'] }}" class="card-img"
-        style="max-width: 150px; max-height: 150px; object-fit: contain; " />
+  <div>
+    <div>
+      <img src="{{ item[0]['productimage'] }}" />
     </div>
-    <div class="col-12">
-      <textarea id="productname"
-        style="width: 335px; height: 4em; resize: none; font-size: 20px; line-height: 20px; text-align: center; overflow: hidden;"
-        name="productname" class="left-align">{{ item[0]['productname'] }}</textarea><br />
+    <div>
+      <textarea id="productname" name="productname">{{ item[0]['productname'] }}</textarea><br />
       <br />
-      <div class="quantity-input-container">
-        <div class="quantity-label"><span>Qty&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</span></div>
-        <div class="quantity-value">
-          <button class="quantity-button" type="button" onclick="decrementQty()">-</button>
-          <input class="quantity-input center-align" type="text" id="qty" name="qty" value="{{ item[0]['qty'] }}"
-            required>
-          <button class="quantity-button" type="button" onclick="incrementQty()">+</button>
+      <div>
+        <div><span>Qty&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</span></div>
+        <div>
+          <button type="button" onclick="decrementQty()">-</button>
+          <input type="text" id="qty" name="qty" value="{{ item[0]['qty'] }}" required>
+          <button type="button" onclick="incrementQty()">+</button>
         </div>
       </div>
 
       <br />
 
-      <div class="quantity-input-container">
-        <div class="quantity-label">Min Qty:</div>
-        <div class="quantity-value">
-          <button class="quantity-button" type="button" onclick="decrementMinQty()">-</button>
-          <input class="quantity-input center-align" type="text" id="minqty" name="minqty"
-            value="{{ item[0]['minqty'] }}" required>
-          <button class="quantity-button" type="button" onclick="incrementMinQty()">+</button>
+      <div>
+        <div>Min Qty:</div>
+        <div>
+          <button type="button" onclick="decrementMinQty()">-</button>
+          <input type="text" id="minqty" name="minqty" value="{{ item[0]['minqty'] }}" required>
+          <button type="button" onclick="incrementMinQty()">+</button>
         </div>
       </div>
       <br /><br />
     </div>
 
-    <div class="col-12">
-      <label for="category" class="left-align">Category</label>
-<select id="category_id" name="category_id" required class="selectpicker right-align" data-live-search="true" onchange="updateSubcategories()">
-  <!-- <option value="">-- Select Category --</option> -->
-  {% for category in categories %}
-    <option value="{{ category.id }}" {% if category.id == item[0]['categoryid'] %}selected{% endif %}>{{ category.category }}</option>
-  {% endfor %}
-</select>
-<br />
-
-      <label for="subcategory" class="left-align">Sub Category</label>
-      <select id="subcategory" name="subcategory_id" required class="selectpicker right-align" data-live-search="true">
-        {% for subcategory in subcategories %}
-        <option value="{{ item[0]['subcategoryid'] }}" {% if subcategory.id==item[0]['subcategoryid'] %}selected{% endif
-          %}>{{ subcategory.subcategory }}</option>
+    <div>
+      <label for="category">Category</label>
+      <select id="category_id" name="category_id" required onchange="updateSubcategories()">
+        {% for category in categories %}
+          <option value="{{ category.id }}" {% if category.id == item[0]['categoryid'] %}selected{% endif %}>{{ category.category }}</option>
         {% endfor %}
       </select>
       <br />
-      <div class="button-container">
-        <input class="btn btn-primary" type="submit" value="Update Item" style="margin-right: 18px;">
-        <a class="btn btn-primary" href="{{ url_for('items_page') }}">Cancel</a>
+
+      <label for="subcategory">Sub Category</label>
+      <select id="subcategory" name="subcategory_id" required>
+        {% for subcategory in subcategories %}
+        <option value="{{ item[0]['subcategoryid'] }}" {% if subcategory.id==item[0]['subcategoryid'] %}selected{% endif %}>{{ subcategory.subcategory }}</option>
+        {% endfor %}
+      </select>
+      <br />
+      <div>
+        <input type="submit" value="Update Item">
+        <a href="{{ url_for('items_page') }}">Cancel</a>
       </div>
     </div>
   </div>
@@ -98,11 +90,8 @@ View Inventory
   }
 
   function updateSubcategories() {
-    console.log("I'M HERE!!!!!!!!!")
     var category_id = document.getElementById('category_id').value;
-    console.log(category_id)
     var subcategoryDropdown = document.getElementById('subcategory');
-    console.log(subcategoryDropdown)
 
     // Clear previous options
     subcategoryDropdown.innerHTML = '';
@@ -136,69 +125,6 @@ View Inventory
       });
     }
   }
-
 </script>
-
-<style>
-
-body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-  }
-
-  h1,
-  h3,
-  h2[contenteditable="true"] {
-    text-align: center;
-  }
-
-  /* Added CSS */
-  h2[contenteditable="true"] {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100px;
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin-bottom: 20px;
-  }
-
-  .quantity-input-container {
-    display: flex;
-    align-items: center;
-  }
-
-  .quantity-label {
-    text-align: right;
-    margin-right: 10px;
-    font-size: 20px;
-    white-space: nowrap;
-    /* Ensure label doesn't wrap to a new line */
-  }
-
-  .quantity-value {
-    display: flex;
-    align-items: center;
-  }
-
-  .quantity-button {
-    font-size: 20px;
-  }
-
-  .quantity-input {
-    margin-right: 10px;
-    margin-left: 10px;
-    width: 5ch;
-    text-align: center;
-  }
-
-  .button-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-  }
-</style>
 
 {% endblock %}

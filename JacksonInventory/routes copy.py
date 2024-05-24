@@ -1,6 +1,5 @@
 from JacksonInventory import app
 from flask import render_template, redirect, url_for, flash, request, jsonify
-import requests
 from JacksonInventory.models import Item, User, Category, Subcategory
 from JacksonInventory.forms import RegisterForm, LoginForm, PurchaseItemForm, SellItemForm, SearchForm
 from JacksonInventory import db
@@ -86,57 +85,7 @@ def logout_page():
     flash("You have been logged out!", category='info')
     return redirect(url_for("home_page"))
 
-@app.route('/add_item', methods=['GET'])
-def add_item_form():
-    barcode = request.args.get('barcode')
-    category_id = request.args.get('category_id')
-    categories = Category.query.order_by(Category.category).all()
-    return render_template('add_item.html', barcode=barcode, categories=categories)
 
-@app.route('/add_item', methods=['GET', 'POST'])
-def add_item():
-    barcode = request.form['barcode']
-    productname = request.form['productname']
-    qty = request.form['qty']
-    minqty = request.form['minqty']
-    productimage_input = request.form['productimage']
-    category_id = int(request.form['category_id'])
-    subcategory_id = int(request.form['subcategory_id'])
-
-    # Create a new Item object and set its attributes
-    item = Item(barcode=barcode, productname=productname, qty=qty, minqty=minqty, productimage=productimage_input, category_id=category_id, subcategory_id=subcategory_id)
-
-    # Save the item to the database
-    db.session.add(item)
-    db.session.commit()
-    #return redirect(url_for("items_page"))
-    return redirect(url_for("add_item"))
-
-@app.route('/use_item', methods=['GET'])
-@login_required
-def use_item_form():
-    barcode = request.args.get('barcode')
-    categories = Category.query.order_by(Category.category)
-    return render_template('use_item.html', barcode=barcode, categories=categories)
-
-@app.route('/use_item', methods=['POST'])
-@login_required
-def use_item():
-    barcode = request.form['barcode']
-    existing_item = Item.query.filter_by(barcode=barcode).first()
-
-    if existing_item:
-        existing_item.qty -= 1  # Increment the quantity by 1
-        db.session.commit()
-        product_name = existing_item.productname
-        updated_qty = existing_item.qty
-        flash(f'Product: {product_name} now has {updated_qty}', category='success')
-        # Redirect to the /use_item webpage
-        return redirect(url_for('use_item'))
-    else:
-        # flash(f'Barcode Not Found')
-        # flash(f'Barcode Not Found', category='success')
-        return redirect(url_for('use_item'))
 
 
 @app.route('/items')
@@ -241,6 +190,31 @@ def update_item(id):
 
 
 
+@app.route('/add_item', methods=['GET'])
+def add_item_form():
+    barcode = request.args.get('barcode')
+    category_id = request.args.get('category_id')
+    categories = Category.query.order_by(Category.category).all()
+    return render_template('add_item.html', barcode=barcode, categories=categories)
+
+@app.route('/add_item', methods=['GET', 'POST'])
+def add_item():
+    barcode = request.form['barcode']
+    productname = request.form['productname']
+    qty = request.form['qty']
+    minqty = request.form['minqty']
+    productimage_input = request.form['productimage']
+    category_id = int(request.form['category_id'])
+    subcategory_id = int(request.form['subcategory_id'])
+
+    # Create a new Item object and set its attributes
+    item = Item(barcode=barcode, productname=productname, qty=qty, minqty=minqty, productimage=productimage_input, category_id=category_id, subcategory_id=subcategory_id)
+
+    # Save the item to the database
+    db.session.add(item)
+    db.session.commit()
+    #return redirect(url_for("items_page"))
+    return redirect(url_for("add_item"))
 
 # Add the following route to handle the AJAX request for subcategories
 @app.route('/subcategories', methods=['POST'])
@@ -315,6 +289,31 @@ def grocery_list():
 
     return render_template('grocery_list.html', grouped_groceries=grouped_groceries)
 
+@app.route('/use_item', methods=['GET'])
+@login_required
+def use_item_form():
+    barcode = request.args.get('barcode')
+    categories = Category.query.order_by(Category.category)
+    return render_template('use_item.html', barcode=barcode, categories=categories)
+
+@app.route('/use_item', methods=['POST'])
+@login_required
+def use_item():
+    barcode = request.form['barcode']
+    existing_item = Item.query.filter_by(barcode=barcode).first()
+
+    if existing_item:
+        existing_item.qty -= 1  # Increment the quantity by 1
+        db.session.commit()
+        product_name = existing_item.productname
+        updated_qty = existing_item.qty
+        flash(f'Product: {product_name} now has {updated_qty}', category='success')
+        # Redirect to the /use_item webpage
+        return redirect(url_for('use_item'))
+    else:
+        # flash(f'Barcode Not Found')
+        # flash(f'Barcode Not Found', category='success')
+        return redirect(url_for('use_item'))
     
 
 #Pass Stuff to Navbar
@@ -364,10 +363,6 @@ def get_product_details(barcode):
 @app.route('/srjtest')
 def index():
     return render_template('srjtest.html')
-
-@app.route('/mypantry')
-def mypantry():
-    return render_template('mypantry.html')
 
 @app.route('/product', methods=['POST'])
 def product():

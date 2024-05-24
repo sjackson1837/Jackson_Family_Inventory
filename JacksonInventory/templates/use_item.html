@@ -10,7 +10,7 @@ Add Inventory
       <br/><br/>
       <div id="barcodeContainer">
         <label for="barcode" class="left-align">Barcode:</label>
-        <input type="text" id="barcode" name="barcode" required oninput="checkBarcodeDelayedUseItem(event)" class="right-align"><br/>
+        <input type="text" id="barcode" name="barcode" required oninput="checkBarcodeDelayedUseItem(event)">
       </div>
     </form>
   </div>
@@ -37,70 +37,55 @@ Add Inventory
     }
   
     let debouncedCheckBarcode = debounce(useItem, 500); // Create a debounced version of useItem
-    
+  
     function checkBarcodeDelayedUseItem(event) {
       console.log("did I get here?");
       debouncedCheckBarcode(event);
     }
   
     async function useItem(event) {
-    const barcode = event.target.value;
-    console.log("Barcode isssss: " + barcode);
-    try {
-      const fetchResponse = await fetch("/use_item", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: "barcode=" + barcode
-      });
+      const barcode = event.target.value;
+      console.log("Barcode isssss: " + barcode);
+      try {
+        const fetchResponse = await fetch("/use_item", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: "barcode=" + barcode
+        });
 
-      if (fetchResponse.ok) {
-        const responseData = await fetchResponse.json();
-        console.log("Am I getting to this code?");
-        if (responseData.barcode_not_found) {
-          console.log("I'm here999!");
-          var audio = new Audio('static/sounds/negative.mp3');
-          audio.onended = function () {
-            // After playing the "negative.mp3" sound, show the alert
-            alert("Item not found in inventory");
-            event.target.value = "";
-          };
-          audio.play();
-        } else if (responseData.redirect_url) {
-          // Barcode found in the database, update quantity and save the record
-          console.log("here before sound");
-          var audio = new Audio('static/sounds/positive.mp3');
-          audio.onended = function () {
-            window.location.href = responseData.redirect_url;
-          };
-          audio.play();
-        } else if (responseData.flash_message) {
-          // Handle the flash message here
-          const flashContainer = document.createElement("div");
-          flashContainer.classList.add("alert", `alert-${responseData.flash_category}`);
-          flashContainer.innerHTML = responseData.flash_message;
-          document.body.appendChild(flashContainer);
+        if (fetchResponse.ok) {
+          const responseData = await fetchResponse.json();
+          console.log("Am I getting to this code?");
+          if (responseData.barcode_not_found) {
+            console.log("I'm here999!");
+            var audio = new Audio('static/sounds/negative.mp3');
+            audio.onended = function () {
+              // After playing the "negative.mp3" sound, show the alert
+              alert("Item not found in inventory");
+              event.target.value = "";
+            };
+            audio.play();
+          } else if (responseData.redirect_url) {
+            // Barcode found in the database, update quantity and save the record
+            console.log("here before sound");
+            var audio = new Audio('static/sounds/positive.mp3');
+            audio.onended = function () {
+              window.location.href = responseData.redirect_url;
+            };
+            audio.play();
+          } else if (responseData.flash_message) {
+            // Handle the flash message here
+            const flashContainer = document.createElement("div");
+            flashContainer.classList.add("alert", `alert-${responseData.flash_category}`);
+            flashContainer.innerHTML = responseData.flash_message;
+            document.body.appendChild(flashContainer);
+          }
         }
+      } catch (error) {
+        console.error("Error:", error);
       }
-    } catch (error) {
-      console.error("Error:", error);
     }
-  }
-</script>
-
-
-<style>
-    .container {
-      display: flex;
-      justify-content: center;
-      height: 100vh;
-    }
-    
-    .right-align {
-    text-align: right;
-    display: inline-block;
-    width: 200px;
-  }
-</style>
+  </script>
 {% endblock %}

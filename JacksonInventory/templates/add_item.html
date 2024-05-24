@@ -4,52 +4,44 @@ Add Inventory
 {% endblock %}
 
 {% block content %}
-  <div class="container no-scroll">
+  <div>
     <form method="POST" action="/add_item">
-      <h1 class="display-6 font-weight-normal">Add Item Page</h1>
+      <h1>Add Item Page</h1>
       <br/>
       <div id="barcodeContainer">
-        <label for="barcode" class="left-align">Barcode:</label>
-        <!-- <input type="text" id="barcode" name="barcode" required oninput="checkBarcode(event)" class="right-align"><br/> -->
-        <input type="text" id="barcode" name="barcode" required oninput="checkBarcodeDelayed(event)" class="right-align"><br/>
-
+        <label for="barcode">Barcode:</label>
+        <input type="text" id="barcode" name="barcode" required oninput="checkBarcodeDelayed(event)"><br/>
       </div>
       
       <div id="productDataContainer" style="display: none;">
-        <textarea id="productname" style="width: 335px; height: 3em; resize: none;" name="productname" readonly class="left-align" onclick="enableProductNameEditing()"></textarea><br/>
-        <div class="vertical-center">
-          <img src="" id="productimage_show" alt="" style="max-width: 150px; max-height: 150px; object-fit: contain; "><br/>
-              <button class="btn btn-warning" type="button" onclick="changeImageSrc(); return false;">Delete Picture</button>
-              <input type="text" id="productimage_input" name="productimage" readonly style="display: none;">
-        
-        <div class="quantity-input-container">
-            <div class="quantity-label"><span>Qty&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</span></div>
-            <div class="quantity-value">
-              <button class="quantity-button circular-button" type="button" onclick="decrementQty()">-</button>
-              <input class="quantity-input center-align" type="text" id="qty" name="qty" required>
-              <button class="quantity-button circular-button" type="button" onclick="incrementQty()">+</button>
-            </div>            
+        <textarea id="productname" name="productname" readonly onclick="enableProductNameEditing()"></textarea><br/>
+        <div>
+          <img src="" id="productimage_show" alt="" style="max-width: 150px; max-height: 150px; object-fit: contain;"><br/>
+          <button type="button" onclick="changeImageSrc(); return false;">Delete Picture</button>
+          <input type="text" id="productimage_input" name="productimage" readonly style="display: none;">
+        </div>
+
+        <div>
+          <label>Qty:</label>
+          <button type="button" onclick="decrementQty()">-</button>
+          <input type="text" id="qty" name="qty" required>
+          <button type="button" onclick="incrementQty()">+</button>
         </div>
         <br/>
         
-        <div class="quantity-input-container">
-          
-            <div class="quantity-label">Min Qty:</div>
-            <div class="quantity-value">
-              <button class="quantity-button circular-button" type="button" onclick="decrementMinQty()">-</button>
-              <input class="quantity-input center-align" type="text" id="minqty" name="minqty" required>
-              <button class="quantity-button circular-button" type="button" onclick="incrementMinQty()">+</button>          
-          </div>
+        <div>
+          <label>Min Qty:</label>
+          <button type="button" onclick="decrementMinQty()">-</button>
+          <input type="text" id="minqty" name="minqty" required>
+          <button type="button" onclick="incrementMinQty()">+</button>
         </div>
         <br/>
-      
+
         <label hidden="true" for="productimage">Product Image</label>
         <input hidden="true" type="text" id="productimage" name="productimage" readonly>
-  
         
-  
-        <label for="category" class="left-align">Category</label>
-        <select id="category" name="category_id" required class="selectpicker right-align" data-live-search="true" onchange="updateSubcategories()">
+        <label for="category">Category</label>
+        <select id="category" name="category_id" required onchange="updateSubcategories()">
           <option value="">-- Select Category --</option>
           {% for category in categories %}
             <option value="{{ category.id }}">{{ category.category }}</option>
@@ -57,14 +49,15 @@ Add Inventory
         </select>
         <br/>
   
-        <label for="subcategory" class="left-align">Sub Category</label>
-        <select id="subcategory" name="subcategory_id"  class="selectpicker right-align" data-live-search="true">
+        <label for="subcategory">Sub Category</label>
+        <select id="subcategory" name="subcategory_id">
           <option value=" ">-- Select Subcategory --</option>
         </select>
         <br/>        
-        <div class="button-container">
-          <input class="btn btn-primary" type="submit" value="Add Item">
-          <input class="btn btn-primary" type="button" value="Cancel" onclick="reloadPage()">
+
+        <div>
+          <input type="submit" value="Add Item">
+          <input type="button" value="Cancel" onclick="reloadPage()">
         </div>
       </div>
     </form>
@@ -74,110 +67,4 @@ Add Inventory
   </div>
 
   <script src="static/scripts/scripts.js"></script>
-    
-  <style>
-  .container {
-      display: flex;
-      justify-content: center;
-      height: 100vh;
-    }
-
-    .container.no-scroll {
-      overflow: hidden;
-    }
-  
-  .vertical-center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .quantity-input-container {
-    display: flex;
-    align-items: center;
-  }
-  
-  .quantity-label {
-    text-align: right;
-    margin-right: 10px;
-    font-size: 20px;
-    white-space: nowrap; /* Ensure label doesn't wrap to a new line */
-  }
-  
-  .quantity-value {
-    display: flex;
-    align-items: center;
-  }
-  
-  .quantity-button {
-    font-size: 40px;
-  } 
-
-  .circular-button {
-  width: 30px; /* Adjust the width as needed */
-  height: 30px; /* Adjust the height as needed */
-  border-radius: 50%; /* Makes the button circular */
-  border: none; /* Remove the default button border */
-  background-color: #2c05dd; /* Set the button's background color */
-  color: #fff; /* Set the button's text color */
-  font-size: 25px; /* Adjust the font size as needed */
-  font-weight: bold;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  }
-
-  .circular-button .button-text {
-  transform: translateY(15px); /* Adjust the value to move the text up or down */
-}
-  
-  .quantity-input {
-    margin-right: 10px;
-    margin-left: 10px;
-    width: 3ch;
-    text-align: center;
-  }
-  
-  input[readonly] {
-    border: none;
-    color: black;
-    padding: 0;
-  }
-  
-  .left-align {
-    text-align: left;
-    display: inline-block;
-    width: 120px;
-    margin-right: 10px;
-  }
-  
-  .right-align {
-    text-align: right;
-    display: inline-block;
-    width: 200px;
-  }
-  
-  textarea {
-    width: 250px;
-    height: 100px;
-    resize: none;
-  }
-
-  .button-container {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 8px;
-}
-
-.button-container input {
-  margin-right: 30px;
-}
-
-  
-  </style>
-
- 
- 
-
 {% endblock %}
