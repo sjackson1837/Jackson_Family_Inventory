@@ -84,3 +84,20 @@
         font-weight: bold;
         line-height: 1.5;
     }
+
+
+    .responsive-img {
+      width: 100%;
+      height: auto;
+      max-width: 150px;
+      max-height: 150px;
+      object-fit: cover;
+    }
+    
+    @media (max-width: 767.98px) { /* Targets devices with max-width of 768px (e.g., iPhones) */
+      .responsive-img {
+        max-width: 75px;
+        max-height: 75px;
+      }
+    }
+    
