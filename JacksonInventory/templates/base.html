@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <!-- Required meta tags -->
     <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>{% block title %} {% endblock %}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
         body {
@@ -49,6 +47,7 @@
                 flex-direction: column;
             }
             .sidebar {
+                display: none;
                 width: 100%;
                 height: auto;
             }
@@ -56,28 +55,38 @@
                 padding: 10px;
             }
         }
-        @media (max-width: 480px) {
-            .header {
-                font-size: 12px;
-            }
-            .sidebar {
-                padding: 10px;
-            }
-            .sidebar a {
-                padding: 8px 0;
-            }
-        }
     </style>
-  </head>
-  <body>
+</head>
+<body>
     <div class="header">
         <h1>Jackson Family Inventory</h1>
     </div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark d-block d-lg-none">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="sidebar">
+                <h2>Menu</h2>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('mainmenu_page') }}"><i class="fas fa-boxes"></i> Main Menu</a>
+                <a href="{{ url_for('add_item') }}"><i class="fas fa-boxes"></i> Add Item</a>
+                <a href="{{ url_for('use_item') }}"><i class="fas fa-boxes"></i> Use Item</a>
+                <a href="{{ url_for('items_page') }}"><i class="fas fa-boxes"></i> View Inv</a>
+                <a href="{{ url_for('grocery_list') }}"><i class="fas fa-boxes"></i> Grocery List</a>
+                <a href="{{ url_for('search_start') }}"><i class="fas fa-boxes"></i> Search</a>
+                <a href="{{ url_for('logout_page') }}"><i class="fas fa-boxes"></i> Logout</a>
+                {% else %}
+                <a href="{{ url_for('login_page') }}"><i class="fas fa-sign-in-alt"></i> Log In</a>
+                <a href="{{ url_for('register_page') }}"><i class="fas fa-user-plus"></i> Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
     <div class="container">
-        <div class="sidebar">
+        <div class="sidebar d-none d-lg-block">
             <h2>Menu</h2>
             {% if current_user.is_authenticated %}
-            <!-- <a href="{{ url_for('home_page') }}"><i class="fas fa-home"></i> Home</a> -->
             <a href="{{ url_for('mainmenu_page') }}"><i class="fas fa-boxes"></i> Main Menu</a>
             <a href="{{ url_for('add_item') }}"><i class="fas fa-boxes"></i> Add Item</a>
             <a href="{{ url_for('use_item') }}"><i class="fas fa-boxes"></i> Use Item</a>
@@ -109,16 +118,12 @@
 
     <!-- Optional JavaScript -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.3/js/bootstrap.bundle.min.js"
-      integrity="sha384-pzjw8y+ua61z70K5LvFqgEuIxUgBks4fXnbo7w2pKsLJv/dQC7Sarh4zrPw2+rMX"
-      crossorigin="anonymous"
-    ></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script>
       function closeFlashMessage(button) {
         var alert = button.closest(".alert");
         alert.remove();
       }
     </script>
-  </body>
+</body>
 </html>
