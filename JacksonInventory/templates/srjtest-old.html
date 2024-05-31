@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Lookup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #product-details {
+            margin-top: 20px;
+        }
+        img {
+            max-width: 200px;
+            max-height: 200px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Product Lookup</h1>
+    <form id="barcode-form">
+        <label for="barcode">Enter Barcode:</label>
+        <input type="text" id="barcode" name="barcode" required>
+        <button type="submit">Search</button>
+    </form>
+    <div id="product-details"></div>
+
+    <script>
+        document.getElementById('barcode-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var barcode = document.getElementById('barcode').value;
+            
+            fetch('/product', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'barcode=' + barcode
+            })
+            .then(response => response.json())
+            .then(data => {
+                var productDetailsDiv = document.getElementById('product-details');
+                if (data.error) {
+                    productDetailsDiv.innerHTML = '<p>' + data.error + '</p>';
+                } else {
+                    productDetailsDiv.innerHTML = `
+                        <h2>${data.name}</h2>
+                        <p>${data.description}</p>
+                        <img src="${data.image_url}" alt="${data.name}">
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
