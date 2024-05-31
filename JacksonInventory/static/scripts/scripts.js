@@ -12,6 +12,12 @@ function checkBarcodeDelayed(event) {
   }, 500)();
 }
 
+function checkBarcodeDelayedUseItem(event) {
+  debounce(() => {
+    checkBarcodeUseItem(event);
+  }, 500)();
+}
+
 function checkBarcode(event) {
   const barcode = event.target.value;
 
@@ -31,8 +37,29 @@ function checkBarcode(event) {
   }, 750);
 }
 
+function checkBarcodeUseItem(event) {
+  const barcode = event.target.value;
+
+  setTimeout(function() {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/use_item", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+          const response = JSON.parse(xhr.responseText);
+          handleBarcodeResponse(response, barcode);
+        }
+      }
+    };
+    xhr.send("barcode=" + barcode);
+  }, 750);
+}
+
+
 function handleBarcodeResponse(response, barcode) {
   if (response.redirect_url) {
+    document.getElementById("barcode").value = "";
     playSoundAndRedirect('static/sounds/positive.mp3', response.redirect_url);
   } else if (response.barcode_not_found) {
     checkItem(barcode);
@@ -40,6 +67,7 @@ function handleBarcodeResponse(response, barcode) {
     flash("testing flash message");
   }
 }
+
 
 function useItem(event) {
   const barcode = event.target.value;

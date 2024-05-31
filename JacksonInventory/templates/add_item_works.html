@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}
+Add Inventory
+{% endblock %}
+
+{% block content %}
+  <div>
+    <form method="POST" action="/add_item">
+      <h1>Add Item Page</h1>
+      <br/>
+      <div id="barcodeContainer">
+        <label for="barcode">Barcode:</label>
+        <input type="text" id="barcode" name="barcode" required oninput="checkBarcodeDelayed(event)"><br/>
+      </div>
+      
+      <div id="productDataContainer" style="display: none;">
+        <textarea id="productname" name="productname" readonly onclick="enableProductNameEditing()"></textarea><br/>
+        <div>
+          <img src="" id="productimage_show" alt="" style="max-width: 150px; max-height: 150px; object-fit: contain;"><br/>
+          <button type="button" onclick="changeImageSrc(); return false;">Delete Picture</button>
+          <input type="text" id="productimage_input" name="productimage" readonly style="display: none;">
+        </div>
+
+        <div>
+          <label>Qty:</label>
+          <button type="button" onclick="decrementQty()">-</button>
+          <input type="text" id="qty" name="qty" required>
+          <button type="button" onclick="incrementQty()">+</button>
+        </div>
+        <br/>
+        
+        <div>
+          <label>Min Qty:</label>
+          <button type="button" onclick="decrementMinQty()">-</button>
+          <input type="text" id="minqty" name="minqty" required>
+          <button type="button" onclick="incrementMinQty()">+</button>
+        </div>
+        <br/>
+
+        <label hidden="true" for="productimage">Product Image</label>
+        <input hidden="true" type="text" id="productimage" name="productimage" readonly>
+        
+        <label for="category">Category</label>
+        <select id="category" name="category_id" required onchange="updateSubcategories()">
+          <option value="">-- Select Category --</option>
+          {% for category in categories %}
+            <option value="{{ category.id }}">{{ category.category }}</option>
+          {% endfor %}
+        </select>
+        <br/>
+  
+        <label for="subcategory">Sub Category</label>
+        <select id="subcategory" name="subcategory_id">
+          <option value=" ">-- Select Subcategory --</option>
+        </select>
+        <br/>        
+
+        <div>
+          <input type="submit" value="Add Item">
+          <input type="button" value="Cancel" onclick="reloadPage()">
+        </div>
+      </div>
+    </form>
+    <div id="barcodeImageContainer" style="display: none;">
+      <img src="" id="barcodeImage" alt="Scanned Barcode" style="max-width: 300px; max-height: 300px;">
+    </div>
+  </div>
+
+  <script src="static/scripts/scripts.js"></script>
+{% endblock %}

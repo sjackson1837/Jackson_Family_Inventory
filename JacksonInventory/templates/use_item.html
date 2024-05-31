@@ -1,9 +1,72 @@
 {% extends 'base.html' %}
 {% block title %}
-Add Inventory
+Use Item
 {% endblock %}
 
 {% block content %}
+<script>
+  function checkBarcodeDelayed(event) {
+    debounce(() => {
+      checkBarcode(event);
+    }, 500)();
+  }
+
+  function checkBarcodeDelayedUseItem(event) {
+    debounce(() => {
+      checkBarcode(event);
+    }, 500)();
+  }
+
+  function debounce(func, delay) {
+    let debounceTimer;
+    return function(...args) {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => func.apply(this, args), delay);
+    };
+  }
+
+  function checkBarcode(event) {
+    const barcode = event.target.value;
+
+    setTimeout(function() {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", "/use_item", true);
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            const response = JSON.parse(xhr.responseText);
+            handleBarcodeResponse(response, barcode);
+          }
+        }
+      };
+      xhr.send("barcode=" + barcode);
+    }, 750);
+  }
+
+  function handleBarcodeResponse(response, barcode) {
+  if (response.barcode_not_found) {
+    playSoundAndReload('static/sounds/negative.mp3');
+  } else {
+    playSoundAndReload('static/sounds/positive.mp3');
+  }
+}
+
+function playSound(soundSrc) {
+  const audio = new Audio(soundSrc);
+  audio.play();
+}
+
+
+function playSoundAndReload(soundSrc) {
+  const audio = new Audio(soundSrc);
+  audio.onended = function() {
+    window.location.reload();
+  };
+  audio.play();
+}
+</script>
+
   <div class="container">
     <form method="POST" action="/use_item">
       <h1 class="display-6 font-weight-normal">Use Item Page</h1>
@@ -14,78 +77,4 @@ Add Inventory
       </div>
     </form>
   </div>
-
-  <script>
-
-    document.addEventListener('DOMContentLoaded', function() {
-      // Wait for the page to load and then focus on the barcode input field
-      document.getElementById('barcode').focus();
-    });
-
-
-    // Define the debounce function
-    function debounce(func, delay) {
-      let timer;
-      console.log("What is the timer: " + timer )
-      return function () {
-        clearTimeout(timer);
-        timer = setTimeout(() => {
-          console.log("is the timer defined here? " + timer)
-          func.apply(this, arguments);
-        }, delay);
-      };
-    }
-  
-    let debouncedCheckBarcode = debounce(useItem, 500); // Create a debounced version of useItem
-  
-    function checkBarcodeDelayedUseItem(event) {
-      console.log("did I get here?");
-      debouncedCheckBarcode(event);
-    }
-  
-    async function useItem(event) {
-      const barcode = event.target.value;
-      console.log("Barcode isssss: " + barcode);
-      try {
-        const fetchResponse = await fetch("/use_item", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-          },
-          body: "barcode=" + barcode
-        });
-
-        if (fetchResponse.ok) {
-          const responseData = await fetchResponse.json();
-          console.log("Am I getting to this code?");
-          if (responseData.barcode_not_found) {
-            console.log("I'm here999!");
-            var audio = new Audio('static/sounds/negative.mp3');
-            audio.onended = function () {
-              // After playing the "negative.mp3" sound, show the alert
-              alert("Item not found in inventory");
-              event.target.value = "";
-            };
-            audio.play();
-          } else if (responseData.redirect_url) {
-            // Barcode found in the database, update quantity and save the record
-            console.log("here before sound");
-            var audio = new Audio('static/sounds/positive.mp3');
-            audio.onended = function () {
-              window.location.href = responseData.redirect_url;
-            };
-            audio.play();
-          } else if (responseData.flash_message) {
-            // Handle the flash message here
-            const flashContainer = document.createElement("div");
-            flashContainer.classList.add("alert", `alert-${responseData.flash_category}`);
-            flashContainer.innerHTML = responseData.flash_message;
-            document.body.appendChild(flashContainer);
-          }
-        }
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    }
-  </script>
 {% endblock %}
