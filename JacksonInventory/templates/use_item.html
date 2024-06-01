@@ -73,7 +73,8 @@ function playSoundAndReload(soundSrc) {
       <br/><br/>
       <div id="barcodeContainer">
         <label for="barcode" class="left-align">Barcode:</label>
-        <input type="text" id="barcode" name="barcode" required oninput="checkBarcodeDelayedUseItem(event)">
+        <!-- <input type="text" id="barcode" name="barcode" required oninput="checkBarcodeDelayedUseItem(event)"> -->
+        <input type="text" id="barcode" name="barcode" required onchange="checkBarcodeDelayedUseItem(event)">
       </div>
     </form>
   </div>
