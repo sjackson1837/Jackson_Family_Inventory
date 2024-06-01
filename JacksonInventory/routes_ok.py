@@ -380,6 +380,24 @@ def get_product_details(barcode):
     else:
         return None
 
+@app.route('/')
+def index():
+    return render_template('index.html', groceries=groceries)
+
+@app.route('/item/<int:id>')
+def item(id):
+    query = text('''
+    SELECT c.id, i.id as productid, c.category, s.subcategory,
+    i.productname, i.qty, i.minqty, i.productimage
+    FROM item i
+    JOIN category c ON i.category_id = c.id
+    JOIN subcategory s ON i.subcategory_id = s.id
+    ORDER BY c.category, s.subcategory, i.productname
+    ''')
+    result = db.session.execute(query)
+    groceries = result.fetchall()
+    
+    return render_template('index.html', groceries=groceries)
 
 @app.route('/mypantry')
 def mypantry():
