@@ -4,6 +4,7 @@ from JacksonInventory.models import Item, User, Category, Subcategory
 from JacksonInventory.forms import RegisterForm, LoginForm, PurchaseItemForm, SellItemForm, SearchForm
 from JacksonInventory import db
 from flask_login import login_user, logout_user, login_required, current_user
+import requests
 from sqlalchemy.sql import text, func
 
 @app.route('/')
