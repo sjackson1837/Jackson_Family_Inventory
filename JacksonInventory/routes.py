@@ -237,6 +237,8 @@ def all_categories_page():
     
     return render_template('category.html', groceries=groceries)
 
+
+
 @app.route('/items/<int:id>')
 @login_required
 def item(id):
