@@ -341,87 +341,35 @@ def search():
         items = items.order_by(Item.barcode).all()
         return render_template("search.html", form=form, searched=item.searched, items = items)
     
+    
+def get_product_details(barcode):
+    url = f"https://world.openfoodfacts.org/api/v0/product/{barcode}.json"
+    response = requests.get(url)
+    
+    if response.status_code == 200:
+        product_data = response.json()
+        if product_data['status'] == 1:
+            product = product_data['product']
+            return {
+                'name': product.get('product_name', 'N/A'),
+                'description': product.get('ingredients_text', 'N/A'),
+                'image_url': product.get('image_url', 'N/A')
+            }
+        else:
+            return None
+    else:
+        return None
 
 @app.route('/srjtest')
-@login_required
-def srjtest():
+def index():
     return render_template('srjtest.html')
 
-
-@app.route('/check_barcode/<string:barcode>', methods=['GET'])
-@login_required
-def check_barcode(barcode):
-    item = Item.query.filter_by(barcode=barcode).first()
-
-    if item:
-        category = Category.query.get(item.category_id)
-        subcategory = Subcategory.query.get(item.subcategory_id)
-
-        item_data = {
-            'barcode': item.barcode,
-            'productname': item.productname,
-            'qty': item.qty,
-            'minqty': item.minqty,
-            'productimage': item.productimage,
-            'category': item.category_id,
-            'subcategory': item.subcategory_id
-        }
-        return jsonify(item_data)
+@app.route('/product', methods=['POST'])
+def product():
+    barcode = request.form['barcode']
+    product_details = get_product_details(barcode)
+    if product_details:
+        return jsonify(product_details)
     else:
-        # Check the Open Food Facts API
-        response = requests.get(f'https://world.openfoodfacts.org/api/v0/product/{barcode}.json')
-        if response.status_code == 200:
-            product_data = response.json()
-            if product_data.get('status') == 1:
-                product = product_data.get('product', {})
-                item_data = {
-                    'barcode': barcode,
-                    'productname': product.get('product_name', 'Unknown Product'),
-                    'qty': 1,
-                    'minqty': 1,
-                    'productimage': product.get('image_url', ''),
-                    'category': None,
-                    'subcategory': None
-                }
-                return jsonify(item_data)
+        return jsonify({'error': 'Product not found or failed to fetch data'}), 404
 
-    return jsonify({'error': 'Item not found in database or Open Food Facts'}), 404
-
-@app.route('/updateitem/<string:barcode>', methods=['POST'])
-@login_required
-def updateitem(barcode):
-    data = request.json
-    item = Item.query.filter_by(barcode=barcode).first()
-
-    if item:
-        try:
-            item.productname = data['productname']
-            item.qty = data['qty']
-            item.minqty = data['minqty']
-            item.productimage = data['productimage']
-            item.category_id = data['category_id']
-            item.subcategory_id = data['subcategory_id']
-
-            db.session.commit()
-            return jsonify({'message': 'Item updated successfully'})
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({'error': str(e)}), 500
-    else:
-        return jsonify({'error': 'Item not found'}), 404
-
-@app.route('/get_categories', methods=['GET'])
-@login_required
-def get_categories():
-    categories = Category.query.all()
-    subcategories = Subcategory.query.all()
-
-    category_list = [{'id': c.id, 'category': c.category} for c in categories]
-    subcategory_list = [{'id': s.id, 'subcategory': s.subcategory, 'category_id': s.category_id} for s in subcategories]
-
-    return jsonify({'categories': category_list, 'subcategories': subcategory_list})
-
-@app.route('/add_inventory')
-@login_required
-def add_inventory():
-    return render_template('srjtest.html')

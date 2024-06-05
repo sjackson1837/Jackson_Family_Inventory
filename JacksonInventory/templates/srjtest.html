@@ -1,61 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Lookup</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        #product-details {
-            margin-top: 20px;
-        }
-        img {
-            max-width: 200px;
-            max-height: 200px;
-        }
-    </style>
-</head>
-<body>
-    <h1>Product Lookup</h1>
-    <form id="barcode-form">
-        <label for="barcode">Enter Barcode:</label>
-        <input type="text" id="barcode" name="barcode" required>
-        <button type="submit">Search</button>
-    </form>
-    <div id="product-details"></div>
 
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Barcode Search</title>
     <script>
-        document.getElementById('barcode-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            var barcode = document.getElementById('barcode').value;
-            
-            fetch('/product', {
+        let categories = {};
+        let subcategories = {};
+        let currentCategory = null;
+        let currentSubcategory = null;
+
+        function loadCategories() {
+            fetch('/get_categories')
+                .then(response => response.json())
+                .then(data => {
+                    categories = data.categories;
+                    subcategories = data.subcategories;
+
+                    const categorySelect = document.getElementById('edit-category');
+                    categorySelect.innerHTML = '';
+
+                    for (const category of categories) {
+                        const option = document.createElement('option');
+                        option.value = category.id;
+                        option.textContent = category.category;
+                        if (category.id == currentCategory) {
+                            option.selected = true;
+                        }
+                        categorySelect.appendChild(option);
+                    }
+
+                    categorySelect.addEventListener('change', updateSubcategories);
+                    updateSubcategories();
+                })
+                .catch(error => {
+                    console.error('Error loading categories:', error);
+                });
+        }
+
+        function updateSubcategories() {
+            const categorySelect = document.getElementById('edit-category');
+            const subcategorySelect = document.getElementById('edit-subcategory');
+            const selectedCategoryId = categorySelect.value;
+
+            subcategorySelect.innerHTML = '';
+
+            for (const subcategory of subcategories) {
+                if (subcategory.category_id == selectedCategoryId) {
+                    const option = document.createElement('option');
+                    option.value = subcategory.id;
+                    option.textContent = subcategory.subcategory;
+                    if (subcategory.id == currentSubcategory) {
+                        option.selected = true;
+                    }
+                    subcategorySelect.appendChild(option);
+                }
+            }
+        }
+
+        function checkBarcode() {
+            const barcode = document.getElementById('barcode').value;
+            fetch(`/check_barcode/${barcode}`)
+                .then(response => response.json())
+                .then(data => {
+                    const resultDiv = document.getElementById('result');
+                    if (data.error) {
+                        resultDiv.innerHTML = `<p>${data.error}</p>`;
+                    } else {
+                        currentCategory = data.category;
+                        currentSubcategory = data.subcategory;
+
+                        resultDiv.innerHTML = `
+                            <p>Barcode: <input type="text" id="edit-barcode" value="${data.barcode}" readonly /></p>
+                            <p>Product Name: <input type="text" id="edit-productname" value="${data.productname}" /></p>
+                            <p>
+                                Quantity: 
+                                <button onclick="updateQty(-1)">-</button>
+                                <input type="text" id="edit-qty" value="${data.qty}" />
+                                <button onclick="updateQty(1)">+</button>
+                            </p>
+                            <p>
+                                Minimum Quantity: 
+                                <button onclick="updateMinQty(-1)">-</button>
+                                <input type="text" id="edit-minqty" value="${data.minqty}" />
+                                <button onclick="updateMinQty(1)">+</button>
+                            </p>
+                            <p>Category: <select id="edit-category"></select></p>
+                            <p>Subcategory: <select id="edit-subcategory"></select></p>
+                            <p>Product Image: <input type="text" id="edit-productimage" value="${data.productimage}" /></p>
+                            <img src="${data.productimage}" alt="Product Image" />
+                            <button onclick="saveChanges()">Save Changes</button>
+                        `;
+                        loadCategories();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function updateQty(delta) {
+            const qtyInput = document.getElementById('edit-qty');
+            let qty = parseInt(qtyInput.value);
+            qty += delta;
+            if (qty < 0) qty = 0;
+            qtyInput.value = qty;
+        }
+
+        function updateMinQty(delta) {
+            const minQtyInput = document.getElementById('edit-minqty');
+            let minQty = parseInt(minQtyInput.value);
+            minQty += delta;
+            if (minQty < 0) minQty = 0;
+            minQtyInput.value = minQty;
+        }
+
+        function saveChanges() {
+            const barcode = document.getElementById('edit-barcode').value;
+            const productname = document.getElementById('edit-productname').value;
+            const qty = document.getElementById('edit-qty').value;
+            const minqty = document.getElementById('edit-minqty').value;
+            const category = document.getElementById('edit-category').value;
+            const subcategory = document.getElementById('edit-subcategory').value;
+            const productimage = document.getElementById('edit-productimage').value;
+
+            fetch(`/updateitem/${barcode}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
+                    'Content-Type': 'application/json'
                 },
-                body: 'barcode=' + barcode
+                body: JSON.stringify({
+                    productname: productname,
+                    qty: qty,
+                    minqty: minqty,
+                    category_id: category,
+                    subcategory_id: subcategory,
+                    productimage: productimage
+                })
             })
             .then(response => response.json())
             .then(data => {
-                var productDetailsDiv = document.getElementById('product-details');
                 if (data.error) {
-                    productDetailsDiv.innerHTML = '<p>' + data.error + '</p>';
+                    alert(`Error: ${data.error}`);
                 } else {
-                    productDetailsDiv.innerHTML = `
-                        <h2>${data.name}</h2>
-                        <p>${data.description}</p>
-                        <img src="${data.image_url}" alt="${data.name}">
-                    `;
+                    alert(data.message);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
             });
-        });
+        }
     </script>
+</head>
+
+<body>
+    <a class="btn btn-primary mb-2" href="{{ url_for('add_item') }}">Add Inventory</a>
+    <h1>Add Inventory</h1>
+    <input type="text" id="barcode" placeholder="Enter barcode" onkeypress="if(event.keyCode==13) checkBarcode()">
+    <div id="result"></div>
 </body>
+
 </html>

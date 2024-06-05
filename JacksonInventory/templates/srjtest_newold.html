@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Barcode Search</title>
+    <script>
+        async function fetchExternalProduct(barcode) {
+            const response = await fetch(
+                `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
+            );
+            const data = await response.json();
+
+            if (data.status === 1) {
+                // Product found in the external API
+                document.getElementById("barcode").textContent = barcode;
+                document.getElementById("productname").textContent =
+                    data.product.product_name || "No product name available";
+                document.getElementById("qty").value = "N/A";
+                document.getElementById("productimage").src =
+                    data.product.image_url ||
+                    "https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg";
+            } else {
+                // Product not found in the external API
+                document.getElementById("barcode").textContent = barcode;
+                document.getElementById("productname").textContent = "";
+                document.getElementById("qty").value = "";
+                document.getElementById("productimage").src =
+                    "https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg";
+            }
+        }
+
+        function handleNotFound(barcode) {
+            fetchExternalProduct(barcode);
+        }
+
+        function incrementQty() {
+            const qtyInput = document.getElementById("qty");
+            let qtyValue = parseInt(qtyInput.value) || 0;
+            qtyInput.value = qtyValue + 1;
+        }
+
+        function decrementQty() {
+            const qtyInput = document.getElementById("qty");
+            let qtyValue = parseInt(qtyInput.value) || 0;
+            qtyInput.value = Math.max(0, qtyValue - 1);
+        }
+
+        function incrementMinQty() {
+            const minQtyInput = document.getElementById("minqty");
+            let minQtyValue = parseInt(minQtyInput.value) || 0;
+            minQtyInput.value = minQtyValue + 1;
+        }
+
+        function decrementMinQty() {
+            const minQtyInput = document.getElementById("minqty");
+            let minQtyValue = parseInt(minQtyInput.value) || 0;
+            minQtyInput.value = Math.max(0, minQtyValue - 1);
+        }
+        function updateSubcategories() {
+            const category_id = document.getElementById("category").value;
+            const subcategoryDropdown = document.getElementById("subcategory");
+
+            subcategoryDropdown.innerHTML = "";
+            const defaultOption = document.createElement("option");
+            defaultOption.value = "";
+            defaultOption.textContent = "-- Select Subcategory --";
+            subcategoryDropdown.appendChild(defaultOption);
+
+            if (category_id !== "") {
+                $.ajax({
+                    url: "/subcategories",
+                    method: "POST",
+                    data: { category_id },
+                    success: function (response) {
+                        response.subcategories.forEach((subcategory) => {
+                            const option = document.createElement("option");
+                            option.value = subcategory.id;
+                            option.textContent = subcategory.name;
+                            subcategoryDropdown.appendChild(option);
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(error);
+                    },
+                });
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Search for a Product</h1>
+    <form method="POST" action="/check_barcode">
+        <label for="barcode">Enter Barcode:</label>
+        <input type="text" id="barcode_input" name="barcode" required />
+        <button type="submit">Enter</button>
+    </form>
+
+    {% if item %}
+    <h2>Product Details</h2>
+    <p>
+        <strong>Barcode:</strong>
+        <span id="barcode" contenteditable>{{ item.barcode }}</span>
+    </p>
+    <p>
+        <strong>Product Name:</strong>
+        <span id="productname" contenteditable>{{ item.productname }}</span>
+    </p>
+    <div>
+        <label for="qty">Qty:</label>
+        <button type="button" onclick="decrementQty()">-</button>
+        <input type="text" id="qty" name="qty" required value="{{ item.qty }}" />
+        <button type="button" onclick="incrementQty()">+</button>
+    </div>
+    <div>
+        <label for="minqty">Min Qty:</label>
+        <button type="button" onclick="decrementMinQty()">-</button>
+        <input type="text" id="minqty" name="minqty" required value="{{ item.minqty}}" />
+        <button type="button" onclick="incrementMinQty()">+</button>
+    </div>
+    <p>
+        <strong>Category:</strong>
+        <span id="category" contenteditable>{{ item.category }}</span>
+    </p>
+    <p>
+        <strong>Sub Category:</strong>
+        <span id="subcategory" contenteditable>{{ item.subcategory }}</span>
+    </p>
+    <div>
+        <label for="category">Category</label>
+        <select id="category_id" name="category_id" required onchange="updateSubcategories()">
+          {% for category in categories %}
+            <option value="{{ category.id }}" {% if category.id == item[0]['categoryid'] %}selected{% endif %}>{{ category.category }}</option>
+          {% endfor %}
+        </select>
+        <br />
+        <label for="subcategory">Sub Category</label>
+        <select id="subcategory" name="subcategory_id" required>
+          {% for subcategory in subcategories %}
+          <option value="{{ item[0]['subcategoryid'] }}" {% if subcategory.id==item[0]['subcategoryid'] %}selected{% endif %}>{{ subcategory.subcategory }}</option>
+          {% endfor %}
+        </select>
+        <br />
+        <div>
+
+    <p><strong>Product Image:</strong></p>
+    <img id="productimage" src="{{ item.productimage }}" alt="Product Image" />
+    {% elif searched %}
+    <h2>No product found for the entered barcode.</h2>
+    <script>
+        handleNotFound("{{ barcode }}");
+    </script>
+    <p><strong>Barcode:</strong> <span id="barcode" contenteditable></span></p>
+    <p>
+        <strong>Product Name:</strong>
+        <span id="productname" contenteditable></span>
+    </p>
+    <div>
+        <label for="qty">Qty:</label>
+        <button type="button" onclick="decrementQty()">-</button>
+        <input type="text" id="qty" name="qty" required />
+        <button type="button" onclick="incrementQty()">+</button>
+    </div>
+    <div>
+        <label for="minqty">Min Qty:</label>
+        <button type="button" onclick="decrementMinQty()">-</button>
+        <input type="text" id="minqty" name="minqty" required />
+        <button type="button" onclick="incrementMinQty()">+</button>
+    </div>
+    <br />
+    </select>
+    <br />
+    <p><strong>Product Image:</strong></p>
+    <img id="productimage" src="" alt="Product Image" />
+    {% endif %}
+</body>
+
+</html>
