@@ -26,11 +26,11 @@ class LoginForm(FlaskForm):
     password = PasswordField(label='Password:', validators=[DataRequired()])
     submit = SubmitField(label='Sign in')
 
-class PurchaseItemForm(FlaskForm):
-    submit = SubmitField(label='Purchase Item!')
+# class PurchaseItemForm(FlaskForm):
+#     submit = SubmitField(label='Purchase Item!')
 
-class SellItemForm(FlaskForm):
-    submit = SubmitField(label='Sell Item!')
+# class SellItemForm(FlaskForm):
+#     submit = SubmitField(label='Sell Item!')
 
 #Create A Search Form
 class SearchForm(FlaskForm):

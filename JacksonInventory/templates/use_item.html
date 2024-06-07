@@ -1,81 +1,45 @@
 {% extends 'base.html' %}
+
 {% block title %}
-Use Item
+Use Inventory
 {% endblock %}
 
 {% block content %}
+<div class="main-content">
+    <h1>Use Inventory</h1>
+    <input type="text" id="barcode" placeholder="Enter or scan barcode" oninput="delayedCheckBarcode()" />
+    <div id="result"></div>
+</div>
+
 <script>
-  function checkBarcodeDelayed(event) {
-    debounce(() => {
-      checkBarcode(event);
-    }, 500)();
-  }
+    let barcodeTimeout;
 
-  function checkBarcodeDelayedUseItem(event) {
-    debounce(() => {
-      checkBarcode(event);
-    }, 500)();
-  }
+    function delayedCheckBarcode() {
+        clearTimeout(barcodeTimeout);
+        barcodeTimeout = setTimeout(checkBarcode, 1500); // 1500 milliseconds = 1.5 seconds
+    }
 
-  function debounce(func, delay) {
-    let debounceTimer;
-    return function(...args) {
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => func.apply(this, args), delay);
-    };
-  }
-
-  function checkBarcode(event) {
-    const barcode = event.target.value;
-
-    setTimeout(function() {
-      const xhr = new XMLHttpRequest();
-      xhr.open("POST", "/use_item", true);
-      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
-          if (xhr.status === 200) {
-            const response = JSON.parse(xhr.responseText);
-            handleBarcodeResponse(response, barcode);
-          }
-        }
-      };
-      xhr.send("barcode=" + barcode);
-    }, 750);
-  }
-
-  function handleBarcodeResponse(response, barcode) {
-  if (response.barcode_not_found) {
-    playSoundAndReload('static/sounds/negative.mp3');
-  } else {
-    playSoundAndReload('static/sounds/positive.mp3');
-  }
-}
-
-function playSound(soundSrc) {
-  const audio = new Audio(soundSrc);
-  audio.play();
-}
-
-
-function playSoundAndReload(soundSrc) {
-  const audio = new Audio(soundSrc);
-  audio.onended = function() {
-    window.location.reload();
-  };
-  audio.play();
-}
+    function checkBarcode() {
+        const barcode = document.getElementById('barcode').value;
+        fetch(`/decrement_qty/${barcode}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const resultDiv = document.getElementById('result');
+            if (data.error) {
+                resultDiv.innerHTML = `<p style="color: red;">${data.error}</p>`;
+            } else {
+                resultDiv.innerHTML = `<p style="color: green;">${data.message}</p>`;
+                document.getElementById('barcode').value = '';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
 </script>
-
-  <div class="container">
-    <form method="POST" action="/use_item">
-      <h1 class="display-6 font-weight-normal">Use Item Page</h1>
-      <br/><br/>
-      <div id="barcodeContainer">
-        <label for="barcode" class="left-align">Barcode:</label>
-        <!-- <input type="text" id="barcode" name="barcode" required oninput="checkBarcodeDelayedUseItem(event)"> -->
-        <input type="text" id="barcode" name="barcode" required onchange="checkBarcodeDelayedUseItem(event)">
-      </div>
-    </form>
-  </div>
 {% endblock %}

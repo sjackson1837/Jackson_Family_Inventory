@@ -1,7 +1,7 @@
 from JacksonInventory import app
 from flask import render_template, redirect, url_for, flash, request, jsonify
 from JacksonInventory.models import Item, User, Category, Subcategory
-from JacksonInventory.forms import RegisterForm, LoginForm, PurchaseItemForm, SellItemForm, SearchForm
+from JacksonInventory.forms import RegisterForm, LoginForm, SearchForm
 from JacksonInventory import db
 from flask_login import login_user, logout_user, login_required, current_user
 from sqlalchemy.sql import text, func
@@ -13,38 +13,10 @@ import requests
 def home_page():
     return render_template('home.html')
 
-@app.route('/mainmenu', methods=['GET', 'POST'])
+@app.route('/mainmenu')
 @login_required
 def mainmenu_page():
-    purchase_form = PurchaseItemForm()
-    selling_form = SellItemForm()
-    if request.method == "POST":
-        #Purchase Item Logic
-        purchased_item = request.form.get('purchased_item')
-        p_item_object = Item.query.filter_by(name=purchased_item).first()
-        if p_item_object:
-            if current_user.can_purchase(p_item_object):
-                p_item_object.buy(current_user)
-                flash(f"Congratulations! You purchased {p_item_object.name} for {p_item_object.price}$", category='success')
-            else:
-                flash(f"Unfortunately, you don't have enough money to purchase {p_item_object.name}!", category='danger')
-        #Sell Item Logic
-        sold_item = request.form.get('sold_item')
-        s_item_object = Item.query.filter_by(name=sold_item).first()
-        if s_item_object:
-            if current_user.can_sell(s_item_object):
-                s_item_object.sell(current_user)
-                flash(f"Congratulations! You sold {s_item_object.name} back to market!", category='success')
-            else:
-                flash(f"Something went wrong with selling {s_item_object.name}", category='danger')
-
-
-        return redirect(url_for('mainmenu_page'))
-
-    if request.method == "GET":
-        # items = Item.query.filter_by(owner=None)
-        # owned_items = Item.query.filter_by(owner=current_user.id)
-        return render_template('mainmenu.html')
+    return render_template('mainmenu.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_page():
@@ -528,3 +500,25 @@ def additem():
 @login_required
 def add_inventory():
     return render_template('srjtest.html')
+
+@app.route('/useitem')
+def useitem():
+    return render_template('use_item.html')
+
+@app.route('/decrement_qty/<string:barcode>', methods=['POST'])
+def decrement_qty(barcode):
+    try:
+        item = Item.query.filter_by(barcode=barcode).first()
+        if not item:
+            return jsonify({'error': 'Item not found in the database'}), 404
+
+        item.qty -= 1
+        db.session.commit()
+        return jsonify({'message': f'Product "{item.productname}" quantity updated to {item.qty}'})
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True)
