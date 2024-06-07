@@ -5,6 +5,7 @@ from JacksonInventory.forms import RegisterForm, LoginForm, PurchaseItemForm, Se
 from JacksonInventory import db
 from flask_login import login_user, logout_user, login_required, current_user
 from sqlalchemy.sql import text, func
+from sqlalchemy.exc import IntegrityError
 import requests
 
 @app.route('/')
@@ -348,67 +349,113 @@ def srjtest():
     return render_template('srjtest.html')
 
 
+@app.route('/save_new_item', methods=['POST'])
+@login_required
+def save_new_item():
+    data = request.json
+    print(data)  # Debug: Print the received data
+    barcode = data.get('barcode')
+    productname = data.get('productname')
+    qty = data.get('qty', 1)
+    minqty = data.get('minqty', 1)
+    category_id = data.get('category_id')
+    subcategory_id = data.get('subcategory_id')
+    productimage = data.get('productimage')
+
+    print(f"Creating new item: {barcode}, {productname}, {qty}, {minqty}, {category_id}, {subcategory_id}, {productimage}")  # Debug
+
+    # Create a new item
+    try:
+        new_item = Item(
+            barcode=barcode,
+            productname=productname,
+            qty=qty,
+            minqty=minqty,
+            category_id=category_id,
+            subcategory_id=subcategory_id,
+            productimage=productimage
+        )
+
+        db.session.add(new_item)
+        db.session.commit()
+        print("New item committed to the database")  # Debug
+    except IntegrityError as e:
+        print(f"Integrity error: {e}")  # Debug
+        db.session.rollback()
+        return jsonify({'error': 'There was an error saving the new item.'}), 500
+
+    return jsonify({'message': 'New item saved successfully!'}), 201
+
 @app.route('/check_barcode/<string:barcode>', methods=['GET'])
 @login_required
 def check_barcode(barcode):
     item = Item.query.filter_by(barcode=barcode).first()
-
     if item:
-        category = Category.query.get(item.category_id)
-        subcategory = Subcategory.query.get(item.subcategory_id)
-
-        item_data = {
+        return jsonify({
             'barcode': item.barcode,
             'productname': item.productname,
             'qty': item.qty,
             'minqty': item.minqty,
-            'productimage': item.productimage,
             'category': item.category_id,
-            'subcategory': item.subcategory_id
-        }
-        return jsonify(item_data)
-    else:
-        # Check the Open Food Facts API
-        response = requests.get(f'https://world.openfoodfacts.org/api/v0/product/{barcode}.json')
-        if response.status_code == 200:
-            product_data = response.json()
-            if product_data.get('status') == 1:
-                product = product_data.get('product', {})
-                item_data = {
-                    'barcode': barcode,
-                    'productname': product.get('product_name', 'Unknown Product'),
-                    'qty': 1,
-                    'minqty': 1,
-                    'productimage': product.get('image_url', ''),
-                    'category': None,
-                    'subcategory': None
-                }
-                return jsonify(item_data)
+            'subcategory': item.subcategory_id,
+            'productimage': item.productimage
+        })
 
-    return jsonify({'error': 'Item not found in database or Open Food Facts'}), 404
+    # If not found in the database, check Open Food Facts
+    response = requests.get(f'https://world.openfoodfacts.org/api/v0/product/{barcode}.json')
+    data = response.json()
+
+    if data.get('status') == 1:
+        product = data['product']
+        productname = product.get('product_name', '')
+        productimage = product.get('image_url', 'https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg')
+
+        return jsonify({
+            'barcode': barcode,
+            'productname': productname,
+            'qty': 1,
+            'minqty': 1,
+            'category': '',
+            'subcategory': '',
+            'productimage': productimage,
+            'isNew': True
+        })
+    else:
+        return jsonify({'error': 'Item not found in database or Open Food Facts.'}), 404
+
+from flask import request, jsonify, redirect, url_for
 
 @app.route('/updateitem/<string:barcode>', methods=['POST'])
-@login_required
 def updateitem(barcode):
-    data = request.json
-    item = Item.query.filter_by(barcode=barcode).first()
+    try:
+        data = request.get_json()
+        productname = data['productname']
+        qty = data['qty']
+        minqty = data['minqty']
+        category = data['category']
+        subcategory = data['subcategory']
+        productimage = data['productimage']
 
-    if item:
-        try:
-            item.productname = data['productname']
-            item.qty = data['qty']
-            item.minqty = data['minqty']
-            item.productimage = data['productimage']
-            item.category_id = data['category_id']
-            item.subcategory_id = data['subcategory_id']
+        # Update the item in the database
+        item = Item.query.filter_by(barcode=barcode).first()
+        if item:
+            item.productname = productname
+            item.qty = qty
+            item.minqty = minqty
+            item.category_id = category
+            item.subcategory_id = subcategory
+            item.productimage = productimage
 
             db.session.commit()
-            return jsonify({'message': 'Item updated successfully'})
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({'error': str(e)}), 500
-    else:
-        return jsonify({'error': 'Item not found'}), 404
+            return jsonify({'message': 'Item updated successfully!'})
+        else:
+            return jsonify({'error': 'Item not found'}), 404
+    except KeyError as e:
+        return jsonify({"error": f"Missing field: {e}"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    
 
 @app.route('/get_categories', methods=['GET'])
 @login_required
@@ -416,10 +463,66 @@ def get_categories():
     categories = Category.query.all()
     subcategories = Subcategory.query.all()
 
-    category_list = [{'id': c.id, 'category': c.category} for c in categories]
-    subcategory_list = [{'id': s.id, 'subcategory': s.subcategory, 'category_id': s.category_id} for s in subcategories]
+    categories_list = [{'id': c.id, 'category': c.category} for c in categories]
+    subcategories_list = [{'id': s.id, 'subcategory': s.subcategory, 'category_id': s.category_id} for s in subcategories]
 
-    return jsonify({'categories': category_list, 'subcategories': subcategory_list})
+    return jsonify({'categories': categories_list, 'subcategories': subcategories_list})
+
+@app.route('/increment_qty/<string:barcode>', methods=['POST'])
+@login_required
+def increment_qty(barcode):
+    try:
+        item = Item.query.filter_by(barcode=barcode).first()
+        if not item:
+            return jsonify({'error': 'Item not found in the database'}), 404
+
+        item.qty += 1
+        db.session.commit()
+        return jsonify({'message': f'Product "{item.productname}" quantity updated to {item.qty}'})
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/additem', methods=['POST'])
+def additem():
+    try:
+        data = request.get_json()
+        barcode = data['barcode']
+        productname = data['productname']
+        qty = data['qty']
+        minqty = data['minqty']
+        category = data['category']
+        subcategory = data['subcategory']
+        productimage = data['productimage']
+        
+        # Check if the item already exists in the database
+        existing_item = Item.query.filter_by(barcode=barcode).first()
+        if existing_item:
+            return jsonify({"error": "Item already exists in the database"}), 400
+
+        # Create a new item object
+        new_item = Item(
+            barcode=barcode,
+            productname=productname,
+            qty=qty,
+            minqty=minqty,
+            category_id=category,
+            subcategory_id=subcategory,
+            productimage=productimage
+        )
+
+        # Add the new item to the database
+        db.session.add(new_item)
+        db.session.commit()
+
+        return jsonify({"message": "Item added successfully!"}), 201
+    except KeyError as e:
+        return jsonify({"error": f"Missing field: {e}"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 
 @app.route('/add_inventory')
 @login_required
