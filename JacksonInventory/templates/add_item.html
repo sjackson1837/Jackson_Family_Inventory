@@ -13,11 +13,11 @@ Add Inventory
 </div>
 
 <style>
-    .product-image {
+    /* .product-image {
         max-width: 250px;
         max-height: 250px;
         object-fit: contain;
-    }
+    } */
 </style>
 
 <script>
@@ -99,7 +99,7 @@ Add Inventory
                         document.getElementById('barcode').disabled = true;
 
                         resultDiv.innerHTML = `
-                            <p>Barcode: <input type="text" id="edit-barcode" value="${data.barcode}" readonly /></p>
+                        </br>
                             <p>Product Name: <input type="text" id="edit-productname" value="${data.productname}" /></p>
                             <p>
                                 Quantity: 
@@ -116,7 +116,7 @@ Add Inventory
                             <p>Category: <select id="edit-category"></select></p>
                             <p>Subcategory: <select id="edit-subcategory"></select></p>
                             <p>Product Image: <input type="text" id="edit-productimage" value="${data.productimage}" /></p>
-                            <img class="product-image" src="${data.productimage}" alt="Product Image" />
+                            <img class="product-image" src="${data.productimage}" alt="Product Image" /></br></br></br>
                             <button onclick="saveChanges(isNewItem)">Save Changes</button>
                             <button onclick="cancelChanges()">Cancel</button>
                         `;

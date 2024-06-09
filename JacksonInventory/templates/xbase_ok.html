@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
-          body {
+        body {
             margin: 0;
             font-family: Arial, sans-serif;
         }
@@ -42,6 +42,19 @@
             padding: 10px 20px;
             text-align: center;
         }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                display: none;
+                width: 100%;
+                height: auto;
+            }
+            .main-content {
+                padding: 10px;
+            }
+        }
         .dropdown-menu a.dropdown-item {
             display: block;
             width: 100%;
@@ -53,15 +66,13 @@
             background-color: transparent;
             border: 0;
         }
- 
-
     </style>
 </head>
 <body>
     <div class="header">
         <h1>Jackson Family Inventory</h1>
     </div>
-    <div class="dropdown d-lg-none">
+    <div class="dropdown">
         <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           MENU
         </button>

@@ -1,74 +1,109 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Categories - Products</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
 
-{% block title %}
-All Categories - Products
-{% endblock %}
+        .container {
+            padding: 2rem;
+        }
 
-{% block content %}
-<style>
-  .card-group {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-  }
-  .card {
-    width: calc(33.33% - 10px); /* Adjust the width as needed */
-    background-color: transparent;
-    display: flex;
-    flex-direction: column;
-  }
-  .card-body {
-    padding: 10px;
-    flex-grow: 1;
-  }
-  .card-title {
-    margin-bottom: 5px;
-  }
-  .card-text {
-    margin-bottom: 3px;
-  }
-  .card-img {
-    max-width: 125px;
-    max-height: 125px;
-    object-fit: contain;
-  }
-</style>
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
 
-<div class="container">
-  <div class="row justify-content-center">
-    {% for i in range(0, groceries|length, 3) %}
-    <div class="col-md-12">
-      <div class="card-group">
-        {% for grocery in groceries[i:i+3] %}
-        <div class="card">
-          <div class="row no-gutters">
-            <div class="col-4">
-              <a href="{{ url_for('item', id=grocery.productid) }}">
-                <img src="{{ grocery.productimage }}" class="card-img" alt="{{ grocery.productname }}">
-              </a>
-            </div>
-            <div class="col-8">
-              <div class="card-body">
-                <h5 class="card-title">{{ grocery.productname }}</h5>
-                <p class="card-text">{{ grocery.category }}</p>
-                <p class="card-text">{{ grocery.subcategory }}</p>
-                <div class="d-flex justify-content-between">
-                  <p class="card-text{% if grocery.qty < grocery.minqty %} text-danger{% endif %}">Qty:</p>
-                  <p class="card-text text-right">{{ grocery.qty }}</p>
+        .col-md-6, .col-lg-4, .col-xl-3 {
+            flex: 1 1 calc(25% - 1rem);
+            box-sizing: border-box;
+        }
+
+        .card {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            transition: transform 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 400px; /* Set a fixed height for uniformity */
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        .card-img {
+            max-width: 100%;
+            max-height: 250px;
+            width: auto;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .card-body {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-grow: 1;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            margin: 0.5rem 0;
+        }
+
+        .card-text {
+            margin: 0.5rem 0;
+        }
+
+        .text-danger {
+            color: #b12704;
+        }
+
+        .d-flex {
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="row">
+            <!-- Sample data for iteration -->
+            {% for grocery in groceries %}
+            <div class="col-md-6 col-lg-4 col-xl-3">
+                <div class="card">
+                    <a href="{{ url_for('item', id=grocery.productid) }}">
+                        <img src="{{ grocery.productimage }}" class="card-img" alt="{{ grocery.productname }}">
+                    </a>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ grocery.productname }}</h5>
+                        <p class="card-text">{{ grocery.category }}</p>
+                        <p class="card-text">{{ grocery.subcategory }}</p>
+                        <div class="d-flex justify-content-between">
+                            <p class="card-text{% if grocery.qty < grocery.minqty %} text-danger{% endif %}">Qty: {{ grocery.qty }}</p>
+                            <p class="card-text">Min: {{ grocery.minqty }}</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="d-flex justify-content-between">
-                  <p class="card-text">Min:</p>
-                  <p class="card-text text-right">{{ grocery.minqty }}</p>
-                </div>
-              </div>
             </div>
-          </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-      </div>
     </div>
-    {% endfor %}
-  </div>
-</div>
 
-{% endblock %}
+</body>
+</html>
