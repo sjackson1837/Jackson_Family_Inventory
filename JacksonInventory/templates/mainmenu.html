@@ -23,8 +23,14 @@
             z-index: 2;
             position: relative;
             display: flex;
+<<<<<<< HEAD
             justify-content: center; /* Center the content */
             align-items: center;
+=======
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px; /* Added padding for alignment */
+>>>>>>> 71812649cfc5258c54b048f4035dc63e9f2b6778
         }
         nav {
             background-color: #333;
@@ -53,8 +59,11 @@
             cursor: pointer;
             z-index: 3;
             padding: 14px 16px;
+<<<<<<< HEAD
             position: absolute;
             right: 20px; /* Move the hamburger menu to the right */
+=======
+>>>>>>> 71812649cfc5258c54b048f4035dc63e9f2b6778
         }
         .hamburger div {
             width: 20px; /* Smaller width */
@@ -76,7 +85,10 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+<<<<<<< HEAD
             opacity: 30%;
+=======
+>>>>>>> 71812649cfc5258c54b048f4035dc63e9f2b6778
         }
         @media screen and (max-width: 768px) {
             .menu-container {
@@ -116,7 +128,11 @@
             <a class="menu-item" href="{{ url_for('use_item') }}">Use Inventory</a>
             <a class="menu-item" href="{{ url_for('items_page') }}">View Inventory</a>
             <a class="menu-item" href="{{ url_for('grocery_list') }}">Grocery List</a>
+<<<<<<< HEAD
             <a class="menu-item" href="{{ url_for('search_start') }}">Search 🔍</a>
+=======
+            <a class="menu-item" href="{{ url_for('search_start') }}">Search Item</a>
+>>>>>>> 71812649cfc5258c54b048f4035dc63e9f2b6778
         </div>
     </nav>
     <div class="main-content">
