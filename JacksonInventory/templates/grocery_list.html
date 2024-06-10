@@ -6,12 +6,12 @@ Grocery List
 
 {% block content %}
 <div class="main-content">
-    <div style="text-align: center;">
-        <h2>Jackson Family Grocery List</h2>
+    <div>
+        <h2 style="text-align: center;">Jackson Family Grocery List</h2>
     </div>  
     {% for category, products in grouped_groceries.items() %}
     <h3 style="text-decoration: underline; background-color: lightskyblue">{{ category }}</h3>
-        <ul class="item-list indented" >
+        <ul class="item-list indented">
         {% for product in products %}
             <li class="card-title"><input type="checkbox"> {{ product.productname }} (Needed Qty: {{ product.needed_qty }})</li>
         {% endfor %}
@@ -19,60 +19,38 @@ Grocery List
     {% endfor %}
 </div>
 
-    <!-- <style>
+<script>
+    const itemLists = document.getElementsByClassName('item-list');
 
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        
-        li {
-            display: flex;
-            align-items: center;
-            padding: 5px;
-        }
-        
-        input[type="checkbox"] {
-            margin-right: 5px;
-        }
+    for (let i = 0; i < itemLists.length; i++) {
+        const itemList = itemLists[i];
+        const checkboxes = itemList.getElementsByTagName('input');
 
-        .indented {
-            margin-left: 25px;
-        }
-    </style>  -->
+        for (let j = 0; j < checkboxes.length; j++) {
+            checkboxes[j].addEventListener('change', function() {
+                const listItem = this.parentNode;
 
-    <script>
-        const itemLists = document.getElementsByClassName('item-list');
-
-        for (let i = 0; i < itemLists.length; i++) {
-            const itemList = itemLists[i];
-            const checkboxes = itemList.getElementsByTagName('input');
-
-            for (let j = 0; j < checkboxes.length; j++) {
-                checkboxes[j].addEventListener('change', function() {
-                    const listItem = this.parentNode;
-
-                    if (this.checked) {
-                        itemList.appendChild(listItem);
-                    } else {
-                        // Find the first unchecked item in the category
-                        let firstUnchecked = null;
-                        const items = itemList.getElementsByTagName('li');
-                        for (let k = 0; k < items.length; k++) {
-                            if (!items[k].getElementsByTagName('input')[0].checked) {
-                                firstUnchecked = items[k];
-                                break;
-                            }
-                        }
-
-                        if (firstUnchecked) {
-                            itemList.insertBefore(listItem, firstUnchecked);
-                        } else {
-                            itemList.appendChild(listItem);
+                if (this.checked) {
+                    itemList.appendChild(listItem);
+                } else {
+                    // Find the first unchecked item in the category
+                    let firstUnchecked = null;
+                    const items = itemList.getElementsByTagName('li');
+                    for (let k = 0; k < items.length; k++) {
+                        if (!items[k].getElementsByTagName('input')[0].checked) {
+                            firstUnchecked = items[k];
+                            break;
                         }
                     }
-                });
-            }
+
+                    if (firstUnchecked) {
+                        itemList.insertBefore(listItem, firstUnchecked);
+                    } else {
+                        itemList.appendChild(listItem);
+                    }
+                }
+            });
         }
-    </script>  
+    }
+</script>  
 {% endblock %}

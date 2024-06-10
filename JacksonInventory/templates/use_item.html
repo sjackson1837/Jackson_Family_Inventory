@@ -12,7 +12,13 @@ Use Inventory
 </div>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('barcode').focus();
+    });
+
     let barcodeTimeout;
+    const errorSound = new Audio('./static/sounds/negative.mp3');
+    const successSound = new Audio('./static/sounds/positive.mp3');
 
     function delayedCheckBarcode() {
         clearTimeout(barcodeTimeout);
@@ -32,13 +38,18 @@ Use Inventory
             const resultDiv = document.getElementById('result');
             if (data.error) {
                 resultDiv.innerHTML = `<p style="color: red;">${data.error}</p>`;
+                document.getElementById('barcode').value = ''; // Clear the barcode field on error
+                errorSound.play(); // Play error sound
             } else {
                 resultDiv.innerHTML = `<p style="color: green;">${data.message}</p>`;
-                document.getElementById('barcode').value = '';
+                document.getElementById('barcode').value = ''; // Clear the barcode field on success
+                successSound.play(); // Play success sound
             }
         })
         .catch(error => {
             console.error('Error:', error);
+            document.getElementById('barcode').value = ''; // Clear the barcode field on error
+            errorSound.play(); // Play error sound
         });
     }
 </script>

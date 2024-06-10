@@ -429,13 +429,12 @@ def updateitem(barcode):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-    
 
 @app.route('/get_categories', methods=['GET'])
 @login_required
 def get_categories():
-    categories = Category.query.all()
-    subcategories = Subcategory.query.all()
+    categories = Category.query.order_by(Category.category).all()  # Sort categories alphabetically
+    subcategories = Subcategory.query.order_by(Subcategory.subcategory).all()  # Sort subcategories alphabetically
 
     categories_list = [{'id': c.id, 'category': c.category} for c in categories]
     subcategories_list = [{'id': s.id, 'subcategory': s.subcategory, 'category_id': s.category_id} for s in subcategories]
@@ -445,13 +444,14 @@ def get_categories():
 @app.route('/get_categories/<int:category_id>', methods=['GET'])
 @login_required
 def get_subcategories(category_id):
-    # Query subcategories associated with the given category ID
-    subcategories = Subcategory.query.filter_by(category_id=category_id).all()
+    # Query subcategories associated with the given category ID and sort alphabetically
+    subcategories = Subcategory.query.filter_by(category_id=category_id).order_by(Subcategory.subcategory).all()
 
     # Create a list of dictionaries containing subcategory details
     subcategories_list = [{'id': s.id, 'subcategory': s.subcategory} for s in subcategories]
 
     return jsonify({'subcategories': subcategories_list})
+
 
 
 @app.route('/increment_qty/<string:barcode>', methods=['POST'])

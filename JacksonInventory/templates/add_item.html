@@ -14,12 +14,18 @@ Add Inventory
 </div>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('barcode').focus();
+    });
+
     let categories = {};
     let subcategories = {};
     let currentCategory = null;
     let currentSubcategory = null;
     let isNewItem = false;
     let barcodeTimeout;
+    const errorSound = new Audio('./static/sounds/negative.mp3');
+    const successSound = new Audio('./static/sounds/positive.mp3');
 
     function delayedCheckBarcode() {
         clearTimeout(barcodeTimeout);
@@ -83,6 +89,7 @@ Add Inventory
                 if (data.error) {
                     resultDiv.innerHTML = `<p>${data.error}</p>`;
                     displayEmptyFields(barcode);
+                    errorSound.play(); // Play error sound
                 } else {
                     if (data.isNew) {
                         currentCategory = data.category;
@@ -114,8 +121,10 @@ Add Inventory
                             <button onclick="cancelChanges()">Cancel</button>
                         `;
                         loadCategories();
+                        successSound.play(); // Play error sound
                     } else {
                         incrementQuantity(data.barcode);
+                        successSound.play(); // Play error sound
                     }
                 }
             })
