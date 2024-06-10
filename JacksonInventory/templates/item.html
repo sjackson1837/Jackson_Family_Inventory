@@ -10,7 +10,9 @@ Item View
         <form action="{{ url_for('update_item', id=item[0]['productid']) }}" method="POST">
             <div class="item-container">
                 <div class="item-image">
-                    <img src="{{ item[0]['productimage'] }}" alt="Product Image">
+                    <div class="image-wrapper">
+                        <img src="{{ item[0]['productimage'] }}" alt="Product Image">
+                    </div>
                 </div>
                 <div class="item-details">
                     <textarea id="productname" name="productname" rows="2">{{ item[0]['productname'] }}</textarea>

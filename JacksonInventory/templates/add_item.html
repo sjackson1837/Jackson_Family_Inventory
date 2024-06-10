@@ -13,6 +13,7 @@ Add Inventory
     </div>
 </div>
 
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('barcode').focus();
@@ -108,7 +109,7 @@ Add Inventory
                                 <button onclick="updateQty(1)">+</button>
                             </p>
                             <p>
-                                Minimum Quantity: 
+                                Min Quantity: 
                                 <button onclick="updateMinQty(-1)">-</button>
                                 <input type="text" id="edit-minqty" value="${data.minqty}" />
                                 <button onclick="updateMinQty(1)">+</button>
@@ -175,7 +176,7 @@ Add Inventory
                 <button onclick="updateQty(1)">+</button>
             </p>
             <p>
-                Minimum Quantity: 
+                Min Quantity: 
                 <button onclick="updateMinQty(-1)">-</button>
                 <input type="text" id="edit-minqty" value="1" />
                 <button onclick="updateMinQty(1)">+</button>
