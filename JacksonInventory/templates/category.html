@@ -1,18 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Categories - Products</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
-        }
+{% extends 'base.html' %}
 
-<<<<<<< HEAD
 {% block title %}
 Category
 {% endblock %}
@@ -32,77 +19,6 @@ Category
 </head>
 <body>
     <div class="main-content">
-=======
-        .container {
-            padding: 2rem;
-        }
-
-        .row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .col-md-6, .col-lg-4, .col-xl-3 {
-            flex: 1 1 calc(25% - 1rem);
-            box-sizing: border-box;
-        }
-
-        .card {
-            background-color: white;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            overflow: hidden;
-            transition: transform 0.2s;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 400px; /* Set a fixed height for uniformity */
-        }
-
-        .card:hover {
-            transform: scale(1.05);
-        }
-
-        .card-img {
-            max-width: 100%;
-            max-height: 250px;
-            width: auto;
-            height: auto;
-            display: block;
-            margin: 0 auto;
-        }
-
-        .card-body {
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            flex-grow: 1;
-        }
-
-        .card-title {
-            font-size: 1.2rem;
-            margin: 0.5rem 0;
-        }
-
-        .card-text {
-            margin: 0.5rem 0;
-        }
-
-        .text-danger {
-            color: #b12704;
-        }
-
-        .d-flex {
-            display: flex;
-            justify-content: space-between;
-        }
-    </style>
-</head>
-<body>
-
->>>>>>> 71812649cfc5258c54b048f4035dc63e9f2b6778
     <div class="container">
         <div class="row">
             <!-- Sample data for iteration -->
@@ -126,11 +42,8 @@ Category
             {% endfor %}
         </div>
     </div>
-<<<<<<< HEAD
+
     </div>
     {% endblock %}
-=======
 
-</body>
-</html>
->>>>>>> 71812649cfc5258c54b048f4035dc63e9f2b6778
+
