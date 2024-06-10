@@ -3,11 +3,11 @@
 {% block content %}
 <div class="main-content">
 <br/><br/>
-<form method="POST" action="{{ url_for('search') }}" class="d-flex ml-auto" role="search">
+<form method="POST" action="{{ url_for('search') }}" role="search">
     {{ form.hidden_tag() }}
-    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="searched">
+    <input type="search" placeholder="Search" aria-label="Search" name="searched">
     <br/><br/>
-    <button class="btn btn-outline-success" type="submit">Search</button>
+    <button type="submit">Search</button>
 </form>
 </div>
 {% endblock %}

@@ -302,19 +302,19 @@ def base():
 def search_start():
     return render_template('search_start.html')
 
-#Create Search Function
 @app.route('/search', methods=['GET', 'POST'])
 @login_required
 def search():
     form = SearchForm()
     items = Item.query
     if form.validate_on_submit():
-        #Get data from submitted form
-        item.searched = form.searched.data
-        # Query the Database
-        items = items.filter(Item.productname.like('%' + item.searched + '%'))
+        # Get data from submitted form
+        searched = form.searched.data.lower()  # Convert to lowercase
+        
+        # Query the Database, convert column values to lowercase for case-insensitive search
+        items = items.filter(func.lower(Item.productname).like('%' + searched + '%'))
         items = items.order_by(Item.barcode).all()
-        return render_template("search.html", form=form, searched=item.searched, items = items)
+        return render_template("search.html", form=form, searched=searched, items=items)
     
 
 @app.route('/srjtest')
