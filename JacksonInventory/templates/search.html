@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="main-content">
 
     <br/>
     <h2>You Searched For:  <em>{{ searched }}</em></h2>
@@ -24,5 +25,5 @@
     Sorry, your search term: <strong> {{ searched }}</strong> was not found!
 
     {% endif %}
-
+  </div>
 {% endblock %}

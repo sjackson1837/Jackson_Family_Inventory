@@ -132,7 +132,9 @@ def item(id):
     categories_query = Category.query.all()
     subcategories_query = Subcategory.query.all()
 
+    # Pass categories and subcategories to the template
     return render_template('item.html', item=item, categories=categories_query, subcategories=subcategories_query)
+
 
 @app.route('/items/<int:id>', methods=['POST'])
 @login_required
@@ -440,6 +442,18 @@ def get_categories():
 
     return jsonify({'categories': categories_list, 'subcategories': subcategories_list})
 
+@app.route('/get_categories/<int:category_id>', methods=['GET'])
+@login_required
+def get_subcategories(category_id):
+    # Query subcategories associated with the given category ID
+    subcategories = Subcategory.query.filter_by(category_id=category_id).all()
+
+    # Create a list of dictionaries containing subcategory details
+    subcategories_list = [{'id': s.id, 'subcategory': s.subcategory} for s in subcategories]
+
+    return jsonify({'subcategories': subcategories_list})
+
+
 @app.route('/increment_qty/<string:barcode>', methods=['POST'])
 @login_required
 def increment_qty(barcode):
@@ -450,7 +464,8 @@ def increment_qty(barcode):
 
         item.qty += 1
         db.session.commit()
-        return jsonify({'message': f'Product "{item.productname}" quantity updated to {item.qty}'})
+        flash(f'Product "{item.productname}" quantity updated to {item.qty}', 'success')
+        return jsonify({'message': f'Producssst "{item.productname}" quantity updated to {item.qty}'})
 
     except Exception as e:
         db.session.rollback()
@@ -514,7 +529,7 @@ def decrement_qty(barcode):
 
         item.qty -= 1
         db.session.commit()
-        return jsonify({'message': f'Product "{item.productname}" quantity updated to {item.qty}'})
+        return jsonify({'message': f'Producsadt "{item.productname}" quantity updated to {item.qty}'})
 
     except Exception as e:
         db.session.rollback()

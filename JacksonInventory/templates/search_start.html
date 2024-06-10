@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="main-content">
 <br/><br/>
 <form method="POST" action="{{ url_for('search') }}" class="d-flex ml-auto" role="search">
     {{ form.hidden_tag() }}
@@ -8,5 +9,5 @@
     <br/><br/>
     <button class="btn btn-outline-success" type="submit">Search</button>
 </form>
-
+</div>
 {% endblock %}
