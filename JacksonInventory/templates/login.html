@@ -1,137 +1,22 @@
 {% extends 'base.html' %}
 {% block title %}
-    Register Page
+    Log In Page
+{% endblock %}
+{% block header %}
+<!-- Override the header block to prevent it from being displayed -->
 {% endblock %}
 
 {% block content %}
-<body class="text-center">
-    <div class="container">
-        <form method="POST" class="form-signin" style="color: black">
-            {{ form.hidden_tag() }}
-        </br>
-            <h1 class="h3 mb-3 font-weight-large">
-                Please Login
-            </h1>
-
-            <!-- {{ form.username.label() }} -->
-            <div class="col-md-12 mb-12">
-                <div class="btn-group" role="group" aria-label="User Buttons">
-                    <label class="btn btn-secondary btn-md">
-                        <input type="radio" name="{{ form.username.name }}" value="Steven"> Steven
-                    </label>
-                    <label class="btn btn-secondary btn-md">
-                        <input type="radio" name="{{ form.username.name }}" value="Kanika"> Kanika
-                    </label>
-                    <label class="btn btn-secondary btn-md">
-                        <input type="radio" name="{{ form.username.name }}" value="Averi"> Averi
-                    </label>
-                    <label class="btn btn-secondary btn-md">
-                        <input type="radio" name="{{ form.username.name }}" value="Adalyn"> Adalyn
-                    </label>
-                </div>
-            </div>
-
-            <!-- {{ form.password.label() }} -->
-            <div class="keypad d-flex justify-content-center">
-                <div class="row">
-                    <div class="col-4">
-                        <button type="button" class="btn btn-secondary btn-md keypad-btn" data-key="7">7</button>
-                    </div>
-                    <div class="col-4">
-                        <button type="button" class="btn btn-secondary btn-md keypad-btn" data-key="8">8</button>
-                    </div>
-                    <div class="col-4">
-                        <button type="button" class="btn btn-secondary btn-md keypad-btn" data-key="9">9</button>
-                    </div>
-                </div>
-            </div>
-            <div class="keypad d-flex justify-content-center">
-                <div class="row">
-                    <div class="col-4">
-                        <button type="button" class="btn btn-secondary btn-md keypad-btn" data-key="4">4</button>
-                    </div>
-                    <div class="col-4">
-                        <button type="button" class="btn btn-secondary btn-md keypad-btn" data-key="5">5</button>
-                    </div>
-                    <div class="col-4">
-                        <button type="button" class="btn btn-secondary btn-md keypad-btn" data-key="6">6</button>
-                    </div>
-                </div>
-            </div>
-            <div class="keypad d-flex justify-content-center">
-                <div class="row">
-                    <div class="col-4">
-                        <button type="button" class="btn btn-secondary btn-md keypad-btn" data-key="1">1</button>
-                    </div>
-                    <div class="col-4">
-                        <button type="button" class="btn btn-secondary btn-md keypad-btn" data-key="2">2</button>
-                    </div>
-                    <div class="col-4">
-                        <button type="button" class="btn btn-secondary btn-md keypad-btn" data-key="3">3</button>
-                    </div>
-                </div>
-            </div>
-            <div class="keypad d-flex justify-content-center">
-                <div class="row">
-                    <div class="col-12 text-center"> <!-- Make the column span the full width -->
-                        <button type="button" class="btn btn-secondary btn-md keypad-btn" data-key="0">0</button>
-                    </div>
-                </div>
-            </div>
-            <div class="keypad d-flex justify-content-center">
-                <div class="row">
-                    <div class="col-12 text-center"> <!-- Make the column span the full width -->
-                        <button type="button" class="btn btn-secondary btn-md keypad-btn" id="clear-button">Clear</button>
-                    </div>
-                </div>
-            </div>
-            <div class="keypad-input-display">
-                <!-- This div will display asterisks as buttons are pressed -->
-            </div>
-            <input type="hidden" class="keypad-input" name="{{ form.password.name }}" pattern="[0-9]*" required>
-
-            <br>
-
-            {{ form.submit(class="btn btn-lg btn-block btn-primary") }}
-            <br/>
-        
-            <div class="checkbox mb-3">
-                <h6>Do not have an account?</h6>
-                <a class="btn btn-sm btn-secondary" href="{{ url_for('register_page') }}">Register</a>
-            </div>
-
-        </form>
-    </div>
-</body>
-
-<script>
-    const keypadButtons = document.querySelectorAll('.keypad-btn');
-    const keypadInput = document.querySelector('.keypad-input');
-    const clearButton = document.querySelector('#clear-button');
-    const keypadDisplay = document.querySelector('.keypad-input-display');
-
-    keypadButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            if (button.getAttribute('data-key') === '0') {
-                keypadInput.value += button.getAttribute('data-key');
-            } else {
-                keypadInput.value += button.getAttribute('data-key');
-            }
-            updateAsterisksDisplay(keypadInput.value.length);
-            console.log(keypadInput);
-        });
-    });
-
-    clearButton.addEventListener('click', () => {
-        keypadInput.value = '';
-        updateAsterisksDisplay(0);
-    });
-
-    function updateAsterisksDisplay(count) {
-        const asterisks = '*'.repeat(count);
-        keypadDisplay.textContent = asterisks;
-    }
-</script>
-
-
+<div class="login">
+    <h1>Login</h1>
+    <form method="post">
+        {{ form.hidden_tag() }} <!-- Include CSRF token for security -->
+        <input type="text" name="{{ form.username.name }}" placeholder="Username" required="required" />
+        <input type="password" name="{{ form.password.name }}" placeholder="Password" required="required" />
+        {{ form.submit(class="btn btn-primary btn-block btn-large") }}
+        <br/><br/>
+        <h6>Do not have an account?</h6>
+        <a href="{{ url_for('register_page') }}" class="btn btn-primary btn-block btn-large">Register</a>
+    </form>
+</div>
 {% endblock %}

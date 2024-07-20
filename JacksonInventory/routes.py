@@ -16,36 +16,52 @@ def home_page():
 @app.route('/mainmenu')
 @login_required
 def mainmenu_page():
-    return render_template('mainmenu.html')
+    query = text('''
+    SELECT DISTINCT c.category
+    FROM category c
+    ORDER BY c.category
+    ''')
+    result = db.session.execute(query)
+    # categories = result.fetchall()
+    categories = [row[0] for row in result.fetchall()]  # Extract category names from the result set
+    return render_template('mainmenu.html', categories=categories)
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_page():
     form = RegisterForm()
     if form.validate_on_submit():
-        user_to_create = User(username=form.username.data,
-                              password=form.password1.data)
-        print(form.password1.data)
-        db.session.add(user_to_create)
-        db.session.commit()
-        login_user(user_to_create)
-        flash(f"Account created successfully! You are now logged in as {user_to_create.username}", category='success')
-        return redirect(url_for('mainmenu_page'))
-    if form.errors != {}: #If there are not errors from the validations
+        print("Am I here????")
+        if form.password1.data == form.password2.data:
+            print("Am I here????2222222")
+            user_to_create = User(username=form.username.data,
+                                  password=form.password1.data)
+            db.session.add(user_to_create)
+            db.session.commit()
+            login_user(user_to_create)
+            flash(f"Account created successfully! You are now logged in as {user_to_create.username}", category='success')
+            return redirect(url_for('mainmenu_page'))
+        else:
+            flash('Passwords must match!', category='danger')
+    if form.errors != {}:
         for err_msg in form.errors.values():
             flash(f'There was an error with creating a user: {err_msg}', category='danger')
 
     return render_template('register.html', form=form)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
     form = LoginForm()
     if form.validate_on_submit():
         attempted_user = User.query.filter_by(username=form.username.data).first()
+        print(attempted_user)
         if attempted_user and attempted_user.check_password_correction(
                 attempted_password=form.password.data
         ):
             login_user(attempted_user)
             flash(f'Success! You are logged in as: {attempted_user.username}', category='success')
+            print(attempted_user)
             return redirect(url_for('mainmenu_page'))
         else:
             flash('Username and password are not match! Please try again', category='danger')
@@ -511,10 +527,10 @@ def additem():
 
 
 
-@app.route('/add_inventory')
+@app.route('/base_new')
 @login_required
-def add_inventory():
-    return render_template('srjtest.html')
+def base_new():
+    return render_template('base_new.html')
 
 @app.route('/useitem')
 def useitem():

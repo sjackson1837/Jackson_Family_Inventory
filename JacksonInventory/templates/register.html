@@ -2,155 +2,49 @@
 {% block title %}
     Register Page
 {% endblock %}
+{% block header %}
+<!-- Override the header block to prevent it from being displayed -->
+{% endblock %}
 
 {% block content %}
-<body class="text-center">
-    <div class="container">
-        <form method="POST" class="form-register" style="color:white">
-            {{ form.hidden_tag() }}
-            <img class="mb-4" src="static/images/grocery_bag_cartoon.jfif" width="100px" height="100px" alt="">
-            <h1 class="h3 mb-3 font-weight-normal">
-                Please Create your Account
-            </h1>
-            <br>
-            {{ form.username.label() }}
-            {{ form.username(class="form-control", placeholder="User Name") }}
+<div class="login">
+    <h1>Please Create Your Account</h1>
+    <form method="POST">
+        {{ form.hidden_tag() }} <!-- Include CSRF token for security -->
+        
+        <!-- Username Field -->
+        <input type="text" name="{{ form.username.name }}" placeholder="Username" required="required" />
 
-            {{ form.password1.label() }}
-            <div class="keypad d-flex justify-content-center">
-                <div class="row">
-                    <div class="col-12">
-                        <input type="password" class="form-control keypad-input" id="password1-input" name="{{ form.password1.name }}" >
-                    </div>
-                </div>
-            </div>
+        <!-- Password1 Field -->
+        <input type="password" name="{{ form.password1.name }}" placeholder="Password" required="required" />
 
-            {{ form.password2.label() }}
-            <div class="keypad d-flex justify-content-center">
-                <div class="row">
-                    <div class="col-12">
-                        <input type="password" class="form-control keypad-input" id="password2-input" name="{{ form.password2.name }}" >
-                    </div>
-                </div>
-            </div>
+        <!-- Password2 Field -->
+        <input type="password" name="{{ form.password2.name }}" placeholder="Confirm Password" required="required" />
 
-            <div class="keypad d-flex justify-content-center">
-                <div class="row">
-                    <div class="col-4">
-                        <button type="button" class="btn btn-secondary btn-md keypad-btn" data-key="7">7</button>
-                    </div>
-                    <div class="col-4">
-                        <button type="button" class="btn btn-secondary btn-md keypad-btn" data-key="8">8</button>
-                    </div>
-                    <div class="col-4">
-                        <button type="button" class="btn btn-secondary btn-md keypad-btn" data-key="9">9</button>
-                    </div>
-                </div>
-            </div>
-            <div class="keypad d-flex justify-content-center">
-                <div class="row">
-                    <div class="col-4">
-                        <button type="button" class="btn btn-secondary btn-md keypad-btn" data-key="4">4</button>
-                    </div>
-                    <div class="col-4">
-                        <button type="button" class="btn btn-secondary btn-md keypad-btn" data-key="5">5</button>
-                    </div>
-                    <div class="col-4">
-                        <button type="button" class="btn btn-secondary btn-md keypad-btn" data-key="6">6</button>
-                    </div>
-                </div>
-            </div>
-            <div class="keypad d-flex justify-content-center">
-                <div class="row">
-                    <div class="col-4">
-                        <button type="button" class="btn btn-secondary btn-md keypad-btn" data-key="1">1</button>
-                    </div>
-                    <div class="col-4">
-                        <button type="button" class="btn btn-secondary btn-md keypad-btn" data-key="2">2</button>
-                    </div>
-                    <div class="col-4">
-                        <button type="button" class="btn btn-secondary btn-md keypad-btn" data-key="3">3</button>
-                    </div>
-                </div>
-            </div>
-            <div class="keypad d-flex justify-content-center">
-                <div class="row">
-                    <div class="col-4">
-                        <button type="button" class="btn btn-secondary btn-md keypad-btn" data-key="0">0</button>
-                    </div>
-                </div>
-            </div>
-            <div class="keypad d-flex justify-content-center">
-                <div class="row">
-                    <div class="col-12 text-center"> <!-- Make the column span the full width -->
-                        <button type="button" class="btn btn-secondary btn-md keypad-btn" id="clear-btn">Clear</button>
-                    </div>
-                </div>
-            </div>
-            <br/>
+        <!-- Submit Button -->
+        {{ form.submit(class="btn btn-primary btn-block btn-large") }}
 
-            {{ form.submit(class="btn btn-lg btn-block btn-primary") }}
+        <br/><br/>
 
-            <br/><br/><br/>
-
-            <div class="checkbox mb-3">
-                <h6>Already have an account?</h6>
-                <a class="btn btn-sm btn-secondary" href="{{ url_for('login_page') }}">Login</a>
-            </div>
-
-        </form>
-    </div>
-</body>
+        <!-- Redirect to Login Page -->
+        <h6>Already have an account?</h6>
+        <a href="{{ url_for('login_page') }}" class="btn btn-primary btn-block btn-large">Login</a>
+    </form>
+</div>
 
 <script>
-    const keypadButtons = document.querySelectorAll('.keypad-btn');
-    const password1Input = document.getElementById('password1-input');
-    const password2Input = document.getElementById('password2-input');
-    const form = document.querySelector('.form-register');
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const form = document.querySelector('form');
+        const password1Input = document.querySelector('input[name="password1"]');
+        const password2Input = document.querySelector('input[name="password2"]');
 
-    let enteredPassword1 = ''; // Variable to store entered password for password1
-    let enteredPassword2 = ''; // Variable to store entered password for password2
-    let activePasswordField = 'password1'; // Initially, the active field is Password1
-    const clearButton = document.getElementById('clear-btn');
-
-    keypadButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const key = button.getAttribute('data-key');
-
-        if (activePasswordField === 'password1') {
-            enteredPassword1 += key;
-            password1Input.value = enteredPassword1; // Display entered keys in Password1 field
-        } else if (activePasswordField === 'password2') {
-            enteredPassword2 += key;
-            password2Input.value = enteredPassword2; // Display entered keys in Password2 field
-        }
+        form.addEventListener('submit', event => {
+            if (password1Input.value !== password2Input.value) {
+                alert("Passwords do not match. Please try again.");
+                event.preventDefault(); // Prevent form submission
+            }
+        });
     });
-});
-
-password1Input.addEventListener('focus', () => {
-    // When Password1 input is focused, set it as the active field
-    activePasswordField = 'password1';
-});
-
-password2Input.addEventListener('focus', () => {
-    // When Password2 input is focused, set it as the active field
-    activePasswordField = 'password2';
-});
-
-form.addEventListener('submit', event => {
-    if (enteredPassword1 !== enteredPassword2) {
-        alert("Passwords do not match. Please try again.");
-        event.preventDefault(); // Prevent form submission
-    }
-});
-
-clearButton.addEventListener('click', () => {
-    enteredPassword1 = ''; // Reset entered password for password1
-    enteredPassword2 = ''; // Reset entered password for password2
-    password1Input.value = ''; // Clear password1 input field
-    password2Input.value = ''; // Clear password2 input field
-});
-
 </script>
 
 {% endblock %}

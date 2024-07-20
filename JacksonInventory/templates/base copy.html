@@ -37,7 +37,7 @@
 
         header {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
             padding: 10px;
             color: white;
@@ -113,7 +113,7 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
 
         .menu-container {
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             flex-wrap: wrap;
             justify-content: center;
             width: 100%;
@@ -130,7 +130,6 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
             background-color: #5e5e5e;
         }
 
- 
         @media (min-width: 769px) {
     .hamburger {
         display: none; /* Hide hamburger on larger screens */
@@ -164,6 +163,7 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
             <div></div>
         </div>
     </header>
+    {% endblock %}
     <nav>
         <div class="menu-container">
             {% if current_user.is_authenticated %}
@@ -175,7 +175,7 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
                 <a class="menu-item" href="{{ url_for('search_start') }}">Search</a>
                 <a class="menu-item" href="{{ url_for('logout_page') }}">Logout</a>
                 <a class="menu-item" href="{{ url_for('base_new') }}">TESTING</a>
-            {% else %}
+                {% else %}
                 {% if request.endpoint != 'login_page' and request.endpoint != 'register_page' and request.endpoint != 'home_page' %}
                     <a class="menu-item" href="{{ url_for('login_page') }}">Log In</a>
                     <a class="menu-item" href="{{ url_for('register_page') }}">Register</a>
@@ -183,32 +183,31 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
             {% endif %}
         </div>
     </nav>
-    <div class="main-content" style="margin-left:200px;">
-        {% endblock %}
+    <div class="main-content">
         {% block content %}{% endblock %}
     </div>
 
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const menu = document.querySelector('.menu-container');
-        const hamburger = document.querySelector('.hamburger');
+document.addEventListener('DOMContentLoaded', () => {
+    const menu = document.querySelector('.menu-container');
+    const hamburger = document.querySelector('.hamburger');
 
-        function toggleMenu() {
-            if (window.innerWidth <= 768) { // Only toggle menu on small screens
-                menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
-            }
+    function toggleMenu() {
+        if (window.innerWidth <= 768) { // Only toggle menu on small screens
+            menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
         }
+    }
 
-        // Toggle menu on hamburger click
-        hamburger.addEventListener('click', toggleMenu);
+    // Toggle menu on hamburger click
+    hamburger.addEventListener('click', toggleMenu);
 
-        // Hide the menu when the screen is resized to larger than 768px
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                menu.style.display = 'flex'; // Show menu on larger screens
-            }
-        });
+    // Hide the menu when the screen is resized to larger than 768px
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            menu.style.display = 'flex'; // Show menu on larger screens
+        }
     });
+});
     </script>
 </body>
 </html>
