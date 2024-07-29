@@ -193,6 +193,13 @@
     {% block header %}
     <header>
         <h1>Jackson Family Inventory</h1>
+        <div class="search-bar">
+            <form action="{{ url_for('mainmenu_page') }}" method="GET">
+                <input type="text" name="search" placeholder="Search..." value="{{ request.args.get('search', '') }}">
+                <input type="hidden" name="category" value="{{ selected_category }}">
+                <input type="hidden" name="subcategory" value="{{ selected_subcategory }}">
+            </form>
+        </div>
         <div class="hamburger" onclick="toggleMenu()">
             <div></div>
             <div></div>

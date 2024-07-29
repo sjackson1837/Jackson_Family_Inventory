@@ -17,6 +17,7 @@ def home_page():
 @login_required
 def mainmenu_page():
     selected_category = request.args.get('category')
+    selected_subcategory = request.args.get('subcategory')
 
     # Query to fetch all distinct categories for the sidebar
     category_query = text('''
@@ -28,21 +29,35 @@ def mainmenu_page():
     categories_result = db.session.execute(category_query)
     categories = categories_result.fetchall()
 
-    # Query to fetch items based on the selected category
+    # Query to fetch subcategories based on the selected category
     if selected_category:
+        subcategory_query = text('''
+        SELECT DISTINCT s.id, s.subcategory
+        FROM subcategory s
+        JOIN item i ON i.subcategory_id = s.id
+        JOIN category c ON i.category_id = c.id
+        WHERE c.category = :category
+        ORDER BY s.subcategory
+        ''')
+        subcategories_result = db.session.execute(subcategory_query, {'category': selected_category})
+        subcategories = subcategories_result.fetchall()
+
+        # Query to fetch items based on the selected category and subcategory
         item_query = text('''
-        SELECT c.category, s.subcategory, i.productimage, i.qty, i.minqty, i.productname
+        SELECT c.category, s.subcategory, i.productimage, i.qty, i.minqty, i.productname, i.id as productid
         FROM item i
         JOIN category c ON i.category_id = c.id
         JOIN subcategory s ON i.subcategory_id = s.id
         WHERE c.category = :category
+        AND (s.subcategory = :subcategory OR :subcategory IS NULL)
         ORDER BY i.productname
         ''')
-        items_result = db.session.execute(item_query, {'category': selected_category})
+        items_result = db.session.execute(item_query, {'category': selected_category, 'subcategory': selected_subcategory})
     else:
+        subcategories = []
         # If no category is selected, show all items
         item_query = text('''
-        SELECT c.category, s.subcategory, i.productimage, i.qty, i.minqty, i.productname
+        SELECT c.category, s.subcategory, i.productimage, i.qty, i.minqty, i.productname, i.id as productid
         FROM item i
         JOIN category c ON i.category_id = c.id
         JOIN subcategory s ON i.subcategory_id = s.id
@@ -52,7 +67,7 @@ def mainmenu_page():
 
     items = items_result.fetchall()
 
-    return render_template('mainmenu.html', categories=categories, items=items, selected_category=selected_category)
+    return render_template('mainmenu.html', categories=categories, subcategories=subcategories, items=items, selected_category=selected_category, selected_subcategory=selected_subcategory)
 
 
 @app.route('/register', methods=['GET', 'POST'])
