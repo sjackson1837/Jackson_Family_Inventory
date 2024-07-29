@@ -5,8 +5,19 @@ Use Inventory
 {% endblock %}
 
 {% block content %}
+<style>
+    .main-content {
+        color: white;
+    }
+
+    input::placeholder{
+        color: white;
+        opacity: 1;
+    }
+</style>
 <div class="main-content">
     <h1>Use Inventory</h1>
+</br>
     <input type="text" id="barcode" placeholder="Enter or scan barcode" oninput="delayedCheckBarcode()" />
     <div id="result"></div>
 </div>

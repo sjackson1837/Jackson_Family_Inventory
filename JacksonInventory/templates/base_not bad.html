@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        @import url(https://fonts.googleapis.com/css?family=Open+Sans);
+        body { 
+            font-family: 'Open Sans', sans-serif;
+            background: #092756;
+            padding-top: 60px; /* Adjust this to the height of the header */
+            margin: 0;
+        }
+
+        header {
+            position: fixed; /* Fix the header at the top */
+            top: 0; /* Align at the top of the viewport */
+            left: 0; /* Align at the left edge of the viewport */
+            width: 100%; /* Full width of the viewport */
+            z-index: 1000; /* Ensure header is above other content */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            color: white;
+            background-color: #000000;
+        }
+
+        nav {
+            position: fixed; /* Fix the navbar at the top below the header */
+            top: 60px; /* Position below the header */
+            left: 0;
+            width: 100%; /* Full width of the viewport */
+            background-color: #000000;
+            z-index: 999; /* Ensure navbar is below the header but above other content */
+        }
+
+        .menu-container {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .menu-item {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            display: block;
+        }
+
+        .menu-item:hover {
+            background-color: #5e5e5e;
+        }
+
+        .hamburger {
+            display: none;
+            cursor: pointer;
+            flex-direction: column;
+            width: 30px;
+            height: 20px;
+            justify-content: space-between;
+        }
+
+        .hamburger div {
+            width: 30px;
+            height: 4px;
+            background-color: white;
+            border-radius: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex; /* Show hamburger on smaller screens */
+            }
+
+            .menu-container {
+                display: none; /* Hide menu by default on smaller screens */
+                flex-direction: column; /* Stack menu items vertically */
+                width: 100%; /* Full width */
+            }
+        }
+
+        @media (min-width: 769px) {
+            .hamburger {
+                display: none; /* Hide hamburger on larger screens */
+            }
+
+            .menu-container {
+                display: flex; /* Ensure menu is visible on larger screens */
+            }
+        }
+
+        .main-content {
+            margin-top: 20px; /* Space for header and navbar */
+            padding: 20px; /* Padding for the main content */
+        }
+    </style>
+</head>
+<body>
+    {% block header %}
+    <header>
+        <h1>Jackson Family Inventory</h1>
+        <div class="hamburger" onclick="toggleMenu()">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </header>
+    <nav>
+        <div class="menu-container">
+            {% if current_user.is_authenticated %}
+                <a class="menu-item" href="{{ url_for('mainmenu_page') }}">Main Menu</a>
+                <a class="menu-item" href="{{ url_for('add_item') }}">Add Item</a>
+                <a class="menu-item" href="{{ url_for('use_item') }}">Use Item</a>
+                <a class="menu-item" href="{{ url_for('items_page') }}">View Inv</a>
+                <a class="menu-item" href="{{ url_for('grocery_list') }}">Grocery List</a>
+                <a class="menu-item" href="{{ url_for('search_start') }}">Search</a>
+                <a class="menu-item" href="{{ url_for('logout_page') }}">Logout</a>
+                <a class="menu-item" href="{{ url_for('base_new') }}">TESTING</a>
+            {% else %}
+                {% if request.endpoint != 'login_page' and request.endpoint != 'register_page' and request.endpoint != 'home_page' %}
+                    <a class="menu-item" href="{{ url_for('login_page') }}">Log In</a>
+                    <a class="menu-item" href="{{ url_for('register_page') }}">Register</a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </nav>
+    <div class="main-content">
+        {% endblock %}
+        {% block content %}{% endblock %}
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.querySelector('.menu-container');
+            menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const hamburger = document.querySelector('.hamburger');
+
+            // Toggle menu on hamburger click
+            hamburger.addEventListener('click', toggleMenu);
+
+            // Hide the menu when the screen is resized to larger than 768px
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
+                    document.querySelector('.menu-container').style.display = 'flex'; // Show menu on larger screens
+                } else {
+                    document.querySelector('.menu-container').style.display = 'none'; // Hide menu on smaller screens
+                }
+            });
+        });
+    </script>
+</body>
+</html>

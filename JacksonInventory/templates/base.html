@@ -33,7 +33,7 @@
             background: -ms-radial-gradient(0% 100%, ellipse cover, rgba(104,128,138,.4) 10%,rgba(138,114,76,0) 40%), -ms-linear-gradient(top,  rgba(57,173,219,.25) 0%,rgba(42,60,87,.4) 100%), -ms-linear-gradient(-45deg,  #670d10 0%,#092756 100%);
             background: -webkit-radial-gradient(0% 100%, ellipse cover, rgba(104,128,138,.4) 10%,rgba(138,114,76,0) 40%), linear-gradient(to bottom,  rgba(57,173,219,.25) 0%,rgba(42,60,87,.4) 100%), linear-gradient(135deg,  #670d10 0%,#092756 100%);
             filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3E1D6D', endColorstr='#092756',GradientType=1 );
-            padding-top: 60px; /* Adjust this to the height of the header */
+            padding-top: 50px; /* Adjust this to the height of the header */
             margin: 0;
         }
 
@@ -44,11 +44,15 @@
             width: 100%; /* Full width of the viewport */
             z-index: 1000; /* Ensure header is above other content */
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
             padding: 10px;
             color: white;
             background-color: #000000;
+        }
+
+        header h1{
+            font-size: 35px;
         }
 
         nav {
@@ -79,30 +83,52 @@
             background-color: #5e5e5e;
         }
 
-        @media (min-width: 769px) {
-            .hamburger {
-                display: none; /* Hide hamburger on larger screens */
-            }
-
-            .menu-container {
-                display: flex; /* Ensure menu is visible on larger screens */
-            }
+        .hamburger {
+            display: none;
+            cursor: pointer;
+            flex-direction: column;
+            width: 30px;
+            height: 20px;
+            justify-content: space-between;
         }
 
-        @media (max-width: 768px) {
-            .hamburger {
-                display: flex; /* Show hamburger on smaller screens */
-            }
-
-            .menu-container {
-                display: none; /* Hide menu by default on smaller screens */
-                flex-direction: column; /* Stack menu items vertically */
-                width: 100%; /* Full width */
-            }
+        .hamburger div {
+            width: 30px;
+            height: 4px;
+            background-color: white;
+            border-radius: 2px;
         }
 
-        .main-content {
-            margin-top: 20px; /* Space for header and navbar */
+    @media (max-width: 768px) {
+        header h1{
+            font-size: 30px;
+        }
+
+    .hamburger {
+        display: flex; /* Show hamburger on smaller screens */
+    }
+
+    .menu-container {
+        display: none; /* Hide menu by default on smaller screens */
+        flex-direction: column; /* Stack menu items vertically */
+        width: 100%; /* Full width */
+    }
+
+}
+
+@media (min-width: 769px) {
+
+    .hamburger {
+        display: none; /* Hide hamburger on larger screens */
+    }
+
+    .menu-container {
+        display: flex; /* Ensure menu is visible on larger screens */
+    }
+}
+
+    .main-content {
+            margin-top: 35px; /* Space for header and navbar */
             padding: 20px; /* Padding for the main content */
         }
 
@@ -152,21 +178,6 @@
             text-transform: uppercase;
         }
 
-        .hamburger {
-            display: none;
-            cursor: pointer;
-            flex-direction: column;
-            width: 30px;
-            height: 20px;
-            justify-content: space-between;
-        }
-
-        .hamburger div {
-            width: 30px;
-            height: 4px;
-            background-color: white;
-            border-radius: 2px;
-        }
     </style>
 </head>
 <body>
@@ -209,10 +220,12 @@
         const hamburger = document.querySelector('.hamburger');
 
         function toggleMenu() {
-            if (window.innerWidth <= 768) { // Only toggle menu on small screens
-                menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
-            }
-        }
+    if (window.innerWidth <= 768) { // Only toggle menu on small screens
+        const menu = document.querySelector('.menu-container');
+        menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+    }
+}
+
 
         // Toggle menu on hamburger click
         hamburger.addEventListener('click', toggleMenu);

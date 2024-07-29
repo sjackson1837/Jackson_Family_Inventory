@@ -36,7 +36,7 @@ Main Menu
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
-    justify-content: space-between;
+    justify-content: flex-start;
 }
 
 .grid-item {
@@ -84,14 +84,15 @@ Main Menu
     <div class="grid-container">
         {% for item in items %}
             <div class="grid-item">
-                <img src="{{ item.productimage }}" alt="{{ item.productname }}">
+                <a href="{{ url_for('item', id=item.productid) }}">
+                    <img src="{{ item.productimage }}" alt="{{ item.productname }}">
+                </a>
                 <p>{{ item.productname }}</p>   
-                <p>Min Qty: {{ item.minqty }}</p>
-                <p>Qty: {{ item.qty }}</p>
-                <p>{{ item.category }}</p>   
-                <p>{{ item.subcategory }}</p>   
+                <p>Min Qty: {{ item.minqty }} | Qty: {{ item.qty }}</p>                
+                <p>{{ item.category }} | {{ item.subcategory }}</p>   
             </div>
         {% endfor %}
     </div>
 </div>
 {% endblock %}
+

@@ -79,27 +79,27 @@
             background-color: #5e5e5e;
         }
 
-        @media (min-width: 769px) {
-            .hamburger {
-                display: none; /* Hide hamburger on larger screens */
-            }
-
-            .menu-container {
-                display: flex; /* Ensure menu is visible on larger screens */
-            }
-        }
-
         @media (max-width: 768px) {
-            .hamburger {
-                display: flex; /* Show hamburger on smaller screens */
-            }
+    .hamburger {
+        display: flex; /* Show hamburger on smaller screens */
+    }
 
-            .menu-container {
-                display: none; /* Hide menu by default on smaller screens */
-                flex-direction: column; /* Stack menu items vertically */
-                width: 100%; /* Full width */
-            }
-        }
+    .menu-container {
+        display: none; /* Hide menu by default on smaller screens */
+        flex-direction: column; /* Stack menu items vertically */
+        width: 100%; /* Full width */
+    }
+}
+
+@media (min-width: 769px) {
+    .hamburger {
+        display: none; /* Hide hamburger on larger screens */
+    }
+
+    .menu-container {
+        display: flex; /* Ensure menu is visible on larger screens */
+    }
+}
 
         .main-content {
             margin-top: 20px; /* Space for header and navbar */
@@ -209,10 +209,12 @@
         const hamburger = document.querySelector('.hamburger');
 
         function toggleMenu() {
-            if (window.innerWidth <= 768) { // Only toggle menu on small screens
-                menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
-            }
-        }
+    if (window.innerWidth <= 768) { // Only toggle menu on small screens
+        const menu = document.querySelector('.menu-container');
+        menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+    }
+}
+
 
         // Toggle menu on hamburger click
         hamburger.addEventListener('click', toggleMenu);

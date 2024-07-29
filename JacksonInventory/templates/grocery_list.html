@@ -5,52 +5,155 @@ Grocery List
 {% endblock %}
 
 {% block content %}
+<style>
+    .main-content {
+        color: black;
+        margin: 15px auto;
+        padding: 10px;
+        max-width: 100%;
+    }
+
+    .h2 {
+        font-size: 25px;
+        text-align: center;
+        color: white;
+        padding-top: 10px;
+    }
+
+    h3 {
+        text-decoration: underline;
+        background-color: lightskyblue;
+        padding: 5px;
+    }
+
+    .item-list {
+        display: grid;
+        grid-template-columns: repeat(1, 1fr); /* Default: 1 column */
+        gap: 10px;
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .item-list li {
+        display: grid;
+        grid-template-columns: 5% 85% 10%;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        background-color: #f9f9f9;
+        cursor: pointer; /* Indicates the entire item is clickable */
+    }
+
+    .item-list input[type="checkbox"] {
+        margin: 0;
+        display: none; /* Hide checkbox to prevent visual disturbance */
+    }
+
+    .description {
+        grid-column: 2 / 3;
+    }
+
+    .quantity {
+        grid-column: 3 / 4;
+        text-align: center;
+    }
+
+    @media (min-width: 481px) and (max-width: 768px) {
+        .item-list {
+            grid-template-columns: repeat(2, 1fr); /* 2 columns for tablets */
+        }
+
+        .h2 {
+            font-size: 20px;
+        }
+
+        .category-section h3 {
+            font-size: 18px;
+        }
+
+        .item-list li {
+            font-size: 14px;
+        }
+    }
+
+    @media (min-width: 769px) {
+        .item-list {
+            grid-template-columns: repeat(3, 1fr); /* 3 columns for computer screens */
+        }
+
+        .h2 {
+            font-size: 25px;
+        }
+
+        .category-section h3 {
+            font-size: 20px;
+        }
+
+        .item-list li {
+            font-size: 16px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .h2 {
+            font-size: 18px;
+        }
+
+        .category-section h3 {
+            font-size: 16px;
+        }
+
+        .item-list li {
+            font-size: 12px;
+            padding: 8px;
+        }
+    }
+</style>
+
 <div class="main-content">
-    <div>
-        <h2 style="text-align: center;">Jackson Family Grocery List</h2>
-    </div>  
+    <h2 class="h2">Grocery List</h2>  
+
     {% for category, products in grouped_groceries.items() %}
-    <h3 style="text-decoration: underline; background-color: lightskyblue">{{ category }}</h3>
-        <ul class="item-list indented">
-        {% for product in products %}
-            <li class="card-title"><input type="checkbox"> {{ product.productname }} (Needed Qty: {{ product.needed_qty }})</li>
-        {% endfor %}
-        </ul>
+        <div class="category-section">
+            <h3>{{ category }}</h3>
+            <ul class="item-list">
+                {% for product in products %}
+                    <li onclick="toggleCheckbox(this)">
+                        <input type="checkbox" id="product-{{ product.id }}">
+                        <div class="description">{{ product.productname }}</div>
+                        <div class="quantity">{{ product.needed_qty }}</div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </br>
     {% endfor %}
 </div>
 
 <script>
-    const itemLists = document.getElementsByClassName('item-list');
+    function toggleCheckbox(listItem) {
+        const checkbox = listItem.querySelector('input[type="checkbox"]');
+        checkbox.checked = !checkbox.checked;
 
-    for (let i = 0; i < itemLists.length; i++) {
-        const itemList = itemLists[i];
-        const checkboxes = itemList.getElementsByTagName('input');
-
-        for (let j = 0; j < checkboxes.length; j++) {
-            checkboxes[j].addEventListener('change', function() {
-                const listItem = this.parentNode;
-
-                if (this.checked) {
-                    itemList.appendChild(listItem);
-                } else {
-                    // Find the first unchecked item in the category
-                    let firstUnchecked = null;
-                    const items = itemList.getElementsByTagName('li');
-                    for (let k = 0; k < items.length; k++) {
-                        if (!items[k].getElementsByTagName('input')[0].checked) {
-                            firstUnchecked = items[k];
-                            break;
-                        }
-                    }
-
-                    if (firstUnchecked) {
-                        itemList.insertBefore(listItem, firstUnchecked);
-                    } else {
-                        itemList.appendChild(listItem);
-                    }
-                }
-            });
+        if (checkbox.checked) {
+            listItem.style.backgroundColor = '#d0f0c0'; // Green for checked
+        } else {
+            listItem.style.backgroundColor = '#f9f9f9'; // Reset background
         }
     }
-</script>  
+
+    document.querySelectorAll('.item-list input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const listItem = this.closest('li');
+
+            if (this.checked) {
+                listItem.style.backgroundColor = '#d0f0c0'; // Green for checked
+            } else {
+                listItem.style.backgroundColor = '#f9f9f9'; // Reset background
+            }
+        });
+    });
+</script>
+
 {% endblock %}

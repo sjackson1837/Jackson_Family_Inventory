@@ -5,22 +5,10 @@ Add Inventory
 {% endblock %}
 
 {% block content %}
-<style>
-    .main-content {
-        color: white;
-    }
-
-    input::placeholder{
-        color: white;
-        opacity: 1;
-    }
-</style>
-
 <div class="main-content">
     <h1>Add Inventory</h1>
-</br>
     <div style="width: 100%; max-width: 600px; margin: 0 auto; text-align: center;">
-        <input class="input" type="text" id="barcode" placeholder="Enter or scan barcode" oninput="delayedCheckBarcode()" />
+        <input type="text" id="barcode" placeholder="Enter or scan barcode" oninput="delayedCheckBarcode()" />
         <div id="result"></div>
     </div>
 </div>
