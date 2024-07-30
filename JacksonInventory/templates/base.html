@@ -64,6 +64,7 @@
             z-index: 999; /* Ensure navbar is below the header but above other content */
         }
 
+
         .menu-container {
             display: flex;
             flex-direction: row;
@@ -186,6 +187,22 @@
             padding: 10px;
             text-transform: uppercase;
         }
+
+        .search-bar input[type="text"] {
+            margin-right: 12px;
+    border: 2px solid white; /* Change border color to white */
+    border-radius: 10px; /* Optional: rounds the corners of the input box */
+    padding: 8px; /* Optional: adds some padding inside the input box */
+    background-color: transparent; /* Optional: sets background to transparent */
+    color: white; /* Optional: sets text color to white for better contrast */
+    width: 100%; /* Makes the input box full width within its container */
+    box-sizing: border-box; /* Ensures padding and border are included in width calculation */
+}
+
+.search-bar input[type="text"]::placeholder {
+    color: white; /* Optional: sets the color of the placeholder text */
+}
+
 
     </style>
 </head>

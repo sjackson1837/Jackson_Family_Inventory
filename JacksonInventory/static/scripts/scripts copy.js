@@ -106,60 +106,36 @@ function debounce(func, delay) {
     audio.play();
   }
   
-  // function checkItem(barcode) {
-  //   const url = `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`;
-  
-  //   fetch(url)
-  //     .then(response => response.json())
-  //     .then(data => {
-  //       if (data.status === 0) {
-  //         populateProductFormForNewProduct(barcode);
-  //       } else {
-  //         populateProductForm(data.product, barcode);
-  //       }
-  //     })
-  //     .catch(error => console.error(error));
-  // }
-  
   function checkItem(barcode) {
-    console.log("I'm Here");
-    console.log(barcode);
-    const url = `https://api.upcitemdb.com/prod/trial/lookup?upc=${barcode}`;
-    
+    const url = `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`;
+  
     fetch(url)
       .then(response => response.json())
       .then(data => {
-        if (data.items && data.items.length > 0) {
-          const item = data.items[0]; // Assuming you want the first item
-          console.log("here" + item);
-          populateProductForm(item, barcode);
-        } else {
+        if (data.status === 0) {
           populateProductFormForNewProduct(barcode);
+        } else {
+          populateProductForm(data.product, barcode);
         }
       })
       .catch(error => console.error(error));
   }
   
-
-  function populateProductForm(item, barcode) {
-    const imageUrl = item.images && item.images.length > 0 ? item.images[0] : "https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg";
-    const title = item.title || "No title available";
-    const price = item.offers && item.offers.length > 0 ? item.offers[0].price : "Price not available";
-  
+  function populateProductFormForNewProduct(barcode) {
+    const defaultImageUrl = "https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg";
     document.getElementById("barcode").readOnly = true;
-    document.getElementById("productname").readOnly = true;
-    document.getElementById("productimage_input").readOnly = true;
     document.getElementById("barcode").value = barcode;
-    document.getElementById("productname").value = title;
+    document.getElementById("productname").readOnly = false;
+    document.getElementById("qty").readOnly = false;
     document.getElementById("qty").value = 1;
     document.getElementById("minqty").value = 1;
-    document.getElementById("productimage_input").value = imageUrl;
-    document.getElementById("productimage_show").src = imageUrl;
+    document.getElementById("productimage_input").readOnly = false;
+    document.getElementById("productimage_input").value = defaultImageUrl;
+    document.getElementById("productimage_show").src = defaultImageUrl;
   
     showProductData();
-    playSound('static/sounds/positive.mp3');
+    playSound('static/sounds/negative.mp3');
   }
-  
   
   function populateProductForm(product, barcode) {
     const imageUrl = product.image_url || "https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg";

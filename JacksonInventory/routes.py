@@ -20,6 +20,9 @@ def mainmenu_page():
     selected_subcategory = request.args.get('subcategory')
     search_query = request.args.get('search')
 
+    # Trim the search query to remove leading and trailing spaces
+    search_query = search_query.strip() if search_query else None
+
     # Query to fetch all distinct categories for the sidebar
     category_query = text('''
     SELECT DISTINCT c.id, c.category
