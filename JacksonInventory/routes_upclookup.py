@@ -13,11 +13,42 @@ import requests
 def home_page():
     return render_template('home.html')
 
+@app.route('/lookup', methods=['GET'])
+def lookup():
+    upc = request.args.get('upc')
+    if not upc:
+        return jsonify({'error': 'UPC code is required'}), 400
+    
+    api_url = f'https://api.upcitemdb.com/prod/trial/lookup?upc={upc}'
+    response = requests.get(api_url)
+    data = response.json()
+    
+    if data['code'] == 'OK' and data['total'] > 0:
+        item = data['items'][0]
+        title = item['title']
+        highest_price = item['highest_recorded_price']
+        lowest_price = item['lowest_recorded_price']
+        image_url = item['images'][0] if item['images'] else 'https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg'
+
+        return jsonify({
+            'title': title,
+            'highest_price': highest_price,
+            'lowest_price': lowest_price,
+            'image_url': image_url
+        })
+    else:
+        return jsonify({'error': 'No data found for this UPC.'}), 404
+
+
 @app.route('/mainmenu', methods=['GET'])
 @login_required
 def mainmenu_page():
     selected_category = request.args.get('category')
     selected_subcategory = request.args.get('subcategory')
+    search_query = request.args.get('search')
+
+    # Trim the search query to remove leading and trailing spaces
+    search_query = search_query.strip() if search_query else None
 
     # Query to fetch all distinct categories for the sidebar
     category_query = text('''
@@ -29,41 +60,69 @@ def mainmenu_page():
     categories_result = db.session.execute(category_query)
     categories = categories_result.fetchall()
 
-    # Query to fetch subcategories based on the selected category
-    if selected_category:
-        subcategory_query = text('''
-        SELECT DISTINCT s.id, s.subcategory
-        FROM subcategory s
-        JOIN item i ON i.subcategory_id = s.id
-        JOIN category c ON i.category_id = c.id
-        WHERE c.category = :category
-        ORDER BY s.subcategory
-        ''')
-        subcategories_result = db.session.execute(subcategory_query, {'category': selected_category})
-        subcategories = subcategories_result.fetchall()
+    # Initialize subcategories
+    subcategories = []
 
-        # Query to fetch items based on the selected category and subcategory
+    # Convert search_query to lower case for case-insensitive comparison
+    search_query_lower = search_query.lower() if search_query else None
+
+    if search_query_lower and search_query_lower.strip():  # Check if search_query is not empty or just whitespace
+        # Query to fetch items based on the search query (case-insensitive)
         item_query = text('''
         SELECT c.category, s.subcategory, i.productimage, i.qty, i.minqty, i.productname, i.id as productid
         FROM item i
         JOIN category c ON i.category_id = c.id
         JOIN subcategory s ON i.subcategory_id = s.id
-        WHERE c.category = :category
-        AND (s.subcategory = :subcategory OR :subcategory IS NULL)
-        ORDER BY i.productname
-        ''')
-        items_result = db.session.execute(item_query, {'category': selected_category, 'subcategory': selected_subcategory})
-    else:
-        subcategories = []
-        # If no category is selected, show all items
-        item_query = text('''
-        SELECT c.category, s.subcategory, i.productimage, i.qty, i.minqty, i.productname, i.id as productid
-        FROM item i
-        JOIN category c ON i.category_id = c.id
-        JOIN subcategory s ON i.subcategory_id = s.id
+        WHERE LOWER(i.productname) LIKE :search_query
         ORDER BY c.category, i.productname
         ''')
-        items_result = db.session.execute(item_query)
+        items_result = db.session.execute(item_query, {
+            'search_query': f"%{search_query_lower}%"
+        })
+    else:
+        # No search query or just whitespace, so show all items
+        if selected_category:
+            # Query to fetch subcategories based on the selected category
+            subcategory_query = text('''
+            SELECT DISTINCT s.id, s.subcategory
+            FROM subcategory s
+            JOIN item i ON i.subcategory_id = s.id
+            JOIN category c ON i.category_id = c.id
+            WHERE c.category = :category
+            ORDER BY s.subcategory
+            ''')
+            subcategories_result = db.session.execute(subcategory_query, {'category': selected_category})
+            subcategories = subcategories_result.fetchall()
+
+            # Query to fetch items based on the selected category, subcategory, and optional search query (case-insensitive)
+            item_query = text('''
+            SELECT c.category, s.subcategory, i.productimage, i.qty, i.minqty, i.productname, i.id as productid
+            FROM item i
+            JOIN category c ON i.category_id = c.id
+            JOIN subcategory s ON i.subcategory_id = s.id
+            WHERE c.category = :category
+            AND (s.subcategory = :subcategory OR :subcategory IS NULL)
+            AND (LOWER(i.productname) LIKE :search_query OR :search_query IS NULL)
+            ORDER BY i.productname
+            ''')
+            items_result = db.session.execute(item_query, {
+                'category': selected_category,
+                'subcategory': selected_subcategory,
+                'search_query': f"%{search_query_lower}%" if search_query_lower else None
+            })
+        else:
+            # If no category is selected, show all items (case-insensitive)
+            item_query = text('''
+            SELECT c.category, s.subcategory, i.productimage, i.qty, i.minqty, i.productname, i.id as productid
+            FROM item i
+            JOIN category c ON i.category_id = c.id
+            JOIN subcategory s ON i.subcategory_id = s.id
+            WHERE LOWER(i.productname) LIKE :search_query OR :search_query IS NULL
+            ORDER BY c.category, i.productname
+            ''')
+            items_result = db.session.execute(item_query, {
+                'search_query': f"%{search_query_lower}%" if search_query_lower else None
+            })
 
     items = items_result.fetchall()
 
@@ -231,24 +290,43 @@ def add_item_form():
     categories = Category.query.order_by(Category.category).all()
     return render_template('add_item.html', barcode=barcode, categories=categories)
 
-@app.route('/add_item', methods=['GET', 'POST'])
-def add_item():
-    barcode = request.form['barcode']
-    productname = request.form['productname']
-    qty = request.form['qty']
-    minqty = request.form['minqty']
-    productimage_input = request.form['productimage']
-    category_id = int(request.form['category_id'])
-    subcategory_id = int(request.form['subcategory_id'])
+@app.route('/update_item/<barcode>', methods=['POST'])
+def update_item(barcode):
+    try:
+        data = request.json
+        productname = data.get('productname')
+        qty = data.get('qty')
+        minqty = data.get('minqty')
+        productimage = data.get('productimage')
+        category_id = int(data.get('category_id'))
+        subcategory_id = int(data.get('subcategory_id'))
 
-    # Create a new Item object and set its attributes
-    item = Item(barcode=barcode, productname=productname, qty=qty, minqty=minqty, productimage=productimage_input, category_id=category_id, subcategory_id=subcategory_id)
+        if not productimage:
+            raise ValueError("Missing field: productimage")
 
-    # Save the item to the database
-    db.session.add(item)
-    db.session.commit()
-    #return redirect(url_for("items_page"))
-    return redirect(url_for("add_item"))
+        # Fetch existing item or create a new one
+        item = Item.query.filter_by(barcode=barcode).first()
+        if not item:
+            return jsonify({"error": "Item not found"}), 404
+
+        # Update item attributes
+        item.productname = productname
+        item.qty = qty
+        item.minqty = minqty
+        item.productimage = productimage
+        item.category_id = category_id
+        item.subcategory_id = subcategory_id
+
+        db.session.commit()
+
+        return jsonify({"message": "Item updated successfully!"})
+    except KeyError as e:
+        return jsonify({"error": f"Missing field: {str(e)}"}), 400
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
+
 
 # Add the following route to handle the AJAX request for subcategories
 @app.route('/subcategories', methods=['POST'])
@@ -420,7 +498,6 @@ def save_new_item():
     return jsonify({'message': 'New item saved successfully!'}), 201
 
 @app.route('/check_barcode/<string:barcode>', methods=['GET'])
-@login_required
 def check_barcode(barcode):
     item = Item.query.filter_by(barcode=barcode).first()
     if item:
@@ -434,14 +511,14 @@ def check_barcode(barcode):
             'productimage': item.productimage
         })
 
-    # If not found in the database, check Open Food Facts
-    response = requests.get(f'https://world.openfoodfacts.org/api/v0/product/{barcode}.json')
+    # If not found in the database, check UPC Item DB
+    response = requests.get(f'https://api.upcitemdb.com/prod/trial/lookup?upc={barcode}')
     data = response.json()
 
-    if data.get('status') == 1:
-        product = data['product']
-        productname = product.get('product_name', '')
-        productimage = product.get('image_url', 'https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg')
+    if data['code'] == 'OK' and data['total'] > 0:
+        product = data['items'][0]
+        productname = product.get('title', '')
+        productimage = product.get('images', ['https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg'])[0]
 
         return jsonify({
             'barcode': barcode,
@@ -454,7 +531,7 @@ def check_barcode(barcode):
             'isNew': True
         })
     else:
-        return jsonify({'error': 'Item not found in database or Open Food Facts.'}), 404
+        return jsonify({'error': 'Item not found in database or UPC Item DB.'}), 404
 
 from flask import request, jsonify, redirect, url_for
 

@@ -13,22 +13,11 @@ import requests
 def home_page():
     return render_template('home.html')
 
-@app.route('/api/lookup/<upc>', methods=['GET'])
-def proxy_lookup(upc):
-    api_key = 'YOUR_API_KEY'
-    url = f'https://api.upcitemdb.com/prod/trial/lookup?upc={upc}&apikey={api_key}'
-    response = requests.get(url)
-    return jsonify(response.json())
-
 @app.route('/mainmenu', methods=['GET'])
 @login_required
 def mainmenu_page():
     selected_category = request.args.get('category')
     selected_subcategory = request.args.get('subcategory')
-    search_query = request.args.get('search')
-
-    # Trim the search query to remove leading and trailing spaces
-    search_query = search_query.strip() if search_query else None
 
     # Query to fetch all distinct categories for the sidebar
     category_query = text('''
@@ -40,69 +29,41 @@ def mainmenu_page():
     categories_result = db.session.execute(category_query)
     categories = categories_result.fetchall()
 
-    # Initialize subcategories
-    subcategories = []
+    # Query to fetch subcategories based on the selected category
+    if selected_category:
+        subcategory_query = text('''
+        SELECT DISTINCT s.id, s.subcategory
+        FROM subcategory s
+        JOIN item i ON i.subcategory_id = s.id
+        JOIN category c ON i.category_id = c.id
+        WHERE c.category = :category
+        ORDER BY s.subcategory
+        ''')
+        subcategories_result = db.session.execute(subcategory_query, {'category': selected_category})
+        subcategories = subcategories_result.fetchall()
 
-    # Convert search_query to lower case for case-insensitive comparison
-    search_query_lower = search_query.lower() if search_query else None
-
-    if search_query_lower and search_query_lower.strip():  # Check if search_query is not empty or just whitespace
-        # Query to fetch items based on the search query (case-insensitive)
+        # Query to fetch items based on the selected category and subcategory
         item_query = text('''
         SELECT c.category, s.subcategory, i.productimage, i.qty, i.minqty, i.productname, i.id as productid
         FROM item i
         JOIN category c ON i.category_id = c.id
         JOIN subcategory s ON i.subcategory_id = s.id
-        WHERE LOWER(i.productname) LIKE :search_query
+        WHERE c.category = :category
+        AND (s.subcategory = :subcategory OR :subcategory IS NULL)
+        ORDER BY i.productname
+        ''')
+        items_result = db.session.execute(item_query, {'category': selected_category, 'subcategory': selected_subcategory})
+    else:
+        subcategories = []
+        # If no category is selected, show all items
+        item_query = text('''
+        SELECT c.category, s.subcategory, i.productimage, i.qty, i.minqty, i.productname, i.id as productid
+        FROM item i
+        JOIN category c ON i.category_id = c.id
+        JOIN subcategory s ON i.subcategory_id = s.id
         ORDER BY c.category, i.productname
         ''')
-        items_result = db.session.execute(item_query, {
-            'search_query': f"%{search_query_lower}%"
-        })
-    else:
-        # No search query or just whitespace, so show all items
-        if selected_category:
-            # Query to fetch subcategories based on the selected category
-            subcategory_query = text('''
-            SELECT DISTINCT s.id, s.subcategory
-            FROM subcategory s
-            JOIN item i ON i.subcategory_id = s.id
-            JOIN category c ON i.category_id = c.id
-            WHERE c.category = :category
-            ORDER BY s.subcategory
-            ''')
-            subcategories_result = db.session.execute(subcategory_query, {'category': selected_category})
-            subcategories = subcategories_result.fetchall()
-
-            # Query to fetch items based on the selected category, subcategory, and optional search query (case-insensitive)
-            item_query = text('''
-            SELECT c.category, s.subcategory, i.productimage, i.qty, i.minqty, i.productname, i.id as productid
-            FROM item i
-            JOIN category c ON i.category_id = c.id
-            JOIN subcategory s ON i.subcategory_id = s.id
-            WHERE c.category = :category
-            AND (s.subcategory = :subcategory OR :subcategory IS NULL)
-            AND (LOWER(i.productname) LIKE :search_query OR :search_query IS NULL)
-            ORDER BY i.productname
-            ''')
-            items_result = db.session.execute(item_query, {
-                'category': selected_category,
-                'subcategory': selected_subcategory,
-                'search_query': f"%{search_query_lower}%" if search_query_lower else None
-            })
-        else:
-            # If no category is selected, show all items (case-insensitive)
-            item_query = text('''
-            SELECT c.category, s.subcategory, i.productimage, i.qty, i.minqty, i.productname, i.id as productid
-            FROM item i
-            JOIN category c ON i.category_id = c.id
-            JOIN subcategory s ON i.subcategory_id = s.id
-            WHERE LOWER(i.productname) LIKE :search_query OR :search_query IS NULL
-            ORDER BY c.category, i.productname
-            ''')
-            items_result = db.session.execute(item_query, {
-                'search_query': f"%{search_query_lower}%" if search_query_lower else None
-            })
+        items_result = db.session.execute(item_query)
 
     items = items_result.fetchall()
 
@@ -265,20 +226,24 @@ def update_item(id):
 
 @app.route('/add_item', methods=['GET'])
 def add_item_form():
-    barcode = request.args.get('barcode')
-    category_id = request.args.get('category_id')
+    barcode = request.args.get('barcode', '')
     categories = Category.query.order_by(Category.category).all()
     return render_template('add_item.html', barcode=barcode, categories=categories)
 
-@app.route('/add_item', methods=['GET', 'POST'])
+
+@app.route('/add_item', methods=['POST'])
 def add_item():
-    barcode = request.form['barcode']
-    productname = request.form['productname']
-    qty = request.form['qty']
-    minqty = request.form['minqty']
-    productimage_input = request.form['productimage']
-    category_id = int(request.form['category_id'])
-    subcategory_id = int(request.form['subcategory_id'])
+    barcode = request.form.get('barcode')
+    productname = request.form.get('productname')
+    qty = request.form.get('qty')
+    minqty = request.form.get('minqty')
+    productimage_input = request.form.get('productimage')
+    category_id = int(request.form.get('category_id', 0))  # Default to 0 if not provided
+    subcategory_id = int(request.form.get('subcategory_id', 0))  # Default to 0 if not provided
+
+    # Validate required fields
+    if not barcode or not productname or not qty or not minqty or not category_id:
+        return jsonify({'error': 'All required fields must be filled out'}), 400
 
     # Create a new Item object and set its attributes
     item = Item(barcode=barcode, productname=productname, qty=qty, minqty=minqty, productimage=productimage_input, category_id=category_id, subcategory_id=subcategory_id)
@@ -286,8 +251,9 @@ def add_item():
     # Save the item to the database
     db.session.add(item)
     db.session.commit()
-    #return redirect(url_for("items_page"))
-    return redirect(url_for("add_item"))
+
+    # Return a success response or redirect to another page
+    return redirect(url_for("add_item_form", barcode=barcode))
 
 # Add the following route to handle the AJAX request for subcategories
 @app.route('/subcategories', methods=['POST'])
@@ -563,7 +529,7 @@ def increment_qty(barcode):
         item.qty += 1
         db.session.commit()
         flash(f'Product "{item.productname}" quantity updated to {item.qty}', 'success')
-        return jsonify({'message': f'Producssst "{item.productname}" quantity updated to {item.qty}'})
+        return jsonify({'message': f'Product "{item.productname}" quantity updated to {item.qty}'})
 
     except Exception as e:
         db.session.rollback()
@@ -627,7 +593,7 @@ def decrement_qty(barcode):
 
         item.qty -= 1
         db.session.commit()
-        return jsonify({'message': f'Producsadt "{item.productname}" quantity updated to {item.qty}'})
+        return jsonify({'message': f'Product "{item.productname}" quantity updated to {item.qty}'})
 
     except Exception as e:
         db.session.rollback()

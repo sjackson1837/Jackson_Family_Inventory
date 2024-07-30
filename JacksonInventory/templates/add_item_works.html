@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcode Lookup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+        }
+        .result {
+            margin-top: 20px;
+        }
+        .result img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Barcode Lookup</h1>
+        <input type="text" id="barcode" placeholder="Enter barcode" />
+        <button onclick="lookupBarcode()">Lookup</button>
+        <div class="result" id="result">
+            <!-- Result will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        async function lookupBarcode() {
+            const barcode = document.getElementById('barcode').value;
+            const apiUrl = `http://127.0.0.1:5000/lookup?upc=${barcode}`;
+
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                if (data.code === 'OK' && data.total > 0) {
+                    const item = data.items[0];
+                    const title = item.title;
+                    const highestPrice = item.highest_recorded_price;
+                    const lowestPrice = item.lowest_recorded_price;
+                    const imageUrl = item.images[0];
+
+                    document.getElementById('result').innerHTML = `
+                        <h2>${title}</h2>
+                        <p><strong>Highest Price:</strong> $${highestPrice}</p>
+                        <p><strong>Lowest Price:</strong> $${lowestPrice}</p>
+                        <img src="${imageUrl}" alt="${title}" />
+                    `;
+                } else {
+                    document.getElementById('result').innerHTML = '<p>No data found for this barcode.</p>';
+                }
+            } catch (error) {
+                document.getElementById('result').innerHTML = '<p>Error fetching data.</p>';
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

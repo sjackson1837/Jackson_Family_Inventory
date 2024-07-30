@@ -169,71 +169,62 @@ Add Inventory
     }
 
     function checkBarcode() {
-    const barcode = document.getElementById('barcode').value;
-    const url = `/api/lookup/${barcode}`;
-
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            const resultDiv = document.getElementById('result');
-            if (data.items && data.items.length > 0) {
-                const item = data.items[0]; // Assuming you want the first item
-                const imageUrl = item.images && item.images.length > 0 ? item.images[0] : "https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg";
-                const title = item.title || "No title available";
-                const price = item.offers && item.offers.length > 0 ? item.offers[0].price : "Price not available";
-
-                if (data.isNew) {
-                    currentCategory = data.category;
-                    currentSubcategory = data.subcategory;
-                    isNewItem = data.isNew || false;
-
-                    document.getElementById('barcode').disabled = true;
-
-                    resultDiv.innerHTML = `
-                        </br>
-                        <div class="product-container">
-                            <p class="full-width">Product Name: <input type="text" id="edit-productname" value="${title}" /></p>
-                            <img class="product-image" src="${imageUrl}" alt="Product Image" />
-                            <div class="product-details">
-                                <p class="qty-container">
-                                    Quantity: 
-                                    <button onclick="updateQty(-1)">-</button>
-                                    <input type="text" id="edit-qty" value="1" />
-                                    <button onclick="updateQty(1)">+</button>
-                                </p>
-                                <p class="min-qty-container">
-                                    Min Quantity: 
-                                    <button onclick="updateMinQty(-1)">-</button>
-                                    <input type="text" id="edit-minqty" value="1" />
-                                    <button onclick="updateMinQty(1)">+</button>
-                                </p>
-                                <p>Category: <select id="edit-category"></select></p>
-                                <p>Subcategory: <select id="edit-subcategory"></select></p>
-                                <p>Product Image URL: <input type="text" id="edit-productimage" value="${imageUrl}" /></p>
-                                <p>Price: <input type="text" id="edit-price" value="${price}" /></p>
-                                <button onclick="saveChanges(isNewItem)">Save Changes</button>
-                                <button onclick="cancelChanges()">Cancel</button>
-                            </div>
-                        </div>
-                        </br></br></br>
-                    `;
-                    loadCategories();
-                    successSound.play(); // Play success sound
+        const barcode = document.getElementById('barcode').value;
+        fetch(`/check_barcode/${barcode}`)
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('result');
+                if (data.error) {
+                    resultDiv.innerHTML = `<p>${data.error}</p>`;
+                    displayEmptyFields(barcode);
+                    errorSound.play(); // Play error sound
                 } else {
-                    incrementQuantity(barcode);
-                    successSound.play(); // Play success sound
-                }
-            } else {
-                resultDiv.innerHTML = `<p>No product found for barcode ${barcode}</p>`;
-                displayEmptyFields(barcode);
-                errorSound.play(); // Play error sound
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-}
+                    if (data.isNew) {
+                        currentCategory = data.category;
+                        currentSubcategory = data.subcategory;
+                        isNewItem = data.isNew || false;
 
+                        document.getElementById('barcode').disabled = true;
+
+                        resultDiv.innerHTML = `
+                            </br>
+                            <div class="product-container">
+                                <p class="full-width">Product Name: <input type="text" id="edit-productname" value="${data.productname}" /></p>
+                                <img class="product-image" src="${data.productimage}" alt="Product Image" />
+                                <div class="product-details">
+                                    <p class="qty-container">
+                                        Quantity: 
+                                        <button onclick="updateQty(-1)">-</button>
+                                        <input type="text" id="edit-qty" value="${data.qty}" />
+                                        <button onclick="updateQty(1)">+</button>
+                                    </p>
+                                    <p class="min-qty-container">
+                                        Min Quantity: 
+                                        <button onclick="updateMinQty(-1)">-</button>
+                                        <input type="text" id="edit-minqty" value="${data.minqty}" />
+                                        <button onclick="updateMinQty(1)">+</button>
+                                    </p>
+                                    <p>Category: <select id="edit-category"></select></p>
+                                    <p>Subcategory: <select id="edit-subcategory"></select></p>
+                                    <p>Product Image URL: <input type="text" id="edit-productimage" value="${data.productimage}" /></p>
+                                    <button onclick="saveChanges(isNewItem)">Save Changes</button>
+                                    <button onclick="cancelChanges()">Cancel</button>
+                                </div>
+                            </div>
+                            </br></br></br>
+                        `;
+                        loadCategories();
+                        successSound.play(); // Play success sound
+                    } else {
+                        incrementQuantity(data.barcode);
+                        successSound.play(); // Play success sound
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
 
     function incrementQuantity(barcode) {
         fetch(`/increment_qty/${barcode}`, {
