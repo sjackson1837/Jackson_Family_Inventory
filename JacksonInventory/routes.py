@@ -13,6 +13,13 @@ import requests
 def home_page():
     return render_template('home.html')
 
+@app.route('/api/lookup/<upc>', methods=['GET'])
+def proxy_lookup(upc):
+    api_key = 'YOUR_API_KEY'
+    url = f'https://api.upcitemdb.com/prod/trial/lookup?upc={upc}&apikey={api_key}'
+    response = requests.get(url)
+    return jsonify(response.json())
+
 @app.route('/mainmenu', methods=['GET'])
 @login_required
 def mainmenu_page():

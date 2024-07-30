@@ -170,8 +170,7 @@ Add Inventory
 
     function checkBarcode() {
     const barcode = document.getElementById('barcode').value;
-    // const apiKey = 'YOUR_API_KEY'; // Replace with your actual API key
-    const url = `https://api.upcitemdb.com/prod/trial/lookup?upc=${barcode}`;
+    const url = `/api/lookup/${barcode}`;
 
     fetch(url)
         .then(response => response.json())
