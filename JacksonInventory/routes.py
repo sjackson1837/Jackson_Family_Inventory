@@ -18,6 +18,10 @@ def home_page():
 def mainmenu_page():
     selected_category = request.args.get('category')
     selected_subcategory = request.args.get('subcategory')
+    search_query = request.args.get('search')
+
+    # Trim the search query to remove leading and trailing spaces
+    search_query = search_query.strip() if search_query else None
 
     # Query to fetch all distinct categories for the sidebar
     category_query = text('''
@@ -29,41 +33,69 @@ def mainmenu_page():
     categories_result = db.session.execute(category_query)
     categories = categories_result.fetchall()
 
-    # Query to fetch subcategories based on the selected category
-    if selected_category:
-        subcategory_query = text('''
-        SELECT DISTINCT s.id, s.subcategory
-        FROM subcategory s
-        JOIN item i ON i.subcategory_id = s.id
-        JOIN category c ON i.category_id = c.id
-        WHERE c.category = :category
-        ORDER BY s.subcategory
-        ''')
-        subcategories_result = db.session.execute(subcategory_query, {'category': selected_category})
-        subcategories = subcategories_result.fetchall()
+    # Initialize subcategories
+    subcategories = []
 
-        # Query to fetch items based on the selected category and subcategory
+    # Convert search_query to lower case for case-insensitive comparison
+    search_query_lower = search_query.lower() if search_query else None
+
+    if search_query_lower and search_query_lower.strip():  # Check if search_query is not empty or just whitespace
+        # Query to fetch items based on the search query (case-insensitive)
         item_query = text('''
         SELECT c.category, s.subcategory, i.productimage, i.qty, i.minqty, i.productname, i.id as productid
         FROM item i
         JOIN category c ON i.category_id = c.id
         JOIN subcategory s ON i.subcategory_id = s.id
-        WHERE c.category = :category
-        AND (s.subcategory = :subcategory OR :subcategory IS NULL)
-        ORDER BY i.productname
-        ''')
-        items_result = db.session.execute(item_query, {'category': selected_category, 'subcategory': selected_subcategory})
-    else:
-        subcategories = []
-        # If no category is selected, show all items
-        item_query = text('''
-        SELECT c.category, s.subcategory, i.productimage, i.qty, i.minqty, i.productname, i.id as productid
-        FROM item i
-        JOIN category c ON i.category_id = c.id
-        JOIN subcategory s ON i.subcategory_id = s.id
+        WHERE LOWER(i.productname) LIKE :search_query
         ORDER BY c.category, i.productname
         ''')
-        items_result = db.session.execute(item_query)
+        items_result = db.session.execute(item_query, {
+            'search_query': f"%{search_query_lower}%"
+        })
+    else:
+        # No search query or just whitespace, so show all items
+        if selected_category:
+            # Query to fetch subcategories based on the selected category
+            subcategory_query = text('''
+            SELECT DISTINCT s.id, s.subcategory
+            FROM subcategory s
+            JOIN item i ON i.subcategory_id = s.id
+            JOIN category c ON i.category_id = c.id
+            WHERE c.category = :category
+            ORDER BY s.subcategory
+            ''')
+            subcategories_result = db.session.execute(subcategory_query, {'category': selected_category})
+            subcategories = subcategories_result.fetchall()
+
+            # Query to fetch items based on the selected category, subcategory, and optional search query (case-insensitive)
+            item_query = text('''
+            SELECT c.category, s.subcategory, i.productimage, i.qty, i.minqty, i.productname, i.id as productid
+            FROM item i
+            JOIN category c ON i.category_id = c.id
+            JOIN subcategory s ON i.subcategory_id = s.id
+            WHERE c.category = :category
+            AND (s.subcategory = :subcategory OR :subcategory IS NULL)
+            AND (LOWER(i.productname) LIKE :search_query OR :search_query IS NULL)
+            ORDER BY i.productname
+            ''')
+            items_result = db.session.execute(item_query, {
+                'category': selected_category,
+                'subcategory': selected_subcategory,
+                'search_query': f"%{search_query_lower}%" if search_query_lower else None
+            })
+        else:
+            # If no category is selected, show all items (case-insensitive)
+            item_query = text('''
+            SELECT c.category, s.subcategory, i.productimage, i.qty, i.minqty, i.productname, i.id as productid
+            FROM item i
+            JOIN category c ON i.category_id = c.id
+            JOIN subcategory s ON i.subcategory_id = s.id
+            WHERE LOWER(i.productname) LIKE :search_query OR :search_query IS NULL
+            ORDER BY c.category, i.productname
+            ''')
+            items_result = db.session.execute(item_query, {
+                'search_query': f"%{search_query_lower}%" if search_query_lower else None
+            })
 
     items = items_result.fetchall()
 
