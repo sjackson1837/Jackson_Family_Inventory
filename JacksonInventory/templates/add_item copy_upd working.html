@@ -5,14 +5,101 @@ Add Inventory
 {% endblock %}
 
 {% block content %}
+<style>
+    .main-content {
+        color: white;
+        max-width: 600px;
+        margin: 0 auto;
+        margin-top: 15px;
+    }
+
+    input::placeholder {
+        color: white;
+        opacity: 1;
+    }
+
+    .product-container {
+        display: flex;
+        flex-direction: column; /* Changed from row to column */
+        align-items: center;
+        margin-bottom: 20px;
+        background-color: #333; /* Optional: to differentiate container background */
+        padding: 20px;
+        border-radius: 8px;
+    }
+
+    .product-container img {
+        max-width: 150px; /* Adjust size as needed */
+        margin-bottom: 20px; /* Adjust margin to create space below the image */
+        border-radius: 8px; /* Optional: for rounded corners */
+    }
+
+    .product-details {
+        width: 100%;
+        text-align: center; /* Center align text */
+    }
+
+    .product-details p {
+        margin: 0;
+        padding: 5px 0;
+    }
+
+    .product-details input[type="text"] {
+        width: calc(100% - 60px); /* Adjust width to fit in container */
+    }
+
+.qty-container, .min-qty-container {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center align buttons and inputs */
+    gap: 20px; /* Add space between the qty and min-qty sections */
+}
+
+.qty-container input, .min-qty-container input {
+    width: 15px; /* Adjust width as needed */
+    text-align: center;
+}
+
+    .qty-container button, .min-qty-container button {
+        width: 30px; /* Width of the buttons */
+    }
+
+
+    .full-width {
+        width: 100%;
+    }
+
+    .full-width input {
+        width: 100%; /* Make the input span the full width */
+    }
+
+#edit-qty, #edit-minqty{
+    width: 100px; /* Set the width to 8px */
+    text-align: center; /* Center the text inside the input field */
+}
+
+    /* Media queries for iPhone 14 Max and smaller screens */
+@media (max-width: 695px) {
+
+    h1{
+        font-size: 12px;
+    }
+
+    .main-content {
+        margin-top: 3px;
+        padding-left: 15px; /* Ensure there is some padding */
+        padding-right: 10px; /* Ensure there is some padding */
+    }
+}
+</style>
+
 <div class="main-content">
     <h1>Add Inventory</h1>
-    <div style="width: 100%; max-width: 600px; margin: 0 auto; text-align: center;">
-        <input type="text" id="barcode" placeholder="Enter or scan barcode" oninput="delayedCheckBarcode()" />
+    <div style="width: 100%; text-align: center;">
+        <input class="input" type="text" id="barcode" placeholder="Enter or scan barcode" oninput="delayedCheckBarcode()" />
         <div id="result"></div>
     </div>
 </div>
-
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -82,57 +169,43 @@ Add Inventory
     }
 
     function checkBarcode() {
-        const barcode = document.getElementById('barcode').value;
-        fetch(`/check_barcode/${barcode}`)
-            .then(response => response.json())
-            .then(data => {
-                const resultDiv = document.getElementById('result');
-                if (data.error) {
-                    resultDiv.innerHTML = `<p>${data.error}</p>`;
-                    displayEmptyFields(barcode);
-                    errorSound.play(); // Play error sound
-                } else {
-                    if (data.isNew) {
-                        currentCategory = data.category;
-                        currentSubcategory = data.subcategory;
-                        isNewItem = data.isNew || false;
-
-                        document.getElementById('barcode').disabled = true;
-
-                        resultDiv.innerHTML = `
-                        </br>
-                            <p>Product Name: <input type="text" id="edit-productname" value="${data.productname}" /></p>
-                            <p>
-                                Quantity: 
-                                <button onclick="updateQty(-1)">-</button>
-                                <input type="text" id="edit-qty" value="${data.qty}" />
-                                <button onclick="updateQty(1)">+</button>
-                            </p>
-                            <p>
-                                Min Quantity: 
-                                <button onclick="updateMinQty(-1)">-</button>
-                                <input type="text" id="edit-minqty" value="${data.minqty}" />
-                                <button onclick="updateMinQty(1)">+</button>
-                            </p>
-                            <p>Category: <select id="edit-category"></select></p>
-                            <p>Subcategory: <select id="edit-subcategory"></select></p>
-                            <p>Product Image: <input type="text" id="edit-productimage" value="${data.productimage}" /></p>
-                            <img class="product-image" src="${data.productimage}" alt="Product Image" /></br></br></br>
-                            <button onclick="saveChanges(isNewItem)">Save Changes</button>
-                            <button onclick="cancelChanges()">Cancel</button>
-                        `;
-                        loadCategories();
-                        successSound.play(); // Play error sound
-                    } else {
-                        incrementQuantity(data.barcode);
-                        successSound.play(); // Play error sound
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    }
+    const barcode = document.getElementById('barcode').value;
+    
+    fetch(`/check_barcode/${barcode}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.found) {
+                incrementQuantity(barcode);
+                successSound.play();
+                document.getElementById('result').innerHTML = `<p>Item is increased by 1</p>`;
+            } else {
+                fetch(`/fetch_product_info/${barcode}`)
+                    .then(response => response.json())
+                    .then(apiData => {
+                        if (apiData.found) {
+                            const title = apiData.title;
+                            const image = apiData.image || 'https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg';
+                            displayEmptyFields(barcode);
+                            document.getElementById('edit-productname').value = title;
+                            document.querySelector('.product-container img').src = image;
+                        } else {
+                            document.getElementById('result').innerHTML = `<p>Barcode not found</p>`;
+                            errorSound.play();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching from API:', error);
+                        document.getElementById('result').innerHTML = `<p>Error fetching from API</p>`;
+                        errorSound.play();
+                    });
+            }
+        })
+        .catch(error => {
+            console.error('Error checking barcode:', error);
+            document.getElementById('result').innerHTML = `<p>Error checking barcode</p>`;
+            errorSound.play();
+        });
+}
 
     function incrementQuantity(barcode) {
         fetch(`/increment_qty/${barcode}`, {
@@ -168,25 +241,29 @@ Add Inventory
 
         const resultDiv = document.getElementById('result');
         resultDiv.innerHTML = `
-            <p>Product Name: <input type="text" id="edit-productname" value="" /></p>
-            <p>
-                Quantity: 
-                <button onclick="updateQty(-1)">-</button>
-                <input type="text" id="edit-qty" value="1" />
-                <button onclick="updateQty(1)">+</button>
-            </p>
-            <p>
-                Min Quantity: 
-                <button onclick="updateMinQty(-1)">-</button>
-                <input type="text" id="edit-minqty" value="1" />
-                <button onclick="updateMinQty(1)">+</button>
-            </p>
-            <p>Category: <select id="edit-category"></select></p>
-            <p>Subcategory: <select id="edit-subcategory"></select></p>
-            <p>Product Image: <input type="text" id="edit-productimage" value="https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg" /></p>
-            <img class="product-image" src="https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg" alt="Product Image" />
-            <button onclick="saveChanges(true)">Save Changes</button>
-            <button onclick="cancelChanges()">Cancel</button>
+            <div class="product-container">
+                <p class="full-width">Product Name: <input type="text" id="edit-productname" value="" /></p>
+                <img class="product-image" src="https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg" alt="Product Image" />
+                <div class="product-details">
+                    <p class="qty-container">
+                        Quantity: 
+                        <button onclick="updateQty(-1)">-</button>
+                        <input type="text" id="edit-qty" value="1" />
+                        <button onclick="updateQty(1)">+</button>
+                    </p>
+                    <p class="min-qty-container">
+                        Min Quantity: 
+                        <button onclick="updateMinQty(-1)">-</button>
+                        <input type="text" id="edit-minqty" value="1" />
+                        <button onclick="updateMinQty(1)">+</button>
+                    </p>
+                    <p>Category: <select id="edit-category"></select></p>
+                    <p>Subcategory: <select id="edit-subcategory"></select></p>
+                    <p>Product Image URL: <input type="text" id="edit-productimage" value="https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg" /></p>
+                    <button onclick="saveChanges(true)">Save Changes</button>
+                    <button onclick="cancelChanges()">Cancel</button>
+                </div>
+            </div>
         `;
         loadCategories();
     }

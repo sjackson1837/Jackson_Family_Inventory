@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Use Inventory
+{% endblock %}
+
+{% block content %}
+<style>
+    .main-content {
+        color: white;
+    }
+
+    input::placeholder{
+        color: white;
+        opacity: 1;
+    }
+</style>
+<div class="main-content">
+    <h1>Use Inventory</h1>
+</br>
+    <input type="text" id="barcode" placeholder="Enter or scan barcode" oninput="delayedCheckBarcode()" />
+    <div id="result"></div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('barcode').focus();
+    });
+
+    let barcodeTimeout;
+    const errorSound = new Audio('./static/sounds/negative.mp3');
+    const successSound = new Audio('./static/sounds/positive.mp3');
+
+    function delayedCheckBarcode() {
+        clearTimeout(barcodeTimeout);
+        barcodeTimeout = setTimeout(checkBarcode, 1500); // 1500 milliseconds = 1.5 seconds
+    }
+
+    function checkBarcode() {
+        const barcode = document.getElementById('barcode').value;
+        fetch(`/decrement_qty/${barcode}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const resultDiv = document.getElementById('result');
+            if (data.error) {
+                resultDiv.innerHTML = `<p style="color: red;">${data.error}</p>`;
+                document.getElementById('barcode').value = ''; // Clear the barcode field on error
+                errorSound.play(); // Play error sound
+            } else {
+                resultDiv.innerHTML = `<p style="color: green;">${data.message}</p>`;
+                document.getElementById('barcode').value = ''; // Clear the barcode field on success
+                successSound.play(); // Play success sound
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('barcode').value = ''; // Clear the barcode field on error
+            errorSound.play(); // Play error sound
+        });
+    }
+</script>
+{% endblock %}

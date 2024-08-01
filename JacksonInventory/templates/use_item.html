@@ -8,18 +8,94 @@ Use Inventory
 <style>
     .main-content {
         color: white;
+        max-width: 600px;
+        margin: 0 auto;
+        margin-top: 15px;
     }
 
-    input::placeholder{
+    input::placeholder {
         color: white;
         opacity: 1;
     }
+
+    .product-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 20px;
+        background-color: #333;
+        padding: 20px;
+        border-radius: 8px;
+    }
+
+    .product-container img {
+        max-width: 150px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+    }
+
+    .product-details {
+        width: 100%;
+        text-align: center;
+    }
+
+    .product-details p {
+        margin: 0;
+        padding: 5px 0;
+    }
+
+    .product-details input[type="text"] {
+        width: calc(100% - 60px);
+    }
+
+    .qty-container, .min-qty-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .qty-container input, .min-qty-container input {
+        width: 15px;
+        text-align: center;
+    }
+
+    .qty-container button, .min-qty-container button {
+        width: 30px;
+    }
+
+    .full-width {
+        width: 100%;
+    }
+
+    .full-width input {
+        width: 100%;
+    }
+
+    #edit-qty, #edit-minqty {
+        width: 100px;
+        text-align: center;
+    }
+
+    @media (max-width: 695px) {
+        h1 {
+            font-size: 12px;
+        }
+
+        .main-content {
+            margin-top: 3px;
+            padding-left: 15px;
+            padding-right: 10px;
+        }
+    }
 </style>
+
 <div class="main-content">
-    <h1>Use Inventory</h1>
-</br>
-    <input type="text" id="barcode" placeholder="Enter or scan barcode" oninput="delayedCheckBarcode()" />
-    <div id="result"></div>
+    <h1>Add Inventory</h1>
+    <div style="width: 100%; text-align: center;">
+        <input class="input" type="text" id="barcode" placeholder="Enter or scan barcode" oninput="delayedCheckBarcode()" />
+        <div id="result"></div>
+    </div>
 </div>
 
 <script>
@@ -27,41 +103,134 @@ Use Inventory
         document.getElementById('barcode').focus();
     });
 
+    let categories = {};
+    let subcategories = {};
+    let currentCategory = null;
+    let currentSubcategory = null;
+    let isNewItem = false;
     let barcodeTimeout;
     const errorSound = new Audio('./static/sounds/negative.mp3');
     const successSound = new Audio('./static/sounds/positive.mp3');
 
     function delayedCheckBarcode() {
         clearTimeout(barcodeTimeout);
-        barcodeTimeout = setTimeout(checkBarcode, 1500); // 1500 milliseconds = 1.5 seconds
+        barcodeTimeout = setTimeout(checkBarcode, 1500);
+    }
+
+    function loadCategories() {
+        fetch('/get_categories')
+            .then(response => response.json())
+            .then(data => {
+                categories = data.categories;
+                subcategories = data.subcategories;
+
+                const categorySelect = document.getElementById('edit-category');
+                categorySelect.innerHTML = '';
+
+                for (const category of categories) {
+                    const option = document.createElement('option');
+                    option.value = category.id;
+                    option.textContent = category.category;
+                    if (category.id == currentCategory) {
+                        option.selected = true;
+                    }
+                    categorySelect.appendChild(option);
+                }
+
+                categorySelect.addEventListener('change', updateSubcategories);
+                updateSubcategories();
+            })
+            .catch(error => {
+                console.error('Error loading categories:', error);
+            });
+    }
+
+    function updateSubcategories() {
+        const categorySelect = document.getElementById('edit-category');
+        const subcategorySelect = document.getElementById('edit-subcategory');
+        const selectedCategoryId = categorySelect.value;
+
+        subcategorySelect.innerHTML = '';
+
+        for (const subcategory of subcategories) {
+            if (subcategory.category_id == selectedCategoryId) {
+                const option = document.createElement('option');
+                option.value = subcategory.id;
+                option.textContent = subcategory.subcategory;
+                if (subcategory.id == currentSubcategory) {
+                    option.selected = true;
+                }
+                subcategorySelect.appendChild(option);
+            }
+        }
     }
 
     function checkBarcode() {
         const barcode = document.getElementById('barcode').value;
-        fetch(`/decrement_qty/${barcode}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            const resultDiv = document.getElementById('result');
-            if (data.error) {
-                resultDiv.innerHTML = `<p style="color: red;">${data.error}</p>`;
-                document.getElementById('barcode').value = ''; // Clear the barcode field on error
-                errorSound.play(); // Play error sound
-            } else {
-                resultDiv.innerHTML = `<p style="color: green;">${data.message}</p>`;
-                document.getElementById('barcode').value = ''; // Clear the barcode field on success
-                successSound.play(); // Play success sound
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            document.getElementById('barcode').value = ''; // Clear the barcode field on error
-            errorSound.play(); // Play error sound
-        });
+
+        fetch(`/check_barcode/${barcode}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.found) {
+                    decrementQuantity(barcode);
+                } else {
+                    displayBarcodeNotFoundMessage();
+                    errorSound.play();
+                }
+            })
+            .catch(error => {
+                console.error('Error checking barcode:', error);
+                displayBarcodeNotFoundMessage();
+                errorSound.play();
+            });
+    }
+
+    function decrementQuantity(barcode) {
+    fetch(`/decrement_qty/${barcode}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert(`Error: ${data.error}`);
+        } else {
+            const productname = data.productname;
+            const newQty = data.newQty;
+            successSound.play(); // Play sound first
+            // Wait for sound to finish, then show alert and reload the page
+            successSound.onended = function() {
+                alert(`${productname} is decreased by 1. New quantity: ${newQty}`);
+                reloadPage();
+            };
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+function reloadPage() {
+    // Clear barcode field and focus
+    document.getElementById('barcode').value = '';
+    document.getElementById('barcode').focus();
+    // Reload the page
+    location.reload();
+}
+
+function displayBarcodeNotFoundMessage() {
+    alert('Barcode not found');
+    // Optionally, you can reload the page after the alert is closed
+    location.reload();
+}
+
+
+
+    function displayBarcodeNotFoundMessage() {
+        alert('Barcode not found');
+        location.reload();
     }
 </script>
 {% endblock %}
