@@ -233,7 +233,6 @@
                 <a class="menu-item" href="{{ url_for('grocery_list') }}">Grocery List</a>
                 <a class="menu-item" href="{{ url_for('search_start') }}">Search</a>
                 <a class="menu-item" href="{{ url_for('logout_page') }}">Logout</a>
-                <a class="menu-item" href="{{ url_for('lookup') }}">LOOKUP</a>
             {% else %}
                 {% if request.endpoint != 'login_page' and request.endpoint != 'register_page' and request.endpoint != 'home_page' %}
                     <a class="menu-item" href="{{ url_for('login_page') }}">Log In</a>

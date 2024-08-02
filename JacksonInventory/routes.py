@@ -47,6 +47,7 @@ def mainmenu_page():
         JOIN category c ON i.category_id = c.id
         JOIN subcategory s ON i.subcategory_id = s.id
         WHERE LOWER(i.productname) LIKE :search_query
+        OR LOWER(i.barcode) LIKE :search_query
         ORDER BY c.category, i.productname
         ''')
         items_result = db.session.execute(item_query, {
@@ -75,7 +76,7 @@ def mainmenu_page():
             JOIN subcategory s ON i.subcategory_id = s.id
             WHERE c.category = :category
             AND (s.subcategory = :subcategory OR :subcategory IS NULL)
-            AND (LOWER(i.productname) LIKE :search_query OR :search_query IS NULL)
+            AND (LOWER(i.productname) LIKE :search_query OR LOWER(i.barcode) LIKE :search_query OR :search_query IS NULL)
             ORDER BY i.productname
             ''')
             items_result = db.session.execute(item_query, {
@@ -90,7 +91,7 @@ def mainmenu_page():
             FROM item i
             JOIN category c ON i.category_id = c.id
             JOIN subcategory s ON i.subcategory_id = s.id
-            WHERE LOWER(i.productname) LIKE :search_query OR :search_query IS NULL
+            WHERE LOWER(i.productname) LIKE :search_query OR LOWER(i.barcode) LIKE :search_query OR :search_query IS NULL
             ORDER BY c.category, i.productname
             ''')
             items_result = db.session.execute(item_query, {
@@ -252,7 +253,7 @@ def update_item(id):
     db.session.commit()
 
     # Redirect to the item view page or any other appropriate response
-    return redirect(url_for('items_page'))
+    return redirect(url_for('mainmenu_page'))
 
 
 
@@ -522,43 +523,6 @@ def check_barcode(barcode):
     else:
         return jsonify({'found': False})
 
-# @app.route('/check_barcode/<string:barcode>', methods=['GET'])
-# @login_required
-# def check_barcode(barcode):
-#     item = Item.query.filter_by(barcode=barcode).first()
-#     if item:
-#         return jsonify({
-#             'barcode': item.barcode,
-#             'productname': item.productname,
-#             'qty': item.qty,
-#             'minqty': item.minqty,
-#             'category': item.category_id,
-#             'subcategory': item.subcategory_id,
-#             'productimage': item.productimage
-#         })
-
-#     # If not found in the database, check Open Food Facts
-#     response = requests.get(f'https://world.openfoodfacts.org/api/v0/product/{barcode}.json')
-#     data = response.json()
-
-#     if data.get('status') == 1:
-#         product = data['product']
-#         productname = product.get('product_name', '')
-#         productimage = product.get('image_url', 'https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg')
-
-#         return jsonify({
-#             'barcode': barcode,
-#             'productname': productname,
-#             'qty': 1,
-#             'minqty': 1,
-#             'category': '',
-#             'subcategory': '',
-#             'productimage': productimage,
-#             'isNew': True
-#         })
-#     else:
-#         return jsonify({'error': 'Item not found in database or Open Food Facts.'}), 404
-
 
 @app.route('/updateitem/<string:barcode>', methods=['POST'])
 def updateitem(barcode):
@@ -625,22 +589,6 @@ def increment_qty(barcode):
         return jsonify({'error': 'Item not found'}), 404
 
 
-# @app.route('/increment_qty/<string:barcode>', methods=['POST'])
-# @login_required
-# def increment_qty(barcode):
-#     try:
-#         item = Item.query.filter_by(barcode=barcode).first()
-#         if not item:
-#             return jsonify({'error': 'Item not found in the database'}), 404
-
-#         item.qty += 1
-#         db.session.commit()
-#         flash(f'Product "{item.productname}" quantity updated to {item.qty}', 'success')
-#         return jsonify({'message': f'Product "{item.productname}" quantity updated to {item.qty}'})
-
-#     except Exception as e:
-#         db.session.rollback()
-#         return jsonify({'error': str(e)}), 500
 
 
 @app.route('/decrement_qty/<barcode>', methods=['POST'])
@@ -655,20 +603,6 @@ def decrement_qty(barcode):
         return jsonify({'error': 'Item not found'}), 404
 
 
-# @app.route('/decrement_qty/<string:barcode>', methods=['POST'])
-# def decrement_qty(barcode):
-#     try:
-#         item = Item.query.filter_by(barcode=barcode).first()
-#         if not item:
-#             return jsonify({'error': 'Item not found in the database'}), 404
-
-#         item.qty -= 1
-#         db.session.commit()
-#         return jsonify({'message': f'Product "{item.productname}" quantity updated to {item.qty}'})
-
-#     except Exception as e:
-#         db.session.rollback()
-#         return jsonify({'error': str(e)}), 500
 
 @app.route('/additem', methods=['POST'])
 def additem():

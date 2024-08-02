@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Item View
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .main-content {
+        color: white;
+        max-width: 600px;
+        margin: 0 auto;
+        margin-top: 15px;
+    }
+
+    input::placeholder {
+        color: white;
+        opacity: 1;
+    }
+
+    .product-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 20px;
+        background-color: #333;
+        padding: 20px;
+        border-radius: 8px;
+    }
+
+    .product-container img {
+        max-width: 150px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+    }
+
+    .product-details {
+        width: 100%;
+        text-align: center;
+    }
+
+    .product-details p {
+        margin: 0;
+        padding: 5px 0;
+    }
+
+    .product-details input[type="text"] {
+        width: calc(100% - 60px);
+    }
+
+    .qty-container, .min-qty-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .qty-container input, .min-qty-container input {
+        width: 15px;
+        text-align: center;
+    }
+
+    .qty-container button, .min-qty-container button {
+        width: 30px;
+    }
+
+    .full-width {
+        width: 100%;
+    }
+
+    .full-width input {
+        width: 100%;
+    }
+
+    #edit-qty, #edit-minqty {
+        width: 100px;
+        text-align: center;
+    }
+
+    @media (max-width: 695px) {
+        h1 {
+            font-size: 12px;
+        }
+
+        .main-content {
+            margin-top: 3px;
+            padding-left: 15px;
+            padding-right: 10px;
+        }
+    }
+</style>
+    <div class="main-content">
+    <div class="container">
+        <form action="{{ url_for('update_item', id=item[0]['productid']) }}" method="POST">
+            <div class="item-container">
+                <div class="item-image">
+                    <div class="image-wrapper">
+                        <img src="{{ item[0]['productimage'] }}" alt="Product Image">
+                    </div>
+                </div>
+                <div class="item-details">
+                    <textarea id="productname" name="productname" rows="2">{{ item[0]['productname'] }}</textarea>
+                    <div class="qty-controls">
+                        <span>Qty:</span>
+                        <button type="button" onclick="decrementQty()">-</button>
+                        <input type="text" id="qty" name="qty" value="{{ item[0]['qty'] }}" required>
+                        <button type="button" onclick="incrementQty()">+</button>
+                    </div>
+                    <div class="qty-controls">
+                        <span>Min Qty:</span>
+                        <button type="button" onclick="decrementMinQty()">-</button>
+                        <input type="text" id="minqty" name="minqty" value="{{ item[0]['minqty'] }}" required>
+                        <button type="button" onclick="incrementMinQty()">+</button>
+                    </div>
+                    <div>
+                        <label for="category">Category</label>
+                        <select id="category_id" name="category_id" required onchange="loadCategories()">
+                            {% for category in categories|sort(attribute='category') %}
+                            <option value="{{ category.id }}" {% if category.id == item[0]['categoryid'] %}selected{% endif %}>{{ category.category }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="subcategory">Sub Category</label>
+                        <select id="subcategory_id" name="subcategory_id" required>
+                            {% for subcategory in subcategories|sort(attribute='subcategory') %}
+                            <option value="{{ item[0]['subcategoryid'] }}" {% if subcategory.id==item[0]['subcategoryid'] %}selected{% endif %}>{{ subcategory.subcategory }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="submit-controls">
+                        <input type="submit" value="Update Item">
+                        <a href="{{ url_for('items_page') }}">Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    </div>
+    <script>
+        function incrementQty() {
+            const qtyInput = document.getElementById('qty');
+            let qtyValue = parseInt(qtyInput.value);
+            qtyValue = isNaN(qtyValue) ? 0 : qtyValue;
+            qtyInput.value = qtyValue + 1;
+        }
+
+        function decrementQty() {
+            const qtyInput = document.getElementById('qty');
+            let qtyValue = parseInt(qtyInput.value);
+            qtyValue = isNaN(qtyValue) ? 0 : qtyValue;
+            qtyInput.value = qtyValue > 0 ? qtyValue - 1 : 0;
+        }
+
+        function incrementMinQty() {
+            const qtyInput = document.getElementById('minqty');
+            let qtyValue = parseInt(qtyInput.value);
+            qtyValue = isNaN(qtyValue) ? 0 : qtyValue;
+            qtyInput.value = qtyValue + 1;
+        }
+
+        function decrementMinQty() {
+            const qtyInput = document.getElementById('minqty');
+            let qtyValue = parseInt(qtyInput.value);
+            qtyValue = isNaN(qtyValue) ? 0 : qtyValue;
+            qtyInput.value = qtyValue > 0 ? qtyValue - 1 : 0;
+        }
+
+        function loadCategories() {
+    const categorySelect = document.getElementById('category_id');
+    const selectedCategoryId = categorySelect.value;
+
+    fetch(`/get_categories/${selectedCategoryId}`)
+        .then(response => response.json())
+        .then(data => {
+            const subcategories = data.subcategories;
+            const subcategorySelect = document.getElementById('subcategory_id');
+            subcategorySelect.innerHTML = ''; // Clear the subcategory dropdown
+
+            subcategories.forEach(subcategory => {
+                const option = document.createElement('option');
+                option.value = subcategory.id;
+                option.textContent = subcategory.subcategory;
+                subcategorySelect.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading subcategories:', error);
+        });
+}
+
+
+    function updateSubcategories() {
+        const categorySelect = document.getElementById('edit-category');
+        const subcategorySelect = document.getElementById('edit-subcategory');
+        const selectedCategoryId = categorySelect.value;
+
+        subcategorySelect.innerHTML = '';
+
+        for (const subcategory of subcategories) {
+            if (subcategory.category_id == selectedCategoryId) {
+                const option = document.createElement('option');
+                option.value = subcategory.id;
+                option.textContent = subcategory.subcategory;
+                if (subcategory.id == currentSubcategory) {
+                    option.selected = true;
+                }
+                subcategorySelect.appendChild(option);
+            }
+        }
+    }
+
+
+    </script>
+
+{% endblock %}
