@@ -91,7 +91,7 @@ Item View
     }
 </style>
 
-<form method="POST" action="{{ url_for('update_item', id=item[0].productid) }}">
+<form id="itemForm" method="POST" action="{{ url_for('update_item', id=item[0].productid) }}">
     <div class="product-container">
         <p class="full-width">Product Name: <input type="text" name="productname" id="edit-productname" value="{{ item[0].productname }}" /></p>
         <img class="product-image" src="{{ item[0].productimage }}" alt="Product Image" />
@@ -157,6 +157,10 @@ Item View
         qtyValue = isNaN(qtyValue) ? 0 : qtyValue;
         qtyInput.value = qtyValue > 0 ? qtyValue - 1 : 0;
     }
+
+    function cancelChanges() {
+    window.location.href = "{{ url_for('mainmenu_page') }}"; // Redirect to mainmenu_page
+}
 
     function updateSubcategories() {
         const categorySelect = document.getElementById('edit-category');

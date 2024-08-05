@@ -307,6 +307,7 @@ def subcategories():
 @app.route('/fetch_product_info/<barcode>', methods=['GET'])
 def fetch_product_info(barcode):
     url = f'https://api.upcitemdb.com/prod/trial/lookup?upc={barcode}'
+    print(url)
     response = requests.get(url)
     
     if response.status_code == 200:
