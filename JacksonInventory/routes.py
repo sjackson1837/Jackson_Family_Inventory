@@ -321,7 +321,17 @@ def fetch_product_info(barcode):
         else:
             return jsonify({'found': False})
     else:
-        return jsonify({'found': False, 'error': 'Error fetching from API'}), 500
+        # return jsonify({'found': False, 'error': 'Error fetching from API'}), 500
+        try:
+            error_data = response.json()
+            error_code = error_data.get('code', 'UNKNOWN_ERROR')
+            error_message = error_data.get('message', 'Unknown error occurred.')
+        except ValueError:
+            error_code = 'UNKNOWN_ERROR'
+            error_message = 'Unknown error occurred.'
+        
+        return jsonify({'found': False, 'error_code': error_code, 'error_message': error_message}), response.status_code
+
 
 
 @app.route('/check_item', methods=['POST'])
