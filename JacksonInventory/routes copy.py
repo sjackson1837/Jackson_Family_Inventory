@@ -13,33 +13,6 @@ import requests
 def home_page():
     return render_template('home.html')
 
-@app.route('/lookup', methods=['GET'])
-def lookup():
-    upc = request.args.get('upc')
-    if not upc:
-        return jsonify({'error': 'UPC code is required'}), 400
-    
-    api_url = f'https://api.upcitemdb.com/prod/trial/lookup?upc={upc}'
-    response = requests.get(api_url)
-    data = response.json()
-    
-    if data['code'] == 'OK' and data['total'] > 0:
-        item = data['items'][0]
-        title = item['title']
-        highest_price = item['highest_recorded_price']
-        lowest_price = item['lowest_recorded_price']
-        image_url = item['images'][0] if item['images'] else 'https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg'
-
-        return jsonify({
-            'title': title,
-            'highest_price': highest_price,
-            'lowest_price': lowest_price,
-            'image_url': image_url
-        })
-    else:
-        return jsonify({'error': 'No data found for this UPC.'}), 404
-
-
 @app.route('/mainmenu', methods=['GET'])
 @login_required
 def mainmenu_page():
@@ -74,6 +47,7 @@ def mainmenu_page():
         JOIN category c ON i.category_id = c.id
         JOIN subcategory s ON i.subcategory_id = s.id
         WHERE LOWER(i.productname) LIKE :search_query
+        OR LOWER(i.barcode) LIKE :search_query
         ORDER BY c.category, i.productname
         ''')
         items_result = db.session.execute(item_query, {
@@ -102,7 +76,7 @@ def mainmenu_page():
             JOIN subcategory s ON i.subcategory_id = s.id
             WHERE c.category = :category
             AND (s.subcategory = :subcategory OR :subcategory IS NULL)
-            AND (LOWER(i.productname) LIKE :search_query OR :search_query IS NULL)
+            AND (LOWER(i.productname) LIKE :search_query OR LOWER(i.barcode) LIKE :search_query OR :search_query IS NULL)
             ORDER BY i.productname
             ''')
             items_result = db.session.execute(item_query, {
@@ -117,7 +91,7 @@ def mainmenu_page():
             FROM item i
             JOIN category c ON i.category_id = c.id
             JOIN subcategory s ON i.subcategory_id = s.id
-            WHERE LOWER(i.productname) LIKE :search_query OR :search_query IS NULL
+            WHERE LOWER(i.productname) LIKE :search_query OR LOWER(i.barcode) LIKE :search_query OR :search_query IS NULL
             ORDER BY c.category, i.productname
             ''')
             items_result = db.session.execute(item_query, {
@@ -279,54 +253,40 @@ def update_item(id):
     db.session.commit()
 
     # Redirect to the item view page or any other appropriate response
-    return redirect(url_for('items_page'))
+    return redirect(url_for('mainmenu_page'))
 
 
 
 @app.route('/add_item', methods=['GET'])
 def add_item_form():
-    barcode = request.args.get('barcode')
-    category_id = request.args.get('category_id')
+    barcode = request.args.get('barcode', '')
     categories = Category.query.order_by(Category.category).all()
     return render_template('add_item.html', barcode=barcode, categories=categories)
 
-@app.route('/update_item/<barcode>', methods=['POST'])
-def update_item(barcode):
-    try:
-        data = request.json
-        productname = data.get('productname')
-        qty = data.get('qty')
-        minqty = data.get('minqty')
-        productimage = data.get('productimage')
-        category_id = int(data.get('category_id'))
-        subcategory_id = int(data.get('subcategory_id'))
 
-        if not productimage:
-            raise ValueError("Missing field: productimage")
+@app.route('/add_item', methods=['POST'])
+def add_item():
+    barcode = request.form.get('barcode')
+    productname = request.form.get('productname')
+    qty = request.form.get('qty')
+    minqty = request.form.get('minqty')
+    productimage_input = request.form.get('productimage')
+    category_id = int(request.form.get('category_id', 0))  # Default to 0 if not provided
+    subcategory_id = int(request.form.get('subcategory_id', 0))  # Default to 0 if not provided
 
-        # Fetch existing item or create a new one
-        item = Item.query.filter_by(barcode=barcode).first()
-        if not item:
-            return jsonify({"error": "Item not found"}), 404
+    # Validate required fields
+    if not barcode or not productname or not qty or not minqty or not category_id:
+        return jsonify({'error': 'All required fields must be filled out'}), 400
 
-        # Update item attributes
-        item.productname = productname
-        item.qty = qty
-        item.minqty = minqty
-        item.productimage = productimage
-        item.category_id = category_id
-        item.subcategory_id = subcategory_id
+    # Create a new Item object and set its attributes
+    item = Item(barcode=barcode, productname=productname, qty=qty, minqty=minqty, productimage=productimage_input, category_id=category_id, subcategory_id=subcategory_id)
 
-        db.session.commit()
+    # Save the item to the database
+    db.session.add(item)
+    db.session.commit()
 
-        return jsonify({"message": "Item updated successfully!"})
-    except KeyError as e:
-        return jsonify({"error": f"Missing field: {str(e)}"}), 400
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 400
-    except Exception as e:
-        return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
-
+    # Return a success response or redirect to another page
+    return redirect(url_for("add_item_form", barcode=barcode))
 
 # Add the following route to handle the AJAX request for subcategories
 @app.route('/subcategories', methods=['POST'])
@@ -342,6 +302,36 @@ def subcategories():
 
     # Return the subcategories as JSON response
     return jsonify({'subcategories': subcategory_list})
+
+
+@app.route('/fetch_product_info/<barcode>', methods=['GET'])
+def fetch_product_info(barcode):
+    url = f'https://api.upcitemdb.com/prod/trial/lookup?upc={barcode}'
+    print(url)
+    response = requests.get(url)
+    
+    if response.status_code == 200:
+        data = response.json()
+        if 'items' in data and len(data['items']) > 0:
+            item = data['items'][0]
+            title = item.get('title', '')
+            images = item.get('images', [])
+            image = images[0] if images else ''
+            return jsonify({'found': True, 'title': title, 'image': image})
+        else:
+            return jsonify({'found': False})
+    else:
+        # return jsonify({'found': False, 'error': 'Error fetching from API'}), 500
+        try:
+            error_data = response.json()
+            error_code = error_data.get('code', 'UNKNOWN_ERROR')
+            error_message = error_data.get('message', 'Unknown error occurred.')
+        except ValueError:
+            error_code = 'UNKNOWN_ERROR'
+            error_message = 'Unknown error occurred.'
+        
+        return jsonify({'found': False, 'error_code': error_code, 'error_message': error_message}), response.status_code
+
 
 
 @app.route('/check_item', methods=['POST'])
@@ -363,6 +353,9 @@ def check_item():
         })
     else:
         return jsonify({'barcode_not_found': True})
+    
+
+
     
 @app.route('/grocery_list', methods=['GET'])
 @login_required
@@ -459,6 +452,41 @@ def search():
 def srjtest():
     return render_template('srjtest.html')
 
+@app.route('/lookup', methods=['GET'])
+def lookup():
+    upc = request.args.get('upc')
+    url = f"https://api.upcitemdb.com/prod/trial/lookup?upc={upc}"
+    #headers = {'user_key': API_KEY}
+    # response = requests.get(url, headers=headers)
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        if 'items' in data and data['items']:
+            item = data['items'][0]
+            result = {
+                'title': item.get('title', 'N/A'),
+                'image': item.get('images', [''])[0],
+                'price': item.get('lowest_recorded_price', 'N/A')
+            }
+            return jsonify(result)
+    return render_template('lookup.html')
+
+@app.route('/save', methods=['POST'])
+def save():
+    data = request.form
+    item = {
+        'barcode': data.get('barcode'),
+        'productname': data.get('productname'),
+        'qty': data.get('qty'),
+        'minqty': data.get('minqty'),
+        'productimage': data.get('productimage'),
+        'category_id': data.get('category_id'),
+        'subcategory_id': data.get('subcategory_id')
+    }
+    # Here you would save the item to the database
+    # For now, just print it to the console
+    print(item)
+    return redirect(url_for('index'))
 
 @app.route('/save_new_item', methods=['POST'])
 @login_required
@@ -497,43 +525,15 @@ def save_new_item():
 
     return jsonify({'message': 'New item saved successfully!'}), 201
 
-@app.route('/check_barcode/<string:barcode>', methods=['GET'])
+@app.route('/check_barcode/<barcode>', methods=['GET'])
+@login_required
 def check_barcode(barcode):
     item = Item.query.filter_by(barcode=barcode).first()
     if item:
-        return jsonify({
-            'barcode': item.barcode,
-            'productname': item.productname,
-            'qty': item.qty,
-            'minqty': item.minqty,
-            'category': item.category_id,
-            'subcategory': item.subcategory_id,
-            'productimage': item.productimage
-        })
-
-    # If not found in the database, check UPC Item DB
-    response = requests.get(f'https://api.upcitemdb.com/prod/trial/lookup?upc={barcode}')
-    data = response.json()
-
-    if data['code'] == 'OK' and data['total'] > 0:
-        product = data['items'][0]
-        productname = product.get('title', '')
-        productimage = product.get('images', ['https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg'])[0]
-
-        return jsonify({
-            'barcode': barcode,
-            'productname': productname,
-            'qty': 1,
-            'minqty': 1,
-            'category': '',
-            'subcategory': '',
-            'productimage': productimage,
-            'isNew': True
-        })
+        return jsonify({'found': True})
     else:
-        return jsonify({'error': 'Item not found in database or UPC Item DB.'}), 404
+        return jsonify({'found': False})
 
-from flask import request, jsonify, redirect, url_for
 
 @app.route('/updateitem/<string:barcode>', methods=['POST'])
 def updateitem(barcode):
@@ -589,23 +589,31 @@ def get_subcategories(category_id):
     return jsonify({'subcategories': subcategories_list})
 
 
-
-@app.route('/increment_qty/<string:barcode>', methods=['POST'])
-@login_required
+@app.route('/increment_qty/<barcode>', methods=['POST'])
 def increment_qty(barcode):
-    try:
-        item = Item.query.filter_by(barcode=barcode).first()
-        if not item:
-            return jsonify({'error': 'Item not found in the database'}), 404
-
+    item = Item.query.filter_by(barcode=barcode).first()
+    if item:
         item.qty += 1
         db.session.commit()
-        flash(f'Product "{item.productname}" quantity updated to {item.qty}', 'success')
-        return jsonify({'message': f'Producssst "{item.productname}" quantity updated to {item.qty}'})
+        return jsonify({'message': 'Item quantity increased by 1'})
+    else:
+        return jsonify({'error': 'Item not found'}), 404
 
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+
+
+
+@app.route('/decrement_qty/<barcode>', methods=['POST'])
+def decrement_qty(barcode):
+    print(barcode)
+    item = Item.query.filter_by(barcode=barcode).first()
+    if item:
+        item.qty -= 1
+        db.session.commit()
+        return jsonify({'message': f'Item quantity decreased by 1. New quantity: {item.qty}'})
+    else:
+        return jsonify({'error': 'Item not found'}), 404
+
+
 
 @app.route('/additem', methods=['POST'])
 def additem():
@@ -656,20 +664,6 @@ def base_new():
 def useitem():
     return render_template('use_item.html')
 
-@app.route('/decrement_qty/<string:barcode>', methods=['POST'])
-def decrement_qty(barcode):
-    try:
-        item = Item.query.filter_by(barcode=barcode).first()
-        if not item:
-            return jsonify({'error': 'Item not found in the database'}), 404
-
-        item.qty -= 1
-        db.session.commit()
-        return jsonify({'message': f'Producsadt "{item.productname}" quantity updated to {item.qty}'})
-
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

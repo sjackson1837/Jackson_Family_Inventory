@@ -310,6 +310,17 @@ def fetch_product_info(barcode):
     print(url)
     response = requests.get(url)
     
+    # Extract rate limit headers
+    rate_limit_limit = response.headers.get('X-RateLimit-Limit')
+    rate_limit_remaining = response.headers.get('X-RateLimit-Remaining')
+    rate_limit_reset = response.headers.get('X-RateLimit-Reset')
+
+    rate_limit_info = {
+        'rate_limit_limit': rate_limit_limit,
+        'rate_limit_remaining': rate_limit_remaining,
+        'rate_limit_reset': rate_limit_reset
+    }
+
     if response.status_code == 200:
         data = response.json()
         if 'items' in data and len(data['items']) > 0:
@@ -317,11 +328,11 @@ def fetch_product_info(barcode):
             title = item.get('title', '')
             images = item.get('images', [])
             image = images[0] if images else ''
-            return jsonify({'found': True, 'title': title, 'image': image})
+            print(rate_limit_info)
+            return jsonify({'found': True, 'title': title, 'image': image, **rate_limit_info})
         else:
-            return jsonify({'found': False})
+            return jsonify({'found': False, **rate_limit_info})
     else:
-        # return jsonify({'found': False, 'error': 'Error fetching from API'}), 500
         try:
             error_data = response.json()
             error_code = error_data.get('code', 'UNKNOWN_ERROR')
@@ -329,9 +340,8 @@ def fetch_product_info(barcode):
         except ValueError:
             error_code = 'UNKNOWN_ERROR'
             error_message = 'Unknown error occurred.'
-        
-        return jsonify({'found': False, 'error_code': error_code, 'error_message': error_message}), response.status_code
 
+        return jsonify({'found': False, 'error_code': error_code, 'error_message': error_message, **rate_limit_info}), response.status_code
 
 
 @app.route('/check_item', methods=['POST'])

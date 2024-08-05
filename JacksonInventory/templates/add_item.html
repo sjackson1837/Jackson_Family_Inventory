@@ -189,9 +189,34 @@ Add Inventory
                                 document.getElementById('edit-productname').value = title;
                                 document.querySelector('.product-container img').src = image;
                                 document.getElementById('edit-productimage').value = image;
+                                if (apiData.rate_limit_limit) {
+                                        console.log(`Rate Limit: ${apiData.rate_limit_limit}`);
+                                    }
+                                if (apiData.rate_limit_remaining) {
+                                        console.log(`Rate Limit Remaining: ${apiData.rate_limit_remaining}`);
+                                    }
+                                if (apiData.rate_limit_reset) {
+                                        const resetTime = new Date(apiData.rate_limit_reset * 1000);
+                                        console.log(`Rate Limit Reset Time: ${resetTime}`);
+                                    }
                             } else {
                                 displayEmptyFields(barcode);
                                 errorSound.play();
+
+                                // Log the error code, message, and rate limit information from the API response
+                                if (apiData.error_code) {
+                                        console.log(`Error Code: ${apiData.error_code}, Message: ${apiData.error_message}`);
+                                    }
+                                if (apiData.rate_limit_limit) {
+                                        console.log(`Rate Limit: ${apiData.rate_limit_limit}`);
+                                    }
+                                if (apiData.rate_limit_remaining) {
+                                        console.log(`Rate Limit Remaining: ${apiData.rate_limit_remaining}`);
+                                    }
+                                if (apiData.rate_limit_reset) {
+                                        const resetTime = new Date(apiData.rate_limit_reset * 1000);
+                                        console.log(`Rate Limit Reset Time: ${resetTime}`);
+                                    }
                             }
                         })
                         .catch(error => {
