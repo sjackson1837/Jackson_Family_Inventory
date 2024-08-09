@@ -229,9 +229,7 @@
                 <a class="menu-item" href="{{ url_for('mainmenu_page') }}">Main Menu</a>
                 <a class="menu-item" href="{{ url_for('add_item') }}">Add Item</a>
                 <a class="menu-item" href="{{ url_for('use_item') }}">Use Item</a>
-                <a class="menu-item" href="{{ url_for('items_page') }}">View Inv</a>
                 <a class="menu-item" href="{{ url_for('grocery_list') }}">Grocery List</a>
-                <a class="menu-item" href="{{ url_for('search_start') }}">Search</a>
                 <a class="menu-item" href="{{ url_for('logout_page') }}">Logout</a>
             {% else %}
                 {% if request.endpoint != 'login_page' and request.endpoint != 'register_page' and request.endpoint != 'home_page' %}
