@@ -606,24 +606,22 @@ def increment_qty(barcode):
     if item:
         item.qty += 1
         db.session.commit()
-        return jsonify({'message': 'Item quantity increased by 1'})
+        message = f'{item.productname} has been increased by 1.<br><br>New quantity: {item.qty}'
+        return jsonify({'message': message, 'productimage': item.productimage})
     else:
         return jsonify({'error': 'Item not found'}), 404
-
-
 
 
 @app.route('/decrement_qty/<barcode>', methods=['POST'])
 def decrement_qty(barcode):
-    print(barcode)
     item = Item.query.filter_by(barcode=barcode).first()
     if item:
         item.qty -= 1
         db.session.commit()
-        return jsonify({'message': f'Item quantity decreased by 1. New quantity: {item.qty}'})
+        message = f'{item.productname} has been decreased by 1.<br><br>New quantity: {item.qty}'
+        return jsonify({'message': message, 'productimage': item.productimage})
     else:
         return jsonify({'error': 'Item not found'}), 404
-
 
 
 @app.route('/additem', methods=['POST'])

@@ -20,23 +20,23 @@ Add Inventory
 
     .product-container {
         display: flex;
-        flex-direction: column; /* Changed from row to column */
+        flex-direction: column;
         align-items: center;
         margin-bottom: 20px;
-        background-color: #333; /* Optional: to differentiate container background */
+        background-color: #333;
         padding: 20px;
         border-radius: 8px;
     }
 
     .product-container img {
-        max-width: 150px; /* Adjust size as needed */
-        margin-bottom: 20px; /* Adjust margin to create space below the image */
-        border-radius: 8px; /* Optional: for rounded corners */
+        max-width: 150px;
+        margin-bottom: 20px;
+        border-radius: 8px;
     }
 
     .product-details {
         width: 100%;
-        text-align: center; /* Center align text */
+        text-align: center;
     }
 
     .product-details p {
@@ -45,52 +45,49 @@ Add Inventory
     }
 
     .product-details input[type="text"] {
-        width: calc(100% - 60px); /* Adjust width to fit in container */
+        width: calc(100% - 60px);
     }
 
-.qty-container, .min-qty-container {
-    display: flex;
-    align-items: center;
-    justify-content: center; /* Center align buttons and inputs */
-    gap: 20px; /* Add space between the qty and min-qty sections */
-}
+    .qty-container, .min-qty-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+    }
 
-.qty-container input, .min-qty-container input {
-    width: 15px; /* Adjust width as needed */
-    text-align: center;
-}
+    .qty-container input, .min-qty-container input {
+        width: 15px;
+        text-align: center;
+    }
 
     .qty-container button, .min-qty-container button {
-        width: 30px; /* Width of the buttons */
+        width: 30px;
     }
-
 
     .full-width {
         width: 100%;
     }
 
     .full-width input {
-        width: 100%; /* Make the input span the full width */
+        width: 100%;
     }
 
-#edit-qty, #edit-minqty{
-    width: 100px; /* Set the width to 8px */
-    text-align: center; /* Center the text inside the input field */
-}
-
-    /* Media queries for iPhone 14 Max and smaller screens */
-@media (max-width: 695px) {
-
-    h1{
-        font-size: 12px;
+    #edit-qty, #edit-minqty {
+        width: 100px;
+        text-align: center;
     }
 
-    .main-content {
-        margin-top: 3px;
-        padding-left: 15px; /* Ensure there is some padding */
-        padding-right: 10px; /* Ensure there is some padding */
+    @media (max-width: 695px) {
+        h1 {
+            font-size: 12px;
+        }
+
+        .main-content {
+            margin-top: 3px;
+            padding-left: 15px;
+            padding-right: 10px;
+        }
     }
-}
 </style>
 
 <div class="main-content">
@@ -117,7 +114,7 @@ Add Inventory
 
     function delayedCheckBarcode() {
         clearTimeout(barcodeTimeout);
-        barcodeTimeout = setTimeout(checkBarcode, 1500); // 1500 milliseconds = 1.5 seconds
+        barcodeTimeout = setTimeout(checkBarcode, 1500);
     }
 
     function loadCategories() {
@@ -170,59 +167,69 @@ Add Inventory
 
     function checkBarcode() {
         const barcode = document.getElementById('barcode').value;
+
         fetch(`/check_barcode/${barcode}`)
             .then(response => response.json())
             .then(data => {
-                const resultDiv = document.getElementById('result');
-                if (data.error) {
-                    resultDiv.innerHTML = `<p>${data.error}</p>`;
-                    displayEmptyFields(barcode);
-                    errorSound.play(); // Play error sound
+                if (data.found) {
+                    incrementQuantity(barcode);
+                    successSound.play();
+                    document.getElementById('result').innerHTML = `<p>Item is increased by 1</p>`;
                 } else {
-                    if (data.isNew) {
-                        currentCategory = data.category;
-                        currentSubcategory = data.subcategory;
-                        isNewItem = data.isNew || false;
+                    fetch(`/fetch_product_info/${barcode}`)
+                        .then(response => response.json())
+                        .then(apiData => {
+                            if (apiData.found) {
+                                const title = apiData.title;
+                                //const image = api.data.image;
+                                
+                                const image = apiData.image || 'https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg';
+                                console.log(image);
+                                displayEmptyFields(barcode);
+                                document.getElementById('edit-productname').value = title;
+                                document.querySelector('.product-container img').src = image;
+                                document.getElementById('edit-productimage').value = image;
+                                if (apiData.rate_limit_limit) {
+                                        console.log(`Rate Limit: ${apiData.rate_limit_limit}`);
+                                    }
+                                if (apiData.rate_limit_remaining) {
+                                        console.log(`Rate Limit Remaining: ${apiData.rate_limit_remaining}`);
+                                    }
+                                if (apiData.rate_limit_reset) {
+                                        const resetTime = new Date(apiData.rate_limit_reset * 1000);
+                                        console.log(`Rate Limit Reset Time: ${resetTime}`);
+                                    }
+                            } else {
+                                displayEmptyFields(barcode);
+                                errorSound.play();
 
-                        document.getElementById('barcode').disabled = true;
-
-                        resultDiv.innerHTML = `
-                            </br>
-                            <div class="product-container">
-                                <p class="full-width">Product Name: <input type="text" id="edit-productname" value="${data.productname}" /></p>
-                                <img class="product-image" src="${data.productimage}" alt="Product Image" />
-                                <div class="product-details">
-                                    <p class="qty-container">
-                                        Quantity: 
-                                        <button onclick="updateQty(-1)">-</button>
-                                        <input type="text" id="edit-qty" value="${data.qty}" />
-                                        <button onclick="updateQty(1)">+</button>
-                                    </p>
-                                    <p class="min-qty-container">
-                                        Min Quantity: 
-                                        <button onclick="updateMinQty(-1)">-</button>
-                                        <input type="text" id="edit-minqty" value="${data.minqty}" />
-                                        <button onclick="updateMinQty(1)">+</button>
-                                    </p>
-                                    <p>Category: <select id="edit-category"></select></p>
-                                    <p>Subcategory: <select id="edit-subcategory"></select></p>
-                                    <p>Product Image URL: <input type="text" id="edit-productimage" value="${data.productimage}" /></p>
-                                    <button onclick="saveChanges(isNewItem)">Save Changes</button>
-                                    <button onclick="cancelChanges()">Cancel</button>
-                                </div>
-                            </div>
-                            </br></br></br>
-                        `;
-                        loadCategories();
-                        successSound.play(); // Play success sound
-                    } else {
-                        incrementQuantity(data.barcode);
-                        successSound.play(); // Play success sound
-                    }
+                                // Log the error code, message, and rate limit information from the API response
+                                if (apiData.error_code) {
+                                        console.log(`Error Code: ${apiData.error_code}, Message: ${apiData.error_message}`);
+                                    }
+                                if (apiData.rate_limit_limit) {
+                                        console.log(`Rate Limit: ${apiData.rate_limit_limit}`);
+                                    }
+                                if (apiData.rate_limit_remaining) {
+                                        console.log(`Rate Limit Remaining: ${apiData.rate_limit_remaining}`);
+                                    }
+                                if (apiData.rate_limit_reset) {
+                                        const resetTime = new Date(apiData.rate_limit_reset * 1000);
+                                        console.log(`Rate Limit Reset Time: ${resetTime}`);
+                                    }
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching from API:', error);
+                            displayEmptyFields(barcode);
+                            errorSound.play();
+                        });
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
+                console.error('Error checking barcode:', error);
+                displayEmptyFields(barcode);
+                errorSound.play();
             });
     }
 

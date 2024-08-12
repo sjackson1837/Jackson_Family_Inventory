@@ -153,23 +153,23 @@ def logout_page():
 
 
 
-@app.route('/items')
-@login_required
-def items_page():
-    query = text('''
-    SELECT c.id, c.category, COUNT(i.category_id) AS product_count
-    FROM category c
-    LEFT JOIN item i ON i.category_id = c.id
-    GROUP BY c.id, c.category
-    ORDER BY c.category
-    ''')
-    result = db.session.execute(query)
-    categories = result.fetchall()
+# @app.route('/items')
+# @login_required
+# def items_page():
+#     query = text('''
+#     SELECT c.id, c.category, COUNT(i.category_id) AS product_count
+#     FROM category c
+#     LEFT JOIN item i ON i.category_id = c.id
+#     GROUP BY c.id, c.category
+#     ORDER BY c.category
+#     ''')
+#     result = db.session.execute(query)
+#     categories = result.fetchall()
 
-    # Retrieve the total product count
-    total_product_count = db.session.query(func.count()).select_from(Item).scalar()
+#     # Retrieve the total product count
+#     total_product_count = db.session.query(func.count()).select_from(Item).scalar()
 
-    return render_template('items.html', categories=categories, total_product_count=total_product_count)
+#     return render_template('items.html', categories=categories, total_product_count=total_product_count)
 
 @app.route('/category/<int:id>')
 @login_required
@@ -240,6 +240,8 @@ def update_item(id):
     print(updated_category_id)
     updated_subcategory_id = request.form.get('subcategory_id')
     print(updated_subcategory_id)
+    updated_image_url = request.form.get('productimage')
+    print(updated_image_url)
 
     # Update the item in the database
     item = Item.query.get(id)
@@ -249,13 +251,12 @@ def update_item(id):
     item.category_id = updated_category_id
     print(updated_category_id)
     item.subcategory_id = updated_subcategory_id
+    item.productimage = updated_image_url
 
     db.session.commit()
 
     # Redirect to the item view page or any other appropriate response
     return redirect(url_for('mainmenu_page'))
-
-
 
 @app.route('/add_item', methods=['GET'])
 def add_item_form():
@@ -310,6 +311,17 @@ def fetch_product_info(barcode):
     print(url)
     response = requests.get(url)
     
+    # Extract rate limit headers
+    rate_limit_limit = response.headers.get('X-RateLimit-Limit')
+    rate_limit_remaining = response.headers.get('X-RateLimit-Remaining')
+    rate_limit_reset = response.headers.get('X-RateLimit-Reset')
+
+    rate_limit_info = {
+        'rate_limit_limit': rate_limit_limit,
+        'rate_limit_remaining': rate_limit_remaining,
+        'rate_limit_reset': rate_limit_reset
+    }
+
     if response.status_code == 200:
         data = response.json()
         if 'items' in data and len(data['items']) > 0:
@@ -317,11 +329,11 @@ def fetch_product_info(barcode):
             title = item.get('title', '')
             images = item.get('images', [])
             image = images[0] if images else ''
-            return jsonify({'found': True, 'title': title, 'image': image})
+            print(rate_limit_info)
+            return jsonify({'found': True, 'title': title, 'image': image, **rate_limit_info})
         else:
-            return jsonify({'found': False})
+            return jsonify({'found': False, **rate_limit_info})
     else:
-        # return jsonify({'found': False, 'error': 'Error fetching from API'}), 500
         try:
             error_data = response.json()
             error_code = error_data.get('code', 'UNKNOWN_ERROR')
@@ -329,9 +341,8 @@ def fetch_product_info(barcode):
         except ValueError:
             error_code = 'UNKNOWN_ERROR'
             error_message = 'Unknown error occurred.'
-        
-        return jsonify({'found': False, 'error_code': error_code, 'error_message': error_message}), response.status_code
 
+        return jsonify({'found': False, 'error_code': error_code, 'error_message': error_message, **rate_limit_info}), response.status_code
 
 
 @app.route('/check_item', methods=['POST'])
@@ -427,30 +438,30 @@ def base():
     form = SearchForm()
     return dict(form=form)
 
-@app.route('/search_start')
-@login_required
-def search_start():
-    return render_template('search_start.html')
+# @app.route('/search_start')
+# @login_required
+# def search_start():
+#     return render_template('search_start.html')
 
-@app.route('/search', methods=['GET', 'POST'])
-@login_required
-def search():
-    form = SearchForm()
-    items = Item.query
-    if form.validate_on_submit():
-        # Get data from submitted form
-        searched = form.searched.data.lower()  # Convert to lowercase
+# @app.route('/search', methods=['GET', 'POST'])
+# @login_required
+# def search():
+#     form = SearchForm()
+#     items = Item.query
+#     if form.validate_on_submit():
+#         # Get data from submitted form
+#         searched = form.searched.data.lower()  # Convert to lowercase
         
-        # Query the Database, convert column values to lowercase for case-insensitive search
-        items = items.filter(func.lower(Item.productname).like('%' + searched + '%'))
-        items = items.order_by(Item.barcode).all()
-        return render_template("search.html", form=form, searched=searched, items=items)
+#         # Query the Database, convert column values to lowercase for case-insensitive search
+#         items = items.filter(func.lower(Item.productname).like('%' + searched + '%'))
+#         items = items.order_by(Item.barcode).all()
+#         return render_template("search.html", form=form, searched=searched, items=items)
     
 
-@app.route('/srjtest')
-@login_required
-def srjtest():
-    return render_template('srjtest.html')
+# @app.route('/srjtest')
+# @login_required
+# def srjtest():
+#     return render_template('srjtest.html')
 
 @app.route('/lookup', methods=['GET'])
 def lookup():
@@ -604,15 +615,13 @@ def increment_qty(barcode):
 
 @app.route('/decrement_qty/<barcode>', methods=['POST'])
 def decrement_qty(barcode):
-    print(barcode)
     item = Item.query.filter_by(barcode=barcode).first()
     if item:
         item.qty -= 1
         db.session.commit()
-        return jsonify({'message': f'Item quantity decreased by 1. New quantity: {item.qty}'})
+        return jsonify({'message': f'{item.productname} has been decreased by 1. New quantity: {item.qty}'})
     else:
         return jsonify({'error': 'Item not found'}), 404
-
 
 
 @app.route('/additem', methods=['POST'])
