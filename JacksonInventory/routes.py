@@ -151,26 +151,6 @@ def logout_page():
     return redirect(url_for("home_page"))
 
 
-
-
-# @app.route('/items')
-# @login_required
-# def items_page():
-#     query = text('''
-#     SELECT c.id, c.category, COUNT(i.category_id) AS product_count
-#     FROM category c
-#     LEFT JOIN item i ON i.category_id = c.id
-#     GROUP BY c.id, c.category
-#     ORDER BY c.category
-#     ''')
-#     result = db.session.execute(query)
-#     categories = result.fetchall()
-
-#     # Retrieve the total product count
-#     total_product_count = db.session.query(func.count()).select_from(Item).scalar()
-
-#     return render_template('items.html', categories=categories, total_product_count=total_product_count)
-
 @app.route('/category/<int:id>')
 @login_required
 def category_page(id):
@@ -672,6 +652,17 @@ def base_new():
 @app.route('/useitem')
 def useitem():
     return render_template('use_item.html')
+
+@app.route('/api', methods=['GET'])
+def api():
+    barcode = request.args.get('barcode')
+    # Fetch product data from your API using the barcode
+    #product_data = fetch_product_data(barcode)  # Implement this function
+    return render_template('api.html')
+
+# def fetch_product_data(barcode):
+#     # Implement API call to fetch product data
+#     pass
 
 
 if __name__ == '__main__':

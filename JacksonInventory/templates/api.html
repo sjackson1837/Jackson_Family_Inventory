@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcode Scanner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        #scanner-container {
+            margin: 20px auto;
+            width: 80%;
+        }
+
+        #qr-reader {
+            border: 1px solid #ccc;
+            margin-top: 20px;
+            height: 400px;
+        }
+    </style>
+    <!-- Load the Html5Qrcode library -->
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+</head>
+<body>
+    <h1>Barcode Scanner</h1>
+    <div id="scanner-container">
+        <button id="start-scanning">Start Scanning</button>
+        <div id="qr-reader"></div>
+    </div>
+
+    <script>
+        document.getElementById('start-scanning').addEventListener('click', function() {
+            console.log("Button clicked: Starting scanning...");
+
+            if (typeof Html5Qrcode === 'undefined') {
+                console.error("Html5Qrcode library is not loaded.");
+                return;
+            }
+
+            const html5QrCode = new Html5Qrcode("qr-reader");
+
+            html5QrCode.start(
+                { facingMode: "environment" }, 
+                {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 }
+                },
+                qrCodeMessage => {
+                    alert(`Scanned Barcode: ${qrCodeMessage}`);
+                    html5QrCode.stop();
+                },
+                errorMessage => {
+                    console.error('Error scanning:', errorMessage);
+                }
+            ).catch(err => {
+                console.error('Failed to start scanning:', err);
+            });
+        });
+    </script>
+</body>
+</html>

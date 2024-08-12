@@ -103,7 +103,7 @@
 
     @media (max-width: 695px) {
         header h1{
-            font-size: 20px;
+            font-size: 15px;
         }
 
         .sidebar {
@@ -119,6 +119,7 @@
         display: none; /* Hide menu by default on smaller screens */
         flex-direction: column; /* Stack menu items vertically */
         width: 100%; /* Full width */
+        margin-left: 5px;
     }
 
     .menu-item {
@@ -231,6 +232,7 @@
                 <a class="menu-item" href="{{ url_for('add_item') }}">Add Item</a>
                 <a class="menu-item" href="{{ url_for('use_item') }}">Use Item</a>
                 <a class="menu-item" href="{{ url_for('grocery_list') }}">Grocery List</a>
+                <a class="menu-item" href="{{ url_for('api') }}">API</a>
                 <a class="menu-item" href="{{ url_for('logout_page') }}">Logout</a>
             {% else %}
                 {% if request.endpoint != 'login_page' and request.endpoint != 'register_page' and request.endpoint != 'home_page' %}
