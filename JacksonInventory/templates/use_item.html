@@ -195,7 +195,10 @@ Use Inventory
     .then(response => response.json())
     .then(data => {
         if (data.error) {
-            swal("Error", data.error, "error");
+            swal("Error", data.error, "error")
+            .then(() => {
+                location.reload(); // Reload the page after the user clicks OK
+            });
         } else {
             const message = data.message;
             const productimage = data.productimage;
@@ -216,8 +219,8 @@ Use Inventory
                 messageText.innerHTML = message;
 
                 content.appendChild(image);
-                content.appendChild(document.createElement('br'));
-                content.appendChild(document.createElement('br'));
+                content.appendChild(document.createElement('br')); // line break
+                content.appendChild(document.createElement('br')); // line break
                 content.appendChild(messageText);
 
                 swal({
@@ -233,7 +236,7 @@ Use Inventory
                         }
                     }
                 }).then(() => {
-                    reloadPage();
+                    location.reload(); // Reload the page after the user clicks OK
                 });
             };
 
@@ -241,10 +244,12 @@ Use Inventory
             setTimeout(() => {
                 if (!successSound.played.length) {
                     console.warn("Sound did not play, showing swal anyway...");
-                    swal("Item Updated", message, "success");
-                    // reloadPage();
+                    swal("Item Updated", message, "success")
+                    .then(() => {
+                        location.reload(); // Reload the page after the user clicks OK
+                    });
                 }
-            }, 1000);  // 2-second timeout for testing fallback
+            }, 2000);  // 2-second timeout for testing fallback
         }
     })
     .catch(error => {
