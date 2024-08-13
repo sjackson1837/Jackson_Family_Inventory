@@ -256,20 +256,27 @@ Add Inventory
             successSound.onended = function() {
                 console.log("Sound ended, displaying swal...");
 
+                // Create the content container
                 const content = document.createElement('div');
+                
+                // Create and style the image element
                 const image = document.createElement('img');
                 image.src = productimage;
                 image.alt = 'Product Image';
                 image.style.width = '100px';
+                image.style.display = 'block'; // Ensure the image is displayed as a block element
+                image.style.margin = '0 auto'; // Center the image
                 
+                // Create and style the message text
                 const messageText = document.createElement('p');
                 messageText.innerHTML = message;
-
+                messageText.style.marginTop = '15px'; // Add spacing between image and text
+                
+                // Append elements to the content container
                 content.appendChild(image);
-                content.appendChild(document.createElement('br')); // line break
-                content.appendChild(document.createElement('br')); // line break
                 content.appendChild(messageText);
 
+                // Show the SweetAlert with the custom content
                 swal({
                     title: "Item Updated",
                     content: content, // Use content instead of html
@@ -303,6 +310,7 @@ Add Inventory
         console.error('Error:', error);
     });
 }
+
 
     function reloadPage() {
         location.reload();
