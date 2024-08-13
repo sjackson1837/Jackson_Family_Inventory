@@ -200,9 +200,12 @@ Use Inventory
             const message = data.message;
             const productimage = data.productimage;
 
+            console.log("Playing success sound...");
             successSound.play(); // Play sound first
+            
             successSound.onended = function() {
-                // Create custom content for SweetAlert
+                console.log("Sound ended, displaying swal...");
+
                 const content = document.createElement('div');
                 const image = document.createElement('img');
                 image.src = productimage;
@@ -212,10 +215,9 @@ Use Inventory
                 const messageText = document.createElement('p');
                 messageText.innerHTML = message;
 
-                // Append image and message to content
                 content.appendChild(image);
-                content.appendChild(document.createElement('br')); // line break
-                content.appendChild(document.createElement('br')); // line break
+                content.appendChild(document.createElement('br'));
+                content.appendChild(document.createElement('br'));
                 content.appendChild(messageText);
 
                 swal({
@@ -234,6 +236,15 @@ Use Inventory
                     reloadPage();
                 });
             };
+
+            // For testing, if sound doesn't play, immediately show swal
+            setTimeout(() => {
+                if (!successSound.played.length) {
+                    console.warn("Sound did not play, showing swal anyway...");
+                    swal("Item Updated", message, "success");
+                    reloadPage();
+                }
+            }, 1000);  // 2-second timeout for testing fallback
         }
     })
     .catch(error => {

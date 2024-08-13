@@ -289,8 +289,9 @@ Add Inventory
                 if (!successSound.played.length) {
                     console.warn("Sound did not play, showing swal anyway...");
                     swal("Item Updated", message, "success");
+                    reloadPage();
                 }
-            }, 2000);  // 2-second timeout for testing fallback
+            }, 1000);  // 2-second timeout for testing fallback
         }
     })
     .catch(error => {
