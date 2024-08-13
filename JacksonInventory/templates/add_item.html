@@ -233,23 +233,26 @@ Add Inventory
     }
 
     function incrementQuantity(barcode) {
-        fetch(`/increment_qty/${barcode}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                swal("Error", data.error, "error");
-            } else {
+    fetch(`/increment_qty/${barcode}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            swal("Error", data.error, "error");
+        } else {
             const message = data.message;
             const productimage = data.productimage;
 
+            console.log("Playing success sound...");
             successSound.play(); // Play sound first
+            
             successSound.onended = function() {
-                // Create custom content for SweetAlert
+                console.log("Sound ended, displaying swal...");
+
                 const content = document.createElement('div');
                 const image = document.createElement('img');
                 image.src = productimage;
@@ -259,15 +262,14 @@ Add Inventory
                 const messageText = document.createElement('p');
                 messageText.innerHTML = message;
 
-                // Append image and message to content
                 content.appendChild(image);
-                content.appendChild(document.createElement('br')); // line break
-                content.appendChild(document.createElement('br')); // line break
+                content.appendChild(document.createElement('br'));
+                content.appendChild(document.createElement('br'));
                 content.appendChild(messageText);
 
                 swal({
                     title: "Item Updated",
-                    content: content, // Use content instead of html
+                    content: content,
                     icon: "success",
                     buttons: {
                         confirm: {
@@ -281,12 +283,21 @@ Add Inventory
                     reloadPage();
                 });
             };
+
+            // For testing, if sound doesn't play, immediately show swal
+            setTimeout(() => {
+                if (!successSound.played.length) {
+                    console.warn("Sound did not play, showing swal anyway...");
+                    swal("Item Updated", message, "success");
+                }
+            }, 2000);  // 2-second timeout for testing fallback
         }
     })
     .catch(error => {
         console.error('Error:', error);
     });
 }
+
 
     function reloadPage() {
         location.reload();
